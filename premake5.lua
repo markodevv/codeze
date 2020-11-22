@@ -2,7 +2,12 @@ workspace "codeze"
 
 configurations {"Debug", "Release"}
 
+include "third_party/glfw/"
+include "third_party/glad/"
 
+IncludeDir = {}
+IncludeDir["glfw"] = "third_party/glfw/include"
+IncludeDir["glad"] = "third_party/glad/include"
 
 project "codeze"
 
@@ -12,13 +17,21 @@ project "codeze"
 
 	files {"code/**.c", "code/**.h"}
 
+	includedirs {
+	   "%{IncludeDir.glfw}",
+	   "%{IncludeDir.glad}"
+	}
+
 	targetdir "bin/"
 	objdir "bin/"
 
+	defines {
+	   "GLFW_INCLUDE_NONE"
+	}
 
 	filter "system:windows"
 
-	    links {"opengl32.lib"}
+	    links {"glad", "glfw", "opengl32.lib"}
 
 		defines {
 		   "WINDOWS_PLATFORM"
@@ -27,9 +40,10 @@ project "codeze"
 
 	filter "system:linux"
 
---		buildoptions {"-g", "-fPIC"}
+	buildoptions {"-g", "-fPIC"}
 
---		linkoptions {"-ldl", "-lGL", "-pthread"}
+	    links {"glad", "glfw"}
+		linkoptions {"-ldl", "-lGL", "-pthread"}
 
 		defines {
 		   "LINUX_PLATFORM"

@@ -1,7 +1,7 @@
 # Project stuff
 .clangd/
 .vscode/
-codeditor.make
+*.make
 *.vcxproj
 *.vcxproj*
 *.vcxproj.filters
