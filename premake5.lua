@@ -40,10 +40,9 @@ project "codeze"
 
 	filter "system:linux"
 
-	buildoptions {"-g", "-fPIC"}
+	    buildoptions {"-g", "-fPIC"}
 
-	    links {"glad", "glfw"}
-		linkoptions {"-ldl", "-lGL", "-pthread"}
+	    links {"glad", "glfw", "GL",  "dl", "pthread", "m"}
 
 		defines {
 		   "LINUX_PLATFORM"

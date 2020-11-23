@@ -1,0 +1,20 @@
+#version 330 core
+
+out vec4 color;
+
+in vec2 vTexCoords;
+in float vTexIndex;
+in vec4 vColor;
+
+uniform sampler2D uFontTexture;
+uniform sampler2D uWhiteTexture;
+
+void main() {
+	color = vColor;
+	if (vTexIndex == 0.0f) {
+		color *= vec4(1.0, 1.0, 1.0, texture(uFontTexture, vTexCoords).r);
+	}
+	else {
+		color *= texture(uWhiteTexture, vTexCoords);
+	}
+}
