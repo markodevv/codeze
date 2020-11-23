@@ -1,4 +1,3 @@
-#include "codeze.h"
 #include "renderer.h"
 #include "event.h"
 #include "debug.h"
@@ -26,8 +25,14 @@ int main() {
 
 
 	Vec2 pos = {};
+	Vec2 pos1 = {100.0f, 100.0f};
+	Vec2 pos2 = {200.0f, 200.0f};
+	Vec2 pos3 = {300.0f, 300.0f};
+	Vec2 pos4 = {400.0f, 400.0f};
 	Vec2 size = {100.0f, 100.0f};
-	Vec4 color = {0.0f, 1.0f, 1.0f, 1.0f};
+	Vec4 color = {1.0f, 1.0f, 1.0f, 1.0f};
+	Vec4 color1 = {1.0f, 1.0f, 0.0f, 1.0f};
+	Vec4 color2 = {0.0f, 1.0f, 0.0f, 1.0f};
 
 
 
@@ -44,12 +49,16 @@ int main() {
 		renderer_begin(renderer);
 
 		render_quad(renderer, pos, size, color);
+		render_quad(renderer, pos1, size, color1);
+		render_textured_quad(renderer, pos2, size, WHITE_TEXTURE_INDEX);
+		render_textured_quad(renderer, pos3, size, GREEN_TEXTURE_INDEX);
+		render_textured_quad(renderer, pos4, size, GREEN_TEXTURE_INDEX);
 
 		renderer_end(renderer);
 
 		glfwSwapBuffers(editor->window);
 
-		glfwPollEvents();
+		glfwWaitEvents();
 
 	}
 

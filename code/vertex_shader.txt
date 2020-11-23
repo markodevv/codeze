@@ -2,10 +2,10 @@
 
 layout (location = 0) in vec4 aPosData;
 layout (location = 1) in vec4 aColor;
-layout (location = 2) in float aTexIndex;
+layout (location = 2) in int aTexIndex;
 
 out vec2 vTexCoords;
-out float vTexIndex;
+flat out int vTexIndex;
 out vec4 vColor;
 
 uniform mat4 uProjection;

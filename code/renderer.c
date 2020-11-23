@@ -7,6 +7,7 @@
 
 #define MAX_VERTICES 100000
 #define VERTICES_PER_QUAD 6
+#define TEXTURE_SLOTS 2
 
 static void
 error_callback(int code, const char* description) {
@@ -55,6 +56,39 @@ renderer_create_window() {
 
 }
 
+static void
+texture_load(const char* path, u32* texID, u8 slot) {
+
+	
+	glActiveTexture(GL_TEXTURE0 + slot);
+
+	i32 w, h, channels, internalFormat, dataFormat;
+	u8* buffer = image_load_png(path, &w, &h, &channels);
+	ASSERT(buffer != NULL);
+
+	if (channels == 4) {
+		internalFormat = GL_RGBA8;
+		dataFormat = GL_RGBA;
+	}
+	else if (channels == 3) {
+		internalFormat = GL_RGB8;
+		dataFormat = GL_RGB;
+	}
+
+
+	glGenTextures(1, texID);
+	glBindTexture(GL_TEXTURE_2D, *texID);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, dataFormat, GL_UNSIGNED_BYTE, buffer);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+
+	image_free(buffer);
+}
 
 void
 renderer_initialize(Renderer* ren, f32 width, f32 height) {
@@ -69,7 +103,6 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 	File* fragmentFile = file_open("code/fragment_shader.txt", "r");
 
 	ren->program = shader_create(vertexFile->buffer, fragmentFile->buffer);
-
 	
 	glUseProgram(ren->program);
 
@@ -89,34 +122,22 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 
 	ortho(ren->projection, 0.0f, width, height, 0.0f);
 
-	glActiveTexture(GL_TEXTURE1);
+	texture_load("code/green.png", &ren->texIDs[0], GREEN_TEXTURE_INDEX);
+	texture_load("code/white.png", &ren->texIDs[1], WHITE_TEXTURE_INDEX);
 
-	i32 w, h, bpp;
-	u8* buffer = image_load_png("code/white.png", &w, &h, &bpp);
-	ASSERT(buffer != NULL);
+	i32 location1 = glGetUniformLocation(ren->program, "uTextures[0]");
+	ASSERT(location1 != -1);
 
+	glUniform1i(location1, GREEN_TEXTURE_INDEX);
 
-	glGenTextures(1, &ren->texIDs[0]);
-	glBindTexture(GL_TEXTURE_2D, ren->texIDs[0]);
+	i32 location2 = glGetUniformLocation(ren->program, "uTextures[1]");
+	ASSERT(location2 != -1);
 
-	glGenTextures(1, &ren->texIDs[1]);
-	glBindTexture(GL_TEXTURE_2D, ren->texIDs[1]);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	i32 whiteLocation = glGetUniformLocation(ren->program, "uWhiteTexture");
-	ASSERT(whiteLocation != -1);
-
-	glUniform1i(whiteLocation, 1);
+	glUniform1i(location2, WHITE_TEXTURE_INDEX);
 
 	file_close(vertexFile);
 	file_close(fragmentFile);
 
-	image_free(buffer);
 }
 
 void
@@ -151,7 +172,7 @@ render_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color) {
 		for (int k = 0; k < VERTICES_PER_QUAD; ++k) {
 			ren->vertexArrayIndex->color = color;
 			ren->vertexArrayIndex->posData = quadVertices[k];
-			ren->vertexArrayIndex->texIndex = 1;
+			ren->vertexArrayIndex->texIndex = NO_TEXTURE_INDEX;
 			ren->vertexArrayIndex++;
 		}
 
@@ -159,8 +180,38 @@ render_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color) {
 
 }
 
+void render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, u32 texID) {
+
+
+		Vec4 quadVertices[] = {
+				{position.x,          position.y,          0.0f, 0.0f},
+				{position.x + size.x, position.y,          1.0f, 0.0f},
+				{position.x + size.x, position.y + size.y, 1.0f, 1.0f},
+				{position.x,          position.y,          0.0f, 0.0f},
+				{position.x,          position.y + size.y, 0.0f, 1.0f},
+				{position.x + size.x, position.y + size.y, 1.0f, 1.0f}
+		};
+
+		if (ren->vertexCount >= MAX_VERTICES) {
+			renderer_end(ren);
+		}
+
+		Vec4 color = {1.0f, 1.0f, 1.0f, 1.0f};
+		for (int k = 0; k < VERTICES_PER_QUAD; ++k) {
+			ren->vertexArrayIndex->color = color;
+			ren->vertexArrayIndex->posData = quadVertices[k];
+			ren->vertexArrayIndex->texIndex = texID;
+			ren->vertexArrayIndex++;
+		}
+
+		ren->vertexCount += VERTICES_PER_QUAD;
+	
+}
+
 void
 renderer_end(Renderer* ren) {
+
+
 
 	static i32 count, dataSize;
 	count = (ren->vertexArrayIndex - ren->vertexArray);

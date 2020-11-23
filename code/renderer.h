@@ -4,12 +4,15 @@
 
 #include <GLFW/glfw3.h>
 
+#define GREEN_TEXTURE_INDEX 0
+#define WHITE_TEXTURE_INDEX 1
+#define NO_TEXTURE_INDEX -1
 
 typedef struct Vertex {
   
 	Vec4 posData;
 	Vec4 color;
-	f32 texIndex;
+	i32 texIndex;
 
 } Vertex;
 
@@ -36,3 +39,4 @@ void renderer_begin(Renderer* ren);
 void renderer_end(Renderer* ren);
 
 void render_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color);
+void render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, u32 texID);

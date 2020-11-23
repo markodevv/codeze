@@ -34,8 +34,6 @@ File* file_open(const char* path, const char* flags) {
 	}
     file->buffer[cursor] = '\0';
 
-	printf("%s \n", file->buffer);
-
 	fclose(fp);
 
 	return file;
