@@ -26,6 +26,7 @@ int main() {
 	editor->window = renderer_create_window();
 	events_initialize(editor->window);
 	renderer_initialize(renderer, 1280, 768);
+	renderer_load_font(renderer, "assets/CONSOLA.TTF", 32);
 
 
 	Vec2 pos = {};
@@ -70,7 +71,6 @@ int main() {
 		render_quad(renderer, pos1, size, color1);
 		render_textured_quad(renderer, pos2, size, WHITE_TEXTURE_INDEX);
 		render_textured_quad(renderer, pos3, size, GREEN_TEXTURE_INDEX);
-		render_textured_quad(renderer, pos4, size, PURPLE_TEXTURE_INDEX);
 
 		renderer_end(renderer);
 

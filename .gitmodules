@@ -1,3 +1,6 @@
 [submodule "third_party/glfw"]
 	path = third_party/glfw
 	url = https://github.com/MarkoB-hub/glfw.git
+[submodule "third_party/freetype"]
+	path = third_party/freetype
+	url = https://github.com/freetype/freetype2.git

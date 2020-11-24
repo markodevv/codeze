@@ -8,6 +8,7 @@ include "third_party/glad/"
 IncludeDir = {}
 IncludeDir["glfw"] = "third_party/glfw/include"
 IncludeDir["glad"] = "third_party/glad/include"
+IncludeDir["freetype"] = "third_party/freetype/include"
 
 project "codeze"
 
@@ -19,6 +20,7 @@ project "codeze"
 
 	includedirs {
 	   "%{IncludeDir.glfw}",
+	   "%{IncludeDir.freetype}",
 	   "%{IncludeDir.glad}"
 	}
 
@@ -31,7 +33,7 @@ project "codeze"
 
 	filter "system:windows"
 
-	    links {"glad", "glfw", "opengl32.lib"}
+	    links {"glad", "glfw", "freetype", "opengl32.lib"}
 
 		defines {
 		   "WINDOWS_PLATFORM"
@@ -42,7 +44,7 @@ project "codeze"
 
 	    buildoptions {"-g", "-fPIC"}
 
-	    links {"glad", "glfw", "GL",  "dl", "pthread", "m"}
+	    links {"glad", "glfw", "GL", "freetype", "dl", "pthread", "m"}
 
 		defines {
 		   "LINUX_PLATFORM"

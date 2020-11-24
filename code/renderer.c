@@ -121,9 +121,8 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 
 	ortho(ren->projection, 0.0f, width, height, 0.0f);
 
-	texture_load("code/green.png", &ren->texIDs[0], GREEN_TEXTURE_INDEX);
-	texture_load("code/white.png", &ren->texIDs[1], WHITE_TEXTURE_INDEX);
-	texture_load("code/purple.png", &ren->texIDs[2], PURPLE_TEXTURE_INDEX);
+	texture_load("code/green.png", &ren->texIDs[GREEN_TEXTURE_INDEX], GREEN_TEXTURE_INDEX);
+	texture_load("code/white.png", &ren->texIDs[WHITE_TEXTURE_INDEX], WHITE_TEXTURE_INDEX);
 
 	i32 location1 = glGetUniformLocation(ren->program, "uTextures[0]");
 	ASSERT(location1 != -1);
@@ -135,14 +134,89 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 
 	glUniform1i(location2, WHITE_TEXTURE_INDEX);
 
-	i32 location3 = glGetUniformLocation(ren->program, "uTextures[2]");
-	ASSERT(location3 != -1);
-
-	glUniform1i(location3, PURPLE_TEXTURE_INDEX);
-
 	file_close(vertexFile);
 	file_close(fragmentFile);
 
+}
+
+void
+renderer_load_font(Renderer* ren, const char* fontFile, i32 fontSize) {
+
+	ren->fontSize = fontSize;
+
+	i32 success = FT_Init_FreeType(&ren->ftLib);
+	ASSERT(success == 0);
+	success = FT_New_Face(ren->ftLib, fontFile, 0, &ren->fontFace);
+	ASSERT(success == 0);
+
+	FT_Set_Pixel_Sizes(ren->fontFace, 0, ren->fontSize);
+
+	i32 w = 0, h = 0;
+	FT_GlyphSlot glyph = ren->fontFace->glyph;
+
+	for (u8 i = 0; i < 128; i++) {
+		i32 success = FT_Load_Char(ren->fontFace, i, FT_LOAD_RENDER);
+		ASSERT(success == 0);
+		w += glyph->bitmap.width;
+		glyph->bitmap.rows > h ? h = glyph->bitmap.rows : h;
+
+	}
+
+	ren->bitmapW = w;
+	ren->bitmapH = h;
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glActiveTexture(GL_TEXTURE0 + FONT_TEXTURE_INDEX);
+
+	glGenTextures(1, &ren->texIDs[FONT_TEXTURE_INDEX]);
+	glBindTexture(GL_TEXTURE_2D, ren->texIDs[FONT_TEXTURE_INDEX]);
+
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+
+
+	i32 texOffset = 0;
+
+	for (u8 i = 0; i < 128; ++i) {
+
+		i32 success = FT_Load_Char(ren->fontFace, i, FT_LOAD_RENDER);
+		ASSERT(success == 0);
+
+		glTexSubImage2D(GL_TEXTURE_2D, 0, texOffset, 0, 
+			glyph->bitmap.width, glyph->bitmap.rows, 
+			GL_RED, GL_UNSIGNED_BYTE, glyph->bitmap.buffer);
+
+		ren->glyphs[i].advanceX = glyph->advance.x >> 6;
+		ren->glyphs[i].advanceY = glyph->advance.y >> 6;
+
+		ren->glyphs[i].width = glyph->bitmap.width;
+		ren->glyphs[i].height = glyph->bitmap.rows;
+
+		ren->glyphs[i].bearingX = glyph->bitmap_left;
+		ren->glyphs[i].bearingY = glyph->bitmap_top;
+	
+		ren->glyphs[i].offsetX = (f32)texOffset / w;
+
+		texOffset += glyph->bitmap.width;
+	}
+
+	i32 location = glGetUniformLocation(ren->program, "uTextures[2]");
+	ASSERT(location != -1);
+
+	glUniform1i(location, FONT_TEXTURE_INDEX);
+
+	// Hardcoded tab size
+	ren->glyphs['\t'].advanceX = ren->glyphs[' '].advanceX * 4;
+
+	FT_Done_Face(ren->fontFace);
+	FT_Done_FreeType(ren->ftLib);
+
+  
 }
 
 void
