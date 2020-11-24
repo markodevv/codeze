@@ -1,6 +1,5 @@
 #include "renderer.h"
 #include "fileio.h"
-#include "string.h"
 #include "shader.h"
 #include "debug.h"
 
@@ -124,6 +123,7 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 
 	texture_load("code/green.png", &ren->texIDs[GREEN_TEXTURE_INDEX], GREEN_TEXTURE_INDEX);
 	texture_load("code/white.png", &ren->texIDs[WHITE_TEXTURE_INDEX], WHITE_TEXTURE_INDEX);
+	texture_load("code/ryuk.png", &ren->texIDs[RYUK_TEXTURE_INDEX], RYUK_TEXTURE_INDEX);
 
 	String* str = str_create_char("uTextures");
 	char index[] = "[ ]";
@@ -230,7 +230,7 @@ renderer_load_font(Renderer* ren, const char* fontFile, i32 fontSize) {
 void
 renderer_begin(Renderer* ren) {
 
-	glClearColor(0.5f, 0.1f, 0.1f, 1.0f);
+	glClearColor(0.1f, 0.1f, 0.13, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	i32 projectionLocation = glGetUniformLocation(ren->program, "uProjection");
@@ -269,7 +269,7 @@ render_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color) {
 }
 
 void
-render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, u32 texID) {
+render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color, u32 texID) {
 
 		Vec4 quadVertices[] = {
 				{position.x,          position.y,          0.0f, 0.0f},
@@ -284,7 +284,6 @@ render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, u32 texID) {
 			renderer_end(ren);
 		}
 
-		Vec4 color = {1.0f, 1.0f, 1.0f, 1.0f};
 		for (int k = 0; k < VERTICES_PER_QUAD; ++k) {
 
 			ren->vertexArrayIndex->color = color;
@@ -298,45 +297,34 @@ render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, u32 texID) {
 }
 
 void
-render_text(Renderer* ren, const char* text, sizet length, Vec2 position, Vec4 color) {
+render_text(Renderer* ren, String* text, Vec2 position, Vec4 color) {
 
 	static float xpos, ypos, w, h, offsetX, texX, texY, advanceX, advanceY;
 	advanceY = position.y;
 	advanceX = position.x;
 
-	for (sizet i = 0; i < length; ++i) {
+	for (sizet i = 0; i < text->length; ++i) {
 
-		if (text[i] == '\n') {
+		if (str_at(text, i) == '\n') {
 
 			advanceY += ren->fontSize;
 			advanceX = 0.0f;
 			continue;
 		}
-		else if (text[i] == '\t') {
+		else if (str_at(text, i) == '\t') {
 
-			advanceX += ren->glyphs[text[i]].advanceX;
+			advanceX += ren->glyphs[str_at(text, i)].advanceX;
 			continue;
 		}
 
-		xpos = advanceX + ren->glyphs[text[i]].bearingX;
+		xpos = advanceX + ren->glyphs[str_at(text, i)].bearingX;
 		// this is stupid, idk how else to make it work
-		ypos = advanceY - ren->glyphs[text[i]].bearingY + ren->fontSize;
-		w = ren->glyphs[text[i]].width;
-		h = ren->glyphs[text[i]].height;
-		offsetX = ren->glyphs[text[i]].offsetX;
+		ypos = advanceY - ren->glyphs[str_at(text, i)].bearingY + ren->fontSize;
+		w = ren->glyphs[str_at(text, i)].width;
+		h = ren->glyphs[str_at(text, i)].height;
+		offsetX = ren->glyphs[str_at(text, i)].offsetX;
 		texX = w / ren->bitmapW;
 		texY = h / ren->bitmapH;
-		/*
-		Vec4 quadVertices[] = {
-			{xpos,     ypos + h, offsetX,        texY},
-			{xpos,     ypos,     offsetX,        0.0f},
-			{xpos + w, ypos,     offsetX + texX, 0.0f},
-
-			{xpos,     ypos + h, offsetX,        texY},
-			{xpos + w, ypos,     offsetX + texX, 0.0f},
-			{xpos + w, ypos + h, offsetX + texX, texY}
-		};
-		*/
 
 		Vec4 quadVertices[] = {
 			{xpos,     ypos,     offsetX,        0.0f},
@@ -346,16 +334,6 @@ render_text(Renderer* ren, const char* text, sizet length, Vec2 position, Vec4 c
 			{xpos,     ypos + h, offsetX,        texY},
 			{xpos + w, ypos + h, offsetX + texX, texY}
 		};
-		/*
-		Vec4 quadVertices[] = {
-				{position.x,          position.y,          0.0f, 0.0f},
-				{position.x + size.x, position.y,          1.0f, 0.0f},
-				{position.x + size.x, position.y + size.y, 1.0f, 1.0f},
-				{position.x,          position.y,          0.0f, 0.0f},
-				{position.x,          position.y + size.y, 0.0f, 1.0f},
-				{position.x + size.x, position.y + size.y, 1.0f, 1.0f}
-		};
-		*/
 
 		if (ren->vertexCount >= MAX_VERTICES) {
 
@@ -371,7 +349,7 @@ render_text(Renderer* ren, const char* text, sizet length, Vec2 position, Vec4 c
 		}
 
 		ren->vertexCount += VERTICES_PER_QUAD;
-		advanceX += ren->glyphs[text[i]].advanceX;
+		advanceX += ren->glyphs[str_at(text, i)].advanceX;
 	}
 }
 

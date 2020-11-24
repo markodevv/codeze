@@ -1,6 +1,7 @@
 #pragma once
 
 #include "math.h"
+#include "string.h"
 
 #include <GLFW/glfw3.h>
 #include <ft2build.h>
@@ -12,8 +13,9 @@ typedef enum TextureIndex {
 	GREEN_TEXTURE_INDEX  = 0,
 	WHITE_TEXTURE_INDEX  = 1,
 	FONT_TEXTURE_INDEX  = 2,
+	RYUK_TEXTURE_INDEX  = 3,
 
-	TEXTURE_SLOTS = 3
+	TEXTURE_SLOTS = 4
 
 	
 } TextureIndex;
@@ -73,5 +75,5 @@ void renderer_begin(Renderer* ren);
 void renderer_end(Renderer* ren);
 
 void render_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color);
-void render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, u32 texID);
-void render_text(Renderer* ren, const char* text, sizet length, Vec2 position, Vec4 color);
+void render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color, u32 texID);
+void render_text(Renderer* ren, String* text, Vec2 position, Vec4 color);

@@ -6,7 +6,7 @@ in vec2 vTexCoords;
 flat in int vTexIndex;
 in vec4 vColor;
 
-uniform sampler2D uTextures[3];
+uniform sampler2D uTextures[16];
 
 void main() {
 	color = vColor;
@@ -18,5 +18,8 @@ void main() {
 	}
 	else if (vTexIndex == 2) {
 		color *= vec4(1.0, 1.0, 1.0, texture(uTextures[2], vTexCoords).r);
+	}
+	else if (vTexIndex == 3) {
+		color *= texture(uTextures[3], vTexCoords);
 	}
 }

@@ -34,20 +34,14 @@ int main() {
 	editor->window = renderer_create_window();
 	events_initialize(editor->window);
 	renderer_initialize(renderer, 1280, 768);
-	renderer_load_font(renderer, "assets/CONSOLA.TTF", 32);
-
-	String* str = str_create_char("hello world");
-	str_print(str);
-	str_concat(str, ", and merry christmass");
-	str_print(str);
-	str_concat(str, ", and merry christmass");
-	str_print(str);
-	printf("%c \n", str_at(str, 10));
+	renderer_load_font(renderer, "assets/CONSOLA.TTF", 20);
 
 
 	Vec2 pos = {};
-	Vec2 pos2 = {0.0f, 32.0f};
 	Vec4 color = {1.0f, 1.0f, 1.0f, 1.0f};
+	Vec2 ryukSize = {1920.0f, 1080.0f};
+	Vec4 ryukColor = {1.0f, 1.0f, 1.0f, 0.3333f};
+	String* str = str_create_char("hello world :)");
 
 
 
@@ -65,14 +59,9 @@ int main() {
 
 		renderer_begin(renderer);
 
-		const char* text = "hello, world";
-		int len = 0;
-		while (text[len] != '\0') {
-			len++;
-		}
 
-		render_text(renderer, text, len, pos, color);
-		render_text(renderer, text, len, pos2, color);
+		render_textured_quad(renderer, pos, ryukSize, ryukColor, RYUK_TEXTURE_INDEX);
+		render_text(renderer, str, pos, color);
 		render_quad(renderer, pos, pos, color);
 
 		renderer_end(renderer);
