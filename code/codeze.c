@@ -6,7 +6,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* TODO:
 
+   1. Font rendering
+
+ */
 typedef struct Editor {
 
 	GLFWwindow* window;
@@ -38,13 +42,27 @@ int main() {
 
 	while (!glfwWindowShouldClose(editor->window)) {
 		
-		/* while(event_queue_next(event)) { */
-		/* 	switch(event->type) { */
-		/* 		case KeyPressed: */
-		/* 			printf("key is pressed \n"); */
-		/* 			break; */
-		/* 	} */
-		/* } */
+		while(event_queue_next(event)) { 
+			switch(event->type) { 
+		 		case KEY_PRESSED: 
+					switch(event->key) {
+					case KEY_A:
+						printf("key A pressed \n"); 
+						break;
+					case KEY_D:
+						printf("key D pressed \n"); 
+						break;
+					case KEY_V:
+						if (event->mods & (MOD_SHIFT | MOD_CONTROL)
+							 == (MOD_SHIFT | MOD_CONTROL)) {
+							printf("%i \n", MOD_SHIFT | MOD_CONTROL);
+							printf("SHIFT-CTRL-V \n");
+						}
+						break;
+						
+					} 
+			}
+		} 
 
 		renderer_begin(renderer);
 
@@ -52,7 +70,7 @@ int main() {
 		render_quad(renderer, pos1, size, color1);
 		render_textured_quad(renderer, pos2, size, WHITE_TEXTURE_INDEX);
 		render_textured_quad(renderer, pos3, size, GREEN_TEXTURE_INDEX);
-		render_textured_quad(renderer, pos4, size, GREEN_TEXTURE_INDEX);
+		render_textured_quad(renderer, pos4, size, PURPLE_TEXTURE_INDEX);
 
 		renderer_end(renderer);
 

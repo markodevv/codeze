@@ -1,20 +1,22 @@
 #pragma once
+#include "types.h"
+
 #include <GLFW/glfw3.h>
 
 typedef enum EventType {
 
-	KeyPressed,
-	KeyReleased,
-	KeyRepeat,
-	CharInputed,
-	MouseButtonPressed,
-	MouseButtonReleased,
-	MouseMoved,
-	MouseScrolled,
-	WindowResize,
-	WindowMove,
-	WindowGainFocus,
-	WindowLostFocus
+	KEY_PRESSED,
+	KEY_RELEASED,
+	KEY_REPEAT,
+	CHAR_INPUTED,
+	MOUSE_BUTTON_PRESSED,
+	MOUSE_BUTTON_RELEASED,
+	MOUSE_MOVED,
+	MOUSE_SCROLLED,
+	WINDOW_RESIZED,
+	WINDOW_MOVED,
+	WINDOW_GAIN_FOCUS,
+	WINDOW_LOST_FOCUS
 
 } EventType;
 
@@ -48,7 +50,7 @@ typedef struct EventQueue {
 } EventQueue;
 
 void events_initialize(GLFWwindow* window);
-int event_queue_next(Event* event);
+i32 event_queue_next(Event* event);
 
 typedef enum MouseButton {
 	LEFT = 0,
@@ -64,137 +66,143 @@ typedef enum MouseButton {
 	BUTTON08 = 8,
 } MouseButton;
 
+
+#define MOD_SHIFT  0x0001
+#define MOD_CONTROL  0x0002
+#define MOD_ALT  0x0004
+#define MOD_SUPER  0x0008
+
 typedef enum KeyCode
 {
 	// From glfw3.h
-	Space               = 32,
-	Apostrophe          = 39, /* ' */
-	Comma               = 44, /* , */
-	Minus               = 45, /* - */
-	Period              = 46, /* . */
-	Slash               = 47, /* / */
+	KEY_Space               = 32,
+	KEY_Apostrophe          = 39, /* ' */
+	KEY_Comma               = 44, /* , */
+	KEY_Minus               = 45, /* - */
+	KEY_Period              = 46, /* . */
+	KEY_Slash               = 47, /* / */
 
-	D0                  = 48, /* 0 */
-	D1                  = 49, /* 1 */
-	D2                  = 50, /* 2 */
-	D3                  = 51, /* 3 */
-	D4                  = 52, /* 4 */
-	D5                  = 53, /* 5 */
-	D6                  = 54, /* 6 */
-	D7                  = 55, /* 7 */
-	D8                  = 56, /* 8 */
-	D9                  = 57, /* 9 */
+	KEY_D0                  = 48, /* 0 */
+	KEY_D1                  = 49, /* 1 */
+	KEY_D2                  = 50, /* 2 */
+	KEY_D3                  = 51, /* 3 */
+	KEY_D4                  = 52, /* 4 */
+	KEY_D5                  = 53, /* 5 */
+	KEY_D6                  = 54, /* 6 */
+	KEY_D7                  = 55, /* 7 */
+	KEY_D8                  = 56, /* 8 */
+	KEY_D9                  = 57, /* 9 */
 
-	Semicolon           = 59, /* ; */
-	Equal               = 61, /* = */
+	KEY_Semicolon           = 59, /* ; */
+	KEY_Equal               = 61, /* = */
 
-	A                   = 65,
-	B                   = 66,
-	C                   = 67,
-	D                   = 68,
-	E                   = 69,
-	F                   = 70,
-	G                   = 71,
-	H                   = 72,
-	I                   = 73,
-	J                   = 74,
-	K                   = 75,
-	L                   = 76,
-	M                   = 77,
-	N                   = 78,
-	O                   = 79,
-	P                   = 80,
-	Q                   = 81,
-	R                   = 82,
-	S                   = 83,
-	T                   = 84,
-	U                   = 85,
-	V                   = 86,
-	W                   = 87,
-	X                   = 88,
-	Y                   = 89,
-	Z                   = 90,
+	KEY_A                   = 65,
+	KEY_B                   = 66,
+	KEY_C                   = 67,
+	KEY_D                   = 68,
+	KEY_E                   = 69,
+	KEY_F                   = 70,
+	KEY_G                   = 71,
+	KEY_H                   = 72,
+	KEY_I                   = 73,
+	KEY_J                   = 74,
+	KEY_K                   = 75,
+	KEY_L                   = 76,
+	KEY_M                   = 77,
+	KEY_N                   = 78,
+	KEY_O                   = 79,
+	KEY_P                   = 80,
+	KEY_Q                   = 81,
+	KEY_R                   = 82,
+	KEY_S                   = 83,
+	KEY_T                   = 84,
+	KEY_U                   = 85,
+	KEY_V                   = 86,
+	KEY_W                   = 87,
+	KEY_X                   = 88,
+	KEY_Y                   = 89,
+	KEY_Z                   = 90,
 
-	LeftBracket         = 91,  /* [ */
-	Backslash           = 92,  /* \ */
-	RightBracket        = 93,  /* ] */
-	GraveAccent         = 96,  /* ` */
+	KEY_LeftBracket         = 91,  /* [ */
+	KEY_Backslash           = 92,  /* \ */
+	KEY_RightBracket        = 93,  /* ] */
+	KEY_GraveAccent         = 96,  /* ` */
 
-	World1              = 161, /* non-US #1 */
-	World2              = 162, /* non-US #2 */
+	KEY_World1              = 161, /* non-US #1 */
+	KEY_World2              = 162, /* non-US #2 */
 
 	/* Function keys */
-	Escape              = 256,
-	Enter               = 257,
-	Tab                 = 258,
-	Backspace           = 259,
-	Insert              = 260,
-	Delete              = 261,
-	Right               = 262,
-	Left                = 263,
-	Down                = 264,
-	Up                  = 265,
-	PageUp              = 266,
-	PageDown            = 267,
-	Home                = 268,
-	End                 = 269,
-	CapsLock            = 280,
-	ScrollLock          = 281,
-	NumLock             = 282,
-	PrintScreen         = 283,
-	Pause               = 284,
-	F1                  = 290,
-	F2                  = 291,
-	F3                  = 292,
-	F4                  = 293,
-	F5                  = 294,
-	F6                  = 295,
-	F7                  = 296,
-	F8                  = 297,
-	F9                  = 298,
-	F10                 = 299,
-	F11                 = 300,
-	F12                 = 301,
-	F13                 = 302,
-	F14                 = 303,
-	F15                 = 304,
-	F16                 = 305,
-	F17                 = 306,
-	F18                 = 307,
-	F19                 = 308,
-	F20                 = 309,
-	F21                 = 310,
-	F22                 = 311,
-	F23                 = 312,
-	F24                 = 313,
-	F25                 = 314,
+	KEY_Escape              = 256,
+	KEY_Enter               = 257,
+	KEY_Tab                 = 258,
+	KEY_Backspace           = 259,
+	KEY_Insert              = 260,
+	KEY_Delete              = 261,
+	KEY_Right               = 262,
+	KEY_Left                = 263,
+	KEY_Down                = 264,
+	KEY_Up                  = 265,
+	KEY_PageUp              = 266,
+	KEY_PageDown            = 267,
+	KEY_Home                = 268,
+	KEY_End                 = 269,
+	KEY_CapsLock            = 280,
+	KEY_ScrollLock          = 281,
+	KEY_NumLock             = 282,
+	KEY_PrintScreen         = 283,
+	KEY_Pause               = 284,
+	KEY_F1                  = 290,
+	KEY_F2                  = 291,
+	KEY_F3                  = 292,
+	KEY_F4                  = 293,
+	KEY_F5                  = 294,
+	KEY_F6                  = 295,
+	KEY_F7                  = 296,
+	KEY_F8                  = 297,
+	KEY_F9                  = 298,
+	KEY_F10                 = 299,
+	KEY_F11                 = 300,
+	KEY_F12                 = 301,
+	KEY_F13                 = 302,
+	KEY_F14                 = 303,
+	KEY_F15                 = 304,
+	KEY_F16                 = 305,
+	KEY_F17                 = 306,
+	KEY_F18                 = 307,
+	KEY_F19                 = 308,
+	KEY_F20                 = 309,
+	KEY_F21                 = 310,
+	KEY_F22                 = 311,
+	KEY_F23                 = 312,
+	KEY_F24                 = 313,
+	KEY_F25                 = 314,
 
 	/* Keypad */
-	KP0                 = 320,
-	KP1                 = 321,
-	KP2                 = 322,
-	KP3                 = 323,
-	KP4                 = 324,
-	KP5                 = 325,
-	KP6                 = 326,
-	KP7                 = 327,
-	KP8                 = 328,
-	KP9                 = 329,
-	KPDecimal           = 330,
-	KPDivide            = 331,
-	KPMultiply          = 332,
-	KPSubtract          = 333,
-	KPAdd               = 334,
-	KPEnter             = 335,
-	KPEqual             = 336,
+	KEY_KP0                 = 320,
+	KEY_KP1                 = 321,
+	KEY_KP2                 = 322,
+	KEY_KP3                 = 323,
+	KEY_KP4                 = 324,
+	KEY_KP5                 = 325,
+	KEY_KP6                 = 326,
+	KEY_KP7                 = 327,
+	KEY_KP8                 = 328,
+	KEY_KP9                 = 329,
+	KEY_KPDecimal           = 330,
+	KEY_KPDivide            = 331,
+	KEY_KPMultiply          = 332,
+	KEY_KPSubtract          = 333,
+	KEY_KPAdd               = 334,
+	KEY_KPEnter             = 335,
+	KEY_KPEqual             = 336,
 
-	LeftShift           = 340,
-	LeftControl         = 341,
-	LeftAlt             = 342,
-	LeftSuper           = 343,
-	RightShift          = 344,
-	RightControl        = 345,
-	RightAlt            = 346,
-	RightSuper          = 347,
-	Menu                = 348
+	KEY_LeftShift           = 340,
+	KEY_LeftControl         = 341,
+	KEY_LeftAlt             = 342,
+	KEY_LeftSuper           = 343,
+	KEY_RightShift          = 344,
+	KEY_RightControl        = 345,
+	KEY_RightAlt            = 346,
+	KEY_RightSuper          = 347,
+	KEY_Menu                = 348
 } KeyCode;

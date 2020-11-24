@@ -6,6 +6,7 @@
 
 #define GREEN_TEXTURE_INDEX 0
 #define WHITE_TEXTURE_INDEX 1
+#define PURPLE_TEXTURE_INDEX 2
 #define NO_TEXTURE_INDEX -1
 
 typedef struct Vertex {
@@ -21,7 +22,7 @@ typedef struct Renderer {
 	u32 program;
 	f32 projection[4][4];
 
-	u32 texIDs[2];
+	u32 texIDs[3];
 	u32 VBO;
 	u32 VAO;
 

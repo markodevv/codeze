@@ -7,7 +7,6 @@
 
 #define MAX_VERTICES 100000
 #define VERTICES_PER_QUAD 6
-#define TEXTURE_SLOTS 2
 
 static void
 error_callback(int code, const char* description) {
@@ -124,6 +123,7 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 
 	texture_load("code/green.png", &ren->texIDs[0], GREEN_TEXTURE_INDEX);
 	texture_load("code/white.png", &ren->texIDs[1], WHITE_TEXTURE_INDEX);
+	texture_load("code/purple.png", &ren->texIDs[2], PURPLE_TEXTURE_INDEX);
 
 	i32 location1 = glGetUniformLocation(ren->program, "uTextures[0]");
 	ASSERT(location1 != -1);
@@ -134,6 +134,11 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 	ASSERT(location2 != -1);
 
 	glUniform1i(location2, WHITE_TEXTURE_INDEX);
+
+	i32 location3 = glGetUniformLocation(ren->program, "uTextures[2]");
+	ASSERT(location3 != -1);
+
+	glUniform1i(location3, PURPLE_TEXTURE_INDEX);
 
 	file_close(vertexFile);
 	file_close(fragmentFile);
