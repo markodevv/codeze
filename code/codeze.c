@@ -29,15 +29,8 @@ int main() {
 	renderer_load_font(renderer, "assets/CONSOLA.TTF", 32);
 
 
-	Vec2 pos = {};
-	Vec2 pos1 = {100.0f, 100.0f};
-	Vec2 pos2 = {200.0f, 200.0f};
-	Vec2 pos3 = {300.0f, 300.0f};
-	Vec2 pos4 = {400.0f, 400.0f};
-	Vec2 size = {100.0f, 100.0f};
+	Vec2 pos = {100, 300};
 	Vec4 color = {1.0f, 1.0f, 1.0f, 1.0f};
-	Vec4 color1 = {1.0f, 1.0f, 0.0f, 1.0f};
-	Vec4 color2 = {0.0f, 1.0f, 0.0f, 1.0f};
 
 
 
@@ -46,31 +39,22 @@ int main() {
 		while(event_queue_next(event)) { 
 			switch(event->type) { 
 		 		case KEY_PRESSED: 
-					switch(event->key) {
-					case KEY_A:
-						printf("key A pressed \n"); 
-						break;
-					case KEY_D:
-						printf("key D pressed \n"); 
-						break;
-					case KEY_V:
-						if (event->mods & (MOD_SHIFT | MOD_CONTROL)
-							 == (MOD_SHIFT | MOD_CONTROL)) {
-							printf("%i \n", MOD_SHIFT | MOD_CONTROL);
-							printf("SHIFT-CTRL-V \n");
-						}
-						break;
-						
-					} 
-			}
+					break;
+				case WINDOW_RESIZED:
+					ortho(renderer->projection, 0.0f, event->width, event->height, 0.0f);
+					break;
+				}
 		} 
 
 		renderer_begin(renderer);
 
-		render_quad(renderer, pos, size, color);
-		render_quad(renderer, pos1, size, color1);
-		render_textured_quad(renderer, pos2, size, WHITE_TEXTURE_INDEX);
-		render_textured_quad(renderer, pos3, size, GREEN_TEXTURE_INDEX);
+		const char* text = "hello, world";
+		int len = 0;
+		while (text[len] != '\0') {
+			len++;
+		}
+
+		render_text(renderer, text, len, pos, color);
 
 		renderer_end(renderer);
 

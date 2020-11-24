@@ -17,6 +17,6 @@ void main() {
 		color *= texture(uTextures[1], vTexCoords);
 	}
 	else if (vTexIndex == 2) {
-		color *= texture(uTextures[2], vTexCoords);
+		color *= vec4(1.0, 1.0, 1.0, texture(uTextures[2], vTexCoords).r);
 	}
 }

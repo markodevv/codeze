@@ -171,7 +171,6 @@ renderer_load_font(Renderer* ren, const char* fontFile, i32 fontSize) {
 	glGenTextures(1, &ren->texIDs[FONT_TEXTURE_INDEX]);
 	glBindTexture(GL_TEXTURE_2D, ren->texIDs[FONT_TEXTURE_INDEX]);
 
-
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -248,10 +247,10 @@ render_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color) {
 			renderer_end(ren);
 		}
 
-		for (int k = 0; k < VERTICES_PER_QUAD; ++k) {
+		for (int i = 0; i < VERTICES_PER_QUAD; ++i) {
 			ren->vertexArrayIndex->color = color;
-			ren->vertexArrayIndex->posData = quadVertices[k];
-			ren->vertexArrayIndex->texIndex = NO_TEXTURE_INDEX;
+			ren->vertexArrayIndex->posData = quadVertices[i];
+			ren->vertexArrayIndex->texIndex = NO_TEXTURE;
 			ren->vertexArrayIndex++;
 		}
 
@@ -259,8 +258,8 @@ render_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color) {
 
 }
 
-void render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, u32 texID) {
-
+void
+render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, u32 texID) {
 
 		Vec4 quadVertices[] = {
 				{position.x,          position.y,          0.0f, 0.0f},
@@ -288,9 +287,60 @@ void render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, u32 texID) {
 }
 
 void
+render_text(Renderer* ren, const char* text, sizet length, Vec2 position, Vec4 color) {
+
+	static float xpos, ypos, w, h, offsetX, texX, texY, advanceX, advanceY;
+	advanceY = position.y;
+	advanceX = position.x;
+
+	for (sizet i = 0; i < length; ++i) {
+		if (text[i] == '\n') {
+			advanceY += ren->fontSize;
+			advanceX = 0.0f;
+			continue;
+		}
+		else if (text[i] == '\t') {
+			advanceX += ren->glyphs[text[i]].advanceX;
+			continue;
+		}
+
+		xpos = advanceX + ren->glyphs[text[i]].bearingX;
+		ypos = advanceY - ren->glyphs[text[i]].bearingY;
+		w = ren->glyphs[text[i]].width;
+		h = ren->glyphs[text[i]].height;
+		offsetX = ren->glyphs[text[i]].offsetX;
+		texX = w / ren->bitmapW;
+		texY = h / ren->bitmapH;
+
+		Vec4 quadVertices[] = {
+			{xpos,     ypos + h, offsetX,        texY},
+			{xpos,     ypos,     offsetX,        0.0f},
+			{xpos + w, ypos,     offsetX + texX, 0.0f},
+
+			{xpos,     ypos + h, offsetX,        texY},
+			{xpos + w, ypos,     offsetX + texX, 0.0f},
+			{xpos + w, ypos + h, offsetX + texX, texY}
+		};
+
+		if (ren->vertexCount >= MAX_VERTICES) {
+			renderer_end(ren);
+		}
+
+		for (int j = 0; j < VERTICES_PER_QUAD; ++j) {
+			ren->vertexArrayIndex->color = color;
+			ren->vertexArrayIndex->posData = quadVertices[j];
+			ren->vertexArrayIndex->texIndex = FONT_TEXTURE_INDEX;
+			ren->vertexArrayIndex++;
+		}
+
+		ren->vertexCount += VERTICES_PER_QUAD;
+		advanceX += ren->glyphs[text[i]].advanceX;
+	}
+	
+}
+
+void
 renderer_end(Renderer* ren) {
-
-
 
 	static i32 count, dataSize;
 	count = (ren->vertexArrayIndex - ren->vertexArray);

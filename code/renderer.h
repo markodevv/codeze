@@ -9,7 +9,7 @@
 #define GREEN_TEXTURE_INDEX 0
 #define WHITE_TEXTURE_INDEX 1
 #define FONT_TEXTURE_INDEX 2
-#define NO_TEXTURE_INDEX -1
+#define NO_TEXTURE -1
 
 typedef struct Vertex {
   
@@ -19,7 +19,7 @@ typedef struct Vertex {
 
 } Vertex;
 
-typedef struct   GlyphData {
+typedef struct GlyphData {
   
 	f32 advanceX;
 	f32 advanceY;
@@ -67,3 +67,4 @@ void renderer_end(Renderer* ren);
 
 void render_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color);
 void render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, u32 texID);
+void render_text(Renderer* ren, const char* text, sizet length, Vec2 position, Vec4 color);
