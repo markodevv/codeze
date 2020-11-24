@@ -1,4 +1,5 @@
 #include "renderer.h"
+#include "string.h"
 #include "event.h"
 #include "debug.h"
 #include "fileio.h"
@@ -8,7 +9,14 @@
 
 /* TODO:
 
-   1. Font rendering
+   - string struct
+   - fix offscreen rendering
+
+ */
+
+/* DONE:
+
+   - Font rendering
 
  */
 typedef struct Editor {
@@ -28,8 +36,17 @@ int main() {
 	renderer_initialize(renderer, 1280, 768);
 	renderer_load_font(renderer, "assets/CONSOLA.TTF", 32);
 
+	String* str = str_create_char("hello world");
+	str_print(str);
+	str_concat(str, ", and merry christmass");
+	str_print(str);
+	str_concat(str, ", and merry christmass");
+	str_print(str);
+	printf("%c \n", str_at(str, 10));
 
-	Vec2 pos = {100, 300};
+
+	Vec2 pos = {};
+	Vec2 pos2 = {0.0f, 32.0f};
 	Vec4 color = {1.0f, 1.0f, 1.0f, 1.0f};
 
 
@@ -55,6 +72,8 @@ int main() {
 		}
 
 		render_text(renderer, text, len, pos, color);
+		render_text(renderer, text, len, pos2, color);
+		render_quad(renderer, pos, pos, color);
 
 		renderer_end(renderer);
 

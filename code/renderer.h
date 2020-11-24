@@ -6,10 +6,17 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#define GREEN_TEXTURE_INDEX 0
-#define WHITE_TEXTURE_INDEX 1
-#define FONT_TEXTURE_INDEX 2
-#define NO_TEXTURE -1
+typedef enum TextureIndex {
+
+	NO_TEXTURE  = -1,
+	GREEN_TEXTURE_INDEX  = 0,
+	WHITE_TEXTURE_INDEX  = 1,
+	FONT_TEXTURE_INDEX  = 2,
+
+	TEXTURE_SLOTS = 3
+
+	
+} TextureIndex;
 
 typedef struct Vertex {
   
