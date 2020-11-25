@@ -2,6 +2,7 @@
 
 #include "math.h"
 #include "string.h"
+#include "clexer.h"
 
 #include <GLFW/glfw3.h>
 #include <ft2build.h>
@@ -77,3 +78,4 @@ void renderer_end(Renderer* ren);
 void render_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color);
 void render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color, u32 texID);
 void render_text(Renderer* ren, String* text, Vec2 position, Vec4 color);
+void render_text_syntax(Renderer* ren, String* text, Vec2 position, Token* tokens);

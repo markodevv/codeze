@@ -2,11 +2,14 @@
 #include "fileio.h"
 #include "shader.h"
 #include "debug.h"
+#include "clexer.h"
 
 #include <glad/glad.h>
 
 #define MAX_VERTICES 100000
 #define VERTICES_PER_QUAD 6
+
+static Vec4 gColors[TOK_KEYWORD + 1];
 
 static void
 error_callback(int code, const char* description) {
@@ -18,6 +21,21 @@ error_callback(int code, const char* description) {
 
 GLFWwindow*
 renderer_create_window() {
+
+	Vec4 white = {0.6f, 0.6f, 0.6f, 1.0f};
+	Vec4 green = {0.8f, 1.0f, 0.8f, 1.0f};
+	Vec4 blue = {0.6f, 0.6f, 1.0f, 1.0f};
+	Vec4 orange = {0.8f, 0.6f, 0.1f, 1.0f};
+	gColors[TOK_IDENTIFIER] = white;
+	gColors[TOK_HASH] = white;
+	gColors[TOK_NUMBER] = green;
+	gColors[TOK_OPEN_PAREN] = orange;
+	gColors[TOK_CLOSED_PAREN] = orange;
+	gColors[TOK_OPEN_CURLY] = orange;
+	gColors[TOK_CLOSED_CURLY] = orange;
+	gColors[TOK_OPEN_SQUARE] = orange;
+	gColors[TOK_CLOSED_SQUARE] = orange;
+	gColors[TOK_KEYWORD] = blue;
 
 	GLFWwindow* window;
 
@@ -347,6 +365,81 @@ render_text(Renderer* ren, String* text, Vec2 position, Vec4 color) {
 			ren->vertexArrayIndex->texIndex = FONT_TEXTURE_INDEX;
 			ren->vertexArrayIndex++;
 		}
+
+		ren->vertexCount += VERTICES_PER_QUAD;
+		advanceX += ren->glyphs[str_at(text, i)].advanceX;
+	}
+}
+
+void
+render_text_syntax(Renderer* ren, String* text, Vec2 position, Token* tokens) {
+
+	static float xpos, ypos, w, h, offsetX, texX, texY, advanceX, advanceY;
+	advanceY = position.y;
+	advanceX = position.x;
+
+	i32 tokIndex = 0;
+	Vec4 color = gColors[0];
+
+	for (sizet i = 0; i < text->length; ++i) {
+
+		if (str_at(text, i) == '\n') {
+
+			advanceY += ren->fontSize;
+			advanceX = 0.0f;
+			continue;
+		}
+		else if (str_at(text, i) == '\t') {
+
+			advanceX += ren->glyphs[str_at(text, i)].advanceX;
+			continue;
+		}
+
+		xpos = advanceX + ren->glyphs[str_at(text, i)].bearingX;
+		// this is stupid, idk how else to make it work
+		ypos = advanceY - ren->glyphs[str_at(text, i)].bearingY + ren->fontSize;
+		w = ren->glyphs[str_at(text, i)].width;
+		h = ren->glyphs[str_at(text, i)].height;
+		offsetX = ren->glyphs[str_at(text, i)].offsetX;
+		texX = w / ren->bitmapW;
+		texY = h / ren->bitmapH;
+
+		Vec4 quadVertices[] = {
+			{xpos,     ypos,     offsetX,        0.0f},
+			{xpos + w, ypos,     offsetX + texX, 0.0f},
+			{xpos + w, ypos + h, offsetX + texX, texY},
+			{xpos,     ypos,     offsetX,        0.0f},
+			{xpos,     ypos + h, offsetX,        texY},
+			{xpos + w, ypos + h, offsetX + texX, texY}
+		};
+
+		if (ren->vertexCount >= MAX_VERTICES) {
+
+			renderer_end(ren);
+		}
+
+		static i32 len = 0;
+
+		if (i == tokens[tokIndex].pos) {
+
+			color = gColors[tokens[tokIndex].type];
+			len = tokens[tokIndex].length;
+			tokIndex++;
+		}
+
+		if (len <= 0) {
+			color = gColors[0];
+		}
+
+		for (int j = 0; j < VERTICES_PER_QUAD; ++j) {
+
+			ren->vertexArrayIndex->color = color;
+			ren->vertexArrayIndex->posData = quadVertices[j];
+			ren->vertexArrayIndex->texIndex = FONT_TEXTURE_INDEX;
+			ren->vertexArrayIndex++;
+		}
+
+		len--;
 
 		ren->vertexCount += VERTICES_PER_QUAD;
 		advanceX += ren->glyphs[str_at(text, i)].advanceX;

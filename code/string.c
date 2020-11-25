@@ -89,7 +89,7 @@ str_concat(String* s1, const char* s2) {
 	if ((s1->length + len) >= s1->capacity) {
 
 		s1->capacity = s1->capacity + (len * 2);
-		s1->data = realloc(s1->data, s1->capacity);
+		s1->data = realloc(s1->data, s1->capacity * sizeof(char));
 	}
 
 	for (sizet i = 0; i < len; ++i) {

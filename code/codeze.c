@@ -3,10 +3,11 @@
 #include "event.h"
 #include "debug.h"
 #include "fileio.h"
+#include "clexer.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <regex.h>
+#include <re.h>
 
 /* TODO:
 
@@ -50,14 +51,8 @@ int main() {
 
 	file_close(file);
 
-	regex_t regex;
-	i32 returnValue;
-
-	str_print(textFile);
-	returnValue = regcomp(&regex, textFile->data, REG_EXTENDED | REG_NOSUB);
-	if (returnValue != 0) {
-		printf("Failed to compile regex \n");
-	}
+	Lexer* lexer = lexer_lex(textFile);
+	lexer_print_tokens(lexer);
 
 
 	while (!glfwWindowShouldClose(editor->window)) {
@@ -76,8 +71,7 @@ int main() {
 
 
 		render_textured_quad(renderer, pos, ryukSize, ryukColor, RYUK_TEXTURE_INDEX);
-		render_text(renderer, textFile, pos, color);
-		render_quad(renderer, pos, pos, color);
+		render_text_syntax(renderer, textFile, pos, lexer->tokens);
 
 		renderer_end(renderer);
 
