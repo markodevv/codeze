@@ -6,17 +6,20 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <regex.h>
 
 /* TODO:
 
-   - string struct
-   - fix offscreen rendering
+   - gap buffer
+   - syntax highliting
 
  */
 
 /* DONE:
 
    - Font rendering
+   - string struct
+   - fix offscreen rendering
 
  */
 typedef struct Editor {
@@ -40,9 +43,21 @@ int main() {
 	Vec2 pos = {};
 	Vec4 color = {1.0f, 1.0f, 1.0f, 1.0f};
 	Vec2 ryukSize = {1920.0f, 1080.0f};
-	Vec4 ryukColor = {1.0f, 1.0f, 1.0f, 0.3333f};
-	String* str = str_create_char("hello world :)");
+	Vec4 ryukColor = {1.0f, 1.0f, 1.0f, 0.5f};
 
+	File* file = file_open("test.c", "r");
+	String* textFile = str_create_c(file->buffer);
+
+	file_close(file);
+
+	regex_t regex;
+	i32 returnValue;
+
+	str_print(textFile);
+	returnValue = regcomp(&regex, textFile->data, REG_EXTENDED | REG_NOSUB);
+	if (returnValue != 0) {
+		printf("Failed to compile regex \n");
+	}
 
 
 	while (!glfwWindowShouldClose(editor->window)) {
@@ -61,7 +76,7 @@ int main() {
 
 
 		render_textured_quad(renderer, pos, ryukSize, ryukColor, RYUK_TEXTURE_INDEX);
-		render_text(renderer, str, pos, color);
+		render_text(renderer, textFile, pos, color);
 		render_quad(renderer, pos, pos, color);
 
 		renderer_end(renderer);

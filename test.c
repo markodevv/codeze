@@ -125,7 +125,7 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 	texture_load("code/white.png", &ren->texIDs[WHITE_TEXTURE_INDEX], WHITE_TEXTURE_INDEX);
 	texture_load("code/ryuk.png", &ren->texIDs[RYUK_TEXTURE_INDEX], RYUK_TEXTURE_INDEX);
 
-	String* str = str_create_c("uTextures");
+	String* str = str_create_char("uTextures");
 	char index[] = "[ ]";
 	i32 location;
 	for (i32 i = 0; i < TEXTURE_SLOTS; ++i) {

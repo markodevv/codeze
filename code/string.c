@@ -3,20 +3,20 @@
 
 
 String*
-str_create_char(const char* text) {
+str_create_c(const char* text) {
 	
 	String* str = malloc(sizeof(String));
 	str->length = cstr_len(text);
 	str->capacity = str->length;
 	str->data = malloc(sizeof(char) * str->length);
-	str_copy(str->data, text);
+	str_copy(str, text);
 
 	return str;
 
 }
 
 String*
-str_create_size(sizet size) {
+str_create_s(sizet size) {
 	
 	String* str = malloc(sizeof(String));
 	str->length = 0;
@@ -67,15 +67,16 @@ str_at(String* str, sizet index) {
 }
 
 void
-str_copy(char* src, const char* dest) {
+str_copy(String* dest, const char* src) {
+
+	ASSERT(dest->capacity >= cstr_len(src));
 
 	sizet i = 0;
-	for (i; dest[i] != '\0'; ++i) {
+	for (i; src[i] != '\0'; ++i) {
 		
-		src[i] = dest[i];
-
+		dest->data[i] = src[i];
 	}
-	src[i] = '\0';
+	dest->data[i] = '\0';
 
 }
 
