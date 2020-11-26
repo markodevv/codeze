@@ -2,7 +2,6 @@
 #include "fileio.h"
 #include "shader.h"
 #include "debug.h"
-#include "clexer.h"
 
 #include <glad/glad.h>
 
@@ -22,10 +21,10 @@ error_callback(int code, const char* description) {
 GLFWwindow*
 renderer_create_window() {
 
-	Vec4 white = {0.6f, 0.6f, 0.6f, 1.0f};
+	Vec4 white = {0.8f, 0.8f, 0.8f, 1.0f};
 	Vec4 green = {0.8f, 1.0f, 0.8f, 1.0f};
 	Vec4 blue = {0.6f, 0.6f, 1.0f, 1.0f};
-	Vec4 orange = {0.8f, 0.6f, 0.1f, 1.0f};
+	Vec4 orange = {0.9f, 0.6f, 0.1f, 1.0f};
 	gColors[TOK_IDENTIFIER] = white;
 	gColors[TOK_HASH] = white;
 	gColors[TOK_NUMBER] = green;
@@ -116,8 +115,8 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	File* vertexFile = file_open("code/vertex_shader.txt", "r");
-	File* fragmentFile = file_open("code/fragment_shader.txt", "r");
+	File* vertexFile = file_open("src/vertex_shader.txt", "r");
+	File* fragmentFile = file_open("src/fragment_shader.txt", "r");
 
 	ren->program = shader_create(vertexFile->buffer, fragmentFile->buffer);
 	
@@ -139,9 +138,9 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 
 	ortho(ren->projection, 0.0f, width, height, 0.0f);
 
-	texture_load("code/green.png", &ren->texIDs[GREEN_TEXTURE_INDEX], GREEN_TEXTURE_INDEX);
-	texture_load("code/white.png", &ren->texIDs[WHITE_TEXTURE_INDEX], WHITE_TEXTURE_INDEX);
-	texture_load("code/ryuk.png", &ren->texIDs[RYUK_TEXTURE_INDEX], RYUK_TEXTURE_INDEX);
+	texture_load("assets/green.png", &ren->texIDs[GREEN_TEXTURE_INDEX], GREEN_TEXTURE_INDEX);
+	texture_load("assets/white.png", &ren->texIDs[WHITE_TEXTURE_INDEX], WHITE_TEXTURE_INDEX);
+	texture_load("assets/ryuk.png", &ren->texIDs[RYUK_TEXTURE_INDEX], RYUK_TEXTURE_INDEX);
 
 	String* str = str_create_c("uTextures");
 	char index[] = "[ ]";

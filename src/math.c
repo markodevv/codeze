@@ -1,7 +1,9 @@
 #include "math.h"
+#include "debug.h"
 
 
-void ortho(f32 mat[4][4], f32 left, f32 right, f32 bottom, f32 top) {
+void
+ortho(f32 mat[4][4], f32 left, f32 right, f32 bottom, f32 top) {
 
     mat[0][0] = 2 / (right - left);
     mat[0][1] = 0;
@@ -24,3 +26,17 @@ void ortho(f32 mat[4][4], f32 left, f32 right, f32 bottom, f32 top) {
     mat[3][3] = 1;
 }
  
+void
+vec4_print(Vec4 vec) {
+
+	printf("( ");
+	printf("%f", vec.x);
+	printf(", ");
+	printf("%f", vec.y);
+	printf(", ");
+	printf("%f", vec.z);
+	printf(", ");
+	printf("%f", vec.w);
+	printf(" )\n");
+  
+}

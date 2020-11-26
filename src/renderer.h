@@ -1,8 +1,8 @@
 #pragma once
 
 #include "math.h"
-#include "string.h"
-#include "clexer.h"
+#include "my_string.h"
+#include "tokenizer.h"
 
 #include <GLFW/glfw3.h>
 #include <ft2build.h>

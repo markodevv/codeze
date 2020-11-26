@@ -26,12 +26,15 @@
 
 #include <stdio.h>
 
-
+#define ASSERT_MSG(condition, message) \
+	assert(condition && message)
 #define ASSERT(condition) \
 	assert(condition)
+
 #else
 
 #define ASSERT(condition) 
+#define ASSERT_MSG(condition) 
 
 #endif
 

@@ -18,7 +18,7 @@ project "codeze"
 	language "C"
 	staticruntime "on"
 
-	files {"code/**.c", "code/**.h"}
+	files {"src/**.c", "src/**.h"}
 
 	includedirs {
 	   "%{IncludeDir.glfw}",

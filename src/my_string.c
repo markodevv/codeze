@@ -1,4 +1,4 @@
-#include "string.h"
+#include "my_string.h"
 #include "debug.h"
 
 
@@ -102,6 +102,27 @@ str_concat(String* s1, const char* s2) {
 
 }
 
+char*
+cstr_concat(const char* s1, const char* s2) {
+  
+	sizet len1 = cstr_len(s1);
+	sizet len2 = cstr_len(s2);
+	char* out = malloc(len1 + len2);
+
+	for (sizet i = 0; i < len1; ++i) {
+		
+		out[i] = s1[i];
+	}
+
+	for (sizet i = 0; i < len2; ++i) {
+		
+		out[i] = s2[i];
+	}
+	out[len1 + len2] = '\0';
+
+	return out;
+}
+
 void
 str_delete_from_back(String* str, sizet count) {
 
@@ -118,5 +139,24 @@ str_print(const String* str) {
 		printf("%c", str->data[i]);
 	}
 	printf("\n");
+
+}
+
+i8
+str_equal(const char* s1, const char* s2) {
+	
+	sizet i = 0;
+
+	sizet len = cstr_len(s1);
+	for (i; i < len; ++i) {
+
+		if (s1[i] != s2[i]) return 0;
+	}
+
+	if (s2[i] != '\0') {
+		return 0;
+	} else {
+		return 1;
+	}
 
 }

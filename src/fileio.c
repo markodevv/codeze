@@ -1,5 +1,6 @@
 #include "fileio.h"
 #include "types.h"
+#include "my_string.h"
 #include "debug.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -11,7 +12,7 @@
 File* file_open(const char* path, const char* flags) {
 
 	FILE* fp = fopen(path, flags);
-	ASSERT(fp);
+	ASSERT_MSG(fp, "Failed to load file ");
 
 	fseek(fp, 0, SEEK_END);
 	sizet size = ftell(fp);

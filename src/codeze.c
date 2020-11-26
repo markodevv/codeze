@@ -1,9 +1,10 @@
 #include "renderer.h"
-#include "string.h"
+#include "my_string.h"
 #include "event.h"
 #include "debug.h"
 #include "fileio.h"
-#include "clexer.h"
+#include "tokenizer.h"
+#include "container.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,6 +12,7 @@
 
 /* TODO:
 
+   - tiny up code
    - gap buffer
    - syntax highliting
 
@@ -51,9 +53,9 @@ int main() {
 
 	file_close(file);
 
-	Lexer* lexer = lexer_lex(textFile);
-	lexer_print_tokens(lexer);
+	Token* tokens = lexer_lex(textFile);
 
+									   
 
 	while (!glfwWindowShouldClose(editor->window)) {
 		
@@ -71,7 +73,7 @@ int main() {
 
 
 		render_textured_quad(renderer, pos, ryukSize, ryukColor, RYUK_TEXTURE_INDEX);
-		render_text_syntax(renderer, textFile, pos, lexer->tokens);
+		render_text_syntax(renderer, textFile, pos, tokens);
 
 		renderer_end(renderer);
 
