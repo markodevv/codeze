@@ -5,11 +5,18 @@
 
 #define INITIAL_TOKEN_CAPACITY 100
 
-#define NUM_KEYWORDS 11
+#define NUM_KEYWORDS 14
 static char* gKeywords[] = {"case", "if", "else", "while", "switch", "continue",
-	                        "break", "struct", "typedef", "return", "enum"};
+	"break", "struct", "typedef", "return", "enum", "static",
+	"const", "constexpr"};
 
-static i8
+
+#define NUM_TYPES 17
+static char* gTypes[] = {"void", "i64", "i32", "i16", "i8", "u64",
+	"u32", "u16", "u8", "sizet", "f32", "int", "float", "char", 
+	"NULL", "double", "long"};
+
+inline static i8
 is_char_identifier(char c) {
 
 	switch (c) {
@@ -84,7 +91,7 @@ is_char_identifier(char c) {
 }
 
 
-static i8
+inline static i8
 is_keyword(const char* word) {
 	
   
@@ -97,7 +104,20 @@ is_keyword(const char* word) {
 
 }
 
-static i8
+inline static i8
+is_type(const char* word) {
+	
+  
+	for (sizet i = 0; i < NUM_TYPES; ++i) {
+
+		if (str_equal(word, gTypes[i])) return 1;
+		
+	}
+	return 0;
+
+}
+
+inline static i8
 is_number(char c) {
 	
 	switch(c) {
@@ -119,8 +139,15 @@ is_number(char c) {
 	}
 }
 
+inline static i8
+in_quote(char c) {
+	
+	return c != '"';
+
+}
+
 Token*
-lexer_lex(String* text) {
+tokens_make(String* text) {
 
 	Token* tokens = array_create(INITIAL_TOKEN_CAPACITY, sizeof(Token));
 	char* begin = text->data;
@@ -185,9 +212,8 @@ lexer_lex(String* text) {
 		case 'X':
 		case 'Y':
 		case 'Z': {
-
 			Token token = {TOK_UNKNOWN, 0, pos - begin};
-			static char word[128];
+			static char word[256];
 			while (is_char_identifier(*pos)) {
 
 				word[token.length] = *pos;
@@ -196,10 +222,18 @@ lexer_lex(String* text) {
 			}
 			word[token.length] = '\0';
 
-			if (is_keyword(word)) 
+			if (is_keyword(word)) {
+				
 				token.type = TOK_KEYWORD;
-			else
+			}
+			else if (is_type(word)) {
+				
+				token.type = TOK_TYPE;
+			}
+			else{
+				
 				token.type = TOK_IDENTIFIER;
+			}
 
 			tokens = array_push(tokens, &token);
 			break;
@@ -258,6 +292,53 @@ lexer_lex(String* text) {
 			tokens = array_push(tokens, &token);
 			break;
 		}
+		case '"': {
+			Token token = {TOK_STRING, 0, pos - begin};
+			pos++;
+			while (in_quote(*pos)) {
+				pos++;
+			}
+			pos++;
+			token.length = (pos - begin) - token.pos;
+			tokens = array_push(tokens, &token);
+			break;
+		}
+		case '<': {
+			Token token = {TOK_STRING, 0, pos - begin};
+			pos++;
+			while ((*pos) != '>') {
+				pos++;
+			}
+			pos++;
+			token.length = (pos - begin) - token.pos;
+			tokens = array_push(tokens, &token);
+			break;
+		}
+		case ';': {
+			Token token = {TOK_SEMICOLON, 1, pos - begin};
+			pos++;
+			tokens = array_push(tokens, &token);
+			break;
+		}
+		case '/': {
+			Token token = {TOK_COMMENT, 1, pos - begin};
+			pos++;
+			if (*pos == '/') {
+				while (*pos != '\n' && *pos != '\0') {
+					token.length++;
+					pos++;
+				}
+			}
+			else if (*pos == '*') {
+				pos++;
+				while (*pos != '\0' && (*pos != '*' && *(pos + 1) != '/')) {
+					token.length++;
+					pos++;
+				}
+			}
+			tokens = array_push(tokens, &token);
+			break;
+		}
 
 		}
 	}
@@ -268,26 +349,29 @@ lexer_lex(String* text) {
 
 static void
 print_token(TokenType type) {
+
+	printf("Token: ");
 	
 	switch(type) {
-		
-	case TOK_IDENTIFIER: printf("%s \n","identifier"); break;
-	case TOK_HASH: printf("%s \n", "hash"); break;
-	case TOK_NUMBER: printf("%s \n", "number"); break;
-	case TOK_OPEN_PAREN: printf("%s \n", "open paren"); break;
-	case TOK_CLOSED_PAREN: printf("%s \n", "closed paren"); break;
-	case TOK_OPEN_CURLY: printf("%s \n", "open curly"); break;
-	case TOK_CLOSED_CURLY: printf("%s \n", "closed curly"); break;
-	case TOK_OPEN_SQUARE: printf("%s \n", "open square"); break;
-	case TOK_CLOSED_SQUARE: printf("%s \n", "closed square"); break;
-	case TOK_KEYWORD: printf("%s \n", "keyword"); break;
+	case TOK_IDENTIFIER: printf("identifier \n"); break;
+	case TOK_HASH: printf("hash \n"); break;
+	case TOK_NUMBER: printf("number \n"); break;
+	case TOK_OPEN_PAREN: printf("open paren \n"); break;
+	case TOK_CLOSED_PAREN: printf("closed paren \n"); break;
+	case TOK_OPEN_CURLY: printf("open curly \n"); break;
+	case TOK_CLOSED_CURLY: printf("closed curly \n"); break;
+	case TOK_OPEN_SQUARE: printf("open square \n"); break;
+	case TOK_CLOSED_SQUARE: printf("closed square \n"); break;
+	case TOK_KEYWORD: printf("keyword \n"); break;
+	case TOK_STRING: printf("quote \n"); break;
+	case TOK_UNKNOWN: printf("unknown\n"); break;
 
 	}
 
 }
 
 void
-lexer_print_tokens(Token* tokens) {
+print_tokens(Token* tokens) {
 
 	for (sizet i = 0; i < ARRAY_LENGTH(tokens); ++i) {
 

@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <re.h>
+#include <threads.h>
 
 /* TODO:
 
@@ -31,6 +31,14 @@ typedef struct Editor {
 
 } Editor;
 
+int some_function() {
+	
+	for (sizet i = 0; i < 10000; ++i) {
+		printf("running thread \n");
+	}
+
+}
+
 int main() {
   
 	Editor* editor = malloc(sizeof(Editor));
@@ -40,11 +48,10 @@ int main() {
 	editor->window = renderer_create_window();
 	events_initialize(editor->window);
 	renderer_initialize(renderer, 1280, 768);
-	renderer_load_font(renderer, "assets/CONSOLA.TTF", 20);
+	renderer_load_font(renderer, "assets/CONSOLA.TTF", 18);
 
 
 	Vec2 pos = {};
-	Vec4 color = {1.0f, 1.0f, 1.0f, 1.0f};
 	Vec2 ryukSize = {1920.0f, 1080.0f};
 	Vec4 ryukColor = {1.0f, 1.0f, 1.0f, 0.5f};
 
@@ -53,9 +60,11 @@ int main() {
 
 	file_close(file);
 
-	Token* tokens = lexer_lex(textFile);
+	Token* tokens = tokens_make(textFile);
 
-									   
+	/* thrd_t* thread; */
+	/* i32 success = thrd_create(thread, some_function, (void*)0); */
+	/* ASSERT(success == thrd_success); */
 
 	while (!glfwWindowShouldClose(editor->window)) {
 		
@@ -72,8 +81,8 @@ int main() {
 		renderer_begin(renderer);
 
 
-		render_textured_quad(renderer, pos, ryukSize, ryukColor, RYUK_TEXTURE_INDEX);
 		render_text_syntax(renderer, textFile, pos, tokens);
+		//render_textured_quad(renderer, pos, ryukSize, ryukColor, RYUK_TEXTURE_INDEX);
 
 		renderer_end(renderer);
 

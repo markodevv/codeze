@@ -8,7 +8,7 @@
 #define MAX_VERTICES 100000
 #define VERTICES_PER_QUAD 6
 
-static Vec4 gColors[TOK_KEYWORD + 1];
+static Vec4 gColors[TOK_TOTAL];
 
 static void
 error_callback(int code, const char* description) {
@@ -25,6 +25,10 @@ renderer_create_window() {
 	Vec4 green = {0.8f, 1.0f, 0.8f, 1.0f};
 	Vec4 blue = {0.6f, 0.6f, 1.0f, 1.0f};
 	Vec4 orange = {0.9f, 0.6f, 0.1f, 1.0f};
+	Vec4 green2 = {0.2f, 0.8f, 0.5f, 0.8f};
+	Vec4 redish = {0.7f, 0.3f, 0.1f, 0.8f};
+	Vec4 purple = {0.5f, 0.2f, 0.6f, 0.8f};
+
 	gColors[TOK_IDENTIFIER] = white;
 	gColors[TOK_HASH] = white;
 	gColors[TOK_NUMBER] = green;
@@ -34,7 +38,11 @@ renderer_create_window() {
 	gColors[TOK_CLOSED_CURLY] = orange;
 	gColors[TOK_OPEN_SQUARE] = orange;
 	gColors[TOK_CLOSED_SQUARE] = orange;
-	gColors[TOK_KEYWORD] = blue;
+	gColors[TOK_KEYWORD] = orange;
+	gColors[TOK_TYPE] = blue;
+	gColors[TOK_STRING] = green2;
+	gColors[TOK_SEMICOLON] = redish;
+	gColors[TOK_COMMENT] = purple;
 
 	GLFWwindow* window;
 

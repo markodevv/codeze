@@ -1,6 +1,7 @@
 #pragma once
 #include "my_string.h"
 #include "types.h"
+
 typedef enum TokenType {
 	
 	TOK_IDENTIFIER = 0,
@@ -13,12 +14,18 @@ typedef enum TokenType {
 	TOK_OPEN_SQUARE,
 	TOK_CLOSED_SQUARE,
 	TOK_KEYWORD,
-	TOK_UNKNOWN
+	TOK_STRING,
+	TOK_SEMICOLON,
+	TOK_COMMENT,
+	TOK_TYPE,
+	TOK_UNKNOWN,
+	TOK_TOTAL
 
 } TokenType;
 
+
 typedef struct Token {
-	
+
 	TokenType type;
 	sizet length;
 	sizet pos;
@@ -26,5 +33,5 @@ typedef struct Token {
 } Token;
 
 
-Token* lexer_lex(String* text);
-void lexer_print_tokens(Token* tokens);
+Token* tokens_make(String* text);
+void print_tokens(Token* tokens);
