@@ -126,7 +126,7 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 	File* vertexFile = file_open("src/vertex_shader.txt", "r");
 	File* fragmentFile = file_open("src/fragment_shader.txt", "r");
 
-	ren->program = shader_create(vertexFile->buffer, fragmentFile->buffer);
+	ren->program = shader_create(str_as_cstr(vertexFile->buffer), str_as_cstr(fragmentFile->buffer));
 	
 	glUseProgram(ren->program);
 
@@ -150,22 +150,22 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 	texture_load("assets/white.png", &ren->texIDs[WHITE_TEXTURE_INDEX], WHITE_TEXTURE_INDEX);
 	texture_load("assets/ryuk.png", &ren->texIDs[RYUK_TEXTURE_INDEX], RYUK_TEXTURE_INDEX);
 
-	String* str = str_create_c("uTextures");
-	char index[] = "[ ]";
+	const i8 subscriptIndex = 10;
+	char str[] = "uTextures[ ]";
+
+
 	i32 location;
 	for (i32 i = 0; i < TEXTURE_SLOTS; ++i) {
 
-		index[1] = '0' + i;
-		str_concat(str, index);
+		str[subscriptIndex] = '0' + i;
 
-		location = glGetUniformLocation(ren->program, str->data);
-		ASSERT(location != -1);
+		location = glGetUniformLocation(ren->program, str);
+		ASSERT_MSG(location != -1, "invalid uniform location");
 
 		glUniform1i(location, i);
-		str_delete_from_back(str, 3);
+
 	}
 
-	str_delete(str);
 
 
 	file_close(vertexFile);
@@ -322,32 +322,32 @@ render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color, u32 te
 }
 
 void
-render_text(Renderer* ren, String* text, Vec2 position, Vec4 color) {
+render_text(Renderer* ren, string* text, Vec2 position, Vec4 color) {
 
 	static float xpos, ypos, w, h, offsetX, texX, texY, advanceX, advanceY;
 	advanceY = position.y;
 	advanceX = position.x;
 
-	for (sizet i = 0; i < text->length; ++i) {
+	for (sizet i = 0; i < STR_LENGTH(text); ++i) {
 
-		if (str_at(text, i) == '\n') {
+		if (text[i] == '\n') {
 
 			advanceY += ren->fontSize;
 			advanceX = 0.0f;
 			continue;
 		}
-		else if (str_at(text, i) == '\t') {
+		else if (text[i] == '\t') {
 
-			advanceX += ren->glyphs[str_at(text, i)].advanceX;
+			advanceX += ren->glyphs[text[i]].advanceX;
 			continue;
 		}
 
-		xpos = advanceX + ren->glyphs[str_at(text, i)].bearingX;
+		xpos = advanceX + ren->glyphs[text[i]].bearingX;
 		// this is stupid, idk how else to make it work
-		ypos = advanceY - ren->glyphs[str_at(text, i)].bearingY + ren->fontSize;
-		w = ren->glyphs[str_at(text, i)].width;
-		h = ren->glyphs[str_at(text, i)].height;
-		offsetX = ren->glyphs[str_at(text, i)].offsetX;
+		ypos = advanceY - ren->glyphs[text[i]].bearingY + ren->fontSize;
+		w = ren->glyphs[text[i]].width;
+		h = ren->glyphs[text[i]].height;
+		offsetX = ren->glyphs[text[i]].offsetX;
 		texX = w / ren->bitmapW;
 		texY = h / ren->bitmapH;
 
@@ -374,12 +374,12 @@ render_text(Renderer* ren, String* text, Vec2 position, Vec4 color) {
 		}
 
 		ren->vertexCount += VERTICES_PER_QUAD;
-		advanceX += ren->glyphs[str_at(text, i)].advanceX;
+		advanceX += ren->glyphs[text[i]].advanceX;
 	}
 }
 
 void
-render_text_syntax(Renderer* ren, String* text, Vec2 position, Token* tokens) {
+render_text_syntax(Renderer* ren, string* text, Vec2 position, Token* tokens) {
 
 	static float xpos, ypos, w, h, offsetX, texX, texY, advanceX, advanceY;
 	advanceY = position.y;
@@ -388,26 +388,26 @@ render_text_syntax(Renderer* ren, String* text, Vec2 position, Token* tokens) {
 	i32 tokIndex = 0;
 	Vec4 color = gColors[0];
 
-	for (sizet i = 0; i < text->length; ++i) {
+	for (sizet i = 0; i < STR_LENGTH(text); ++i) {
 
-		if (str_at(text, i) == '\n') {
+		if (text[i] == '\n') {
 
 			advanceY += ren->fontSize;
 			advanceX = 0.0f;
 			continue;
 		}
-		else if (str_at(text, i) == '\t') {
+		else if (text[i] == '\t') {
 
-			advanceX += ren->glyphs[str_at(text, i)].advanceX;
+			advanceX += ren->glyphs[text[i]].advanceX;
 			continue;
 		}
 
-		xpos = advanceX + ren->glyphs[str_at(text, i)].bearingX;
+		xpos = advanceX + ren->glyphs[text[i]].bearingX;
 		// this is stupid, idk how else to make it work
-		ypos = advanceY - ren->glyphs[str_at(text, i)].bearingY + ren->fontSize;
-		w = ren->glyphs[str_at(text, i)].width;
-		h = ren->glyphs[str_at(text, i)].height;
-		offsetX = ren->glyphs[str_at(text, i)].offsetX;
+		ypos = advanceY - ren->glyphs[text[i]].bearingY + ren->fontSize;
+		w = ren->glyphs[text[i]].width;
+		h = ren->glyphs[text[i]].height;
+		offsetX = ren->glyphs[text[i]].offsetX;
 		texX = w / ren->bitmapW;
 		texY = h / ren->bitmapH;
 
@@ -449,7 +449,7 @@ render_text_syntax(Renderer* ren, String* text, Vec2 position, Token* tokens) {
 		len--;
 
 		ren->vertexCount += VERTICES_PER_QUAD;
-		advanceX += ren->glyphs[str_at(text, i)].advanceX;
+		advanceX += ren->glyphs[text[i]].advanceX;
 	}
 }
 

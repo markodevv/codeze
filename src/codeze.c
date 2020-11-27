@@ -5,6 +5,7 @@
 #include "fileio.h"
 #include "tokenizer.h"
 #include "container.h"
+#include "buffer.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,15 +57,17 @@ int main() {
 	Vec4 ryukColor = {1.0f, 1.0f, 1.0f, 0.5f};
 
 	File* file = file_open("test.c", "r");
-	String* textFile = str_create_c(file->buffer);
+	//String* textFile = str_create_c(file->buffer);
+	Buffer* buffer = buffer_create(file);
+	Token* tokens = tokens_make(file->buffer);
 
 	file_close(file);
 
-	Token* tokens = tokens_make(textFile);
 
 	/* thrd_t* thread; */
 	/* i32 success = thrd_create(thread, some_function, (void*)0); */
 	/* ASSERT(success == thrd_success); */
+
 
 	while (!glfwWindowShouldClose(editor->window)) {
 		
@@ -81,7 +84,7 @@ int main() {
 		renderer_begin(renderer);
 
 
-		render_text_syntax(renderer, textFile, pos, tokens);
+		render_text_syntax(renderer, buffer->text, pos, tokens);
 		//render_textured_quad(renderer, pos, ryukSize, ryukColor, RYUK_TEXTURE_INDEX);
 
 		renderer_end(renderer);

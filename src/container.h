@@ -7,7 +7,7 @@ enum {
 	_CAPACITY,
 	_LENGTH,
 	_STRIDE,
-	_FIELDS,
+	_FIELDS
 };
 
 #define ARRAY_LENGTH(arr) array_field_get(arr, _LENGTH)

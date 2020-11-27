@@ -1,6 +1,5 @@
 #include "fileio.h"
 #include "types.h"
-#include "my_string.h"
 #include "debug.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -19,21 +18,24 @@ File* file_open(const char* path, const char* flags) {
 	rewind(fp);
 
 	File* file = malloc(sizeof(File));
-	file->buffer = malloc(sizeof(char) * size);
+	ASSERT(file);
+
+	file->buffer = str_create_s(size);
+	file->lineCount = 0;
 
 	char line[1024];
-
-	i32 cursor = 0;
+	sizet cursor = 0;
 
 	while (fgets(line, sizeof(line), fp) != NULL) {
-		i32 i = 0;
+
+		sizet i = 0;
 		while (line[i] != '\0') {
-			file->buffer[cursor] = line[i];
-			cursor++;
+
+			file->buffer = str_push(file->buffer, line[i]);
 			i++;
 		}
+		file->lineCount++;
 	}
-    file->buffer[cursor] = '\0';
 
 	fclose(fp);
 
@@ -43,7 +45,7 @@ File* file_open(const char* path, const char* flags) {
 
 File* file_close(File* file) {
 
-	free(file->buffer);
+	str_free(file->buffer);
 	free(file);
 	
 }

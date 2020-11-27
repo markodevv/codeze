@@ -97,7 +97,7 @@ is_keyword(const char* word) {
   
 	for (sizet i = 0; i < NUM_KEYWORDS; ++i) {
 
-		if (str_equal(word, gKeywords[i])) return 1;
+		if (cstr_equal(word, gKeywords[i])) return 1;
 		
 	}
 	return 0;
@@ -110,7 +110,7 @@ is_type(const char* word) {
   
 	for (sizet i = 0; i < NUM_TYPES; ++i) {
 
-		if (str_equal(word, gTypes[i])) return 1;
+		if (cstr_equal(word, gTypes[i])) return 1;
 		
 	}
 	return 0;
@@ -147,19 +147,15 @@ in_quote(char c) {
 }
 
 Token*
-tokens_make(String* text) {
+tokens_make(string* text) {
 
 	Token* tokens = array_create(INITIAL_TOKEN_CAPACITY, sizeof(Token));
-	char* begin = text->data;
-	char* pos = begin;
 
-	while (*pos != '\0') {
-
-		switch(*pos) {
-
+	for (sizet i = 0; i < STR_LENGTH(text); ++i) {
+		
+		switch(text[i]) {
 		default:
-			pos++;
-			break;
+			continue;
 		case 'a':
 		case 'b':
 		case 'c':
@@ -212,13 +208,14 @@ tokens_make(String* text) {
 		case 'X':
 		case 'Y':
 		case 'Z': {
-			Token token = {TOK_UNKNOWN, 0, pos - begin};
+			Token token = {TOK_UNKNOWN, 0, i};
 			static char word[256];
-			while (is_char_identifier(*pos)) {
+			i++;
+			while (is_char_identifier(text[i])) {
 
-				word[token.length] = *pos;
+				word[token.length] = text[i];
 				token.length++;
-				pos++;
+				i++;
 			}
 			word[token.length] = '\0';
 
@@ -236,7 +233,7 @@ tokens_make(String* text) {
 			}
 
 			tokens = array_push(tokens, &token);
-			break;
+			continue;
 		}
 
 		case '0':
@@ -249,95 +246,95 @@ tokens_make(String* text) {
 		case '7':
 		case '8':
 		case '9': {
-			Token token = {TOK_NUMBER, 0, pos - begin};
-			while (is_number(*pos)) {
+			Token token = {TOK_NUMBER, 0, i};
+			while (is_number(text[i])) {
 
 				token.length++;
-				pos++;
+				i++;
 			}
 			tokens = array_push(tokens, &token);
-			break;
+			continue;
 		}
 
 		case '(': {
-			Token token = {TOK_OPEN_PAREN, 1, pos - begin};
-			pos++;
+			Token token = {TOK_OPEN_PAREN, 1, i};
+			i++;
 			tokens = array_push(tokens, &token);
-			break;
+			continue;
 		}
 
 		case ')': {
-			Token token = {TOK_CLOSED_PAREN, 1, pos - begin};
-			pos++;
+			Token token = {TOK_CLOSED_PAREN, 1, i};
+			i++;
 			tokens = array_push(tokens, &token);
-			break;
+			continue;
 		}
 
 		case '{': {
-			Token token = {TOK_OPEN_CURLY, 1, pos - begin};
-			pos++;
+			Token token = {TOK_OPEN_CURLY, 1, i};
+			i++;
 			tokens = array_push(tokens, &token);
-			break;
+			continue;
 		}
 
 		case '}': {
-			Token token = {TOK_CLOSED_CURLY, 1, pos - begin};
-			pos++;
+			Token token = {TOK_CLOSED_CURLY, 1, i};
+			i++;
 			tokens = array_push(tokens, &token);
-			break;
+			continue;
 		}
 		case '#': {
-			Token token = {TOK_HASH, 1, pos - begin};
-			pos++;
+			Token token = {TOK_HASH, 1, i};
+			i++;
 			tokens = array_push(tokens, &token);
-			break;
+			continue;
 		}
 		case '"': {
-			Token token = {TOK_STRING, 0, pos - begin};
-			pos++;
-			while (in_quote(*pos)) {
-				pos++;
+			Token token = {TOK_STRING, 0, i};
+			i++;
+			while (in_quote(text[i])) {
+				i++;
 			}
-			pos++;
-			token.length = (pos - begin) - token.pos;
+			i++;
+			token.length = i - token.pos;
 			tokens = array_push(tokens, &token);
-			break;
+			continue;
 		}
 		case '<': {
-			Token token = {TOK_STRING, 0, pos - begin};
-			pos++;
-			while ((*pos) != '>') {
-				pos++;
+			Token token = {TOK_STRING, 0, i};
+			i++;
+			while (text[i] != '>') {
+				i++;
 			}
-			pos++;
-			token.length = (pos - begin) - token.pos;
+			i++;
+			token.length = i - token.pos;
 			tokens = array_push(tokens, &token);
-			break;
+			continue;
 		}
 		case ';': {
-			Token token = {TOK_SEMICOLON, 1, pos - begin};
-			pos++;
+			Token token = {TOK_SEMICOLON, 1, i};
+			i++;
 			tokens = array_push(tokens, &token);
-			break;
+			continue;
 		}
 		case '/': {
-			Token token = {TOK_COMMENT, 1, pos - begin};
-			pos++;
-			if (*pos == '/') {
-				while (*pos != '\n' && *pos != '\0') {
+			Token token = {TOK_COMMENT, 1, i};
+			i++;
+			if (text[i] == '/') {
+				while (text[i] != '\n' && text[i] != '\0') {
 					token.length++;
-					pos++;
+					i++;
 				}
 			}
-			else if (*pos == '*') {
-				pos++;
-				while (*pos != '\0' && (*pos != '*' && *(pos + 1) != '/')) {
+			else if (text[i] == '*') {
+				i++;
+				while (text[i] != '\0' && (text[i] != '*' && text[i + 1] != '/')) {
 					token.length++;
-					pos++;
+					i++;
 				}
 			}
 			tokens = array_push(tokens, &token);
-			break;
+			continue;
 		}
 
 		}

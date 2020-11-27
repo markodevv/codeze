@@ -1,9 +1,11 @@
 #pragma once
 #include "types.h"
+#include "my_string.h"
 
 typedef struct File {
   
-	char* buffer;
+	string* buffer;
+	sizet lineCount;
 
 } File;
 

@@ -33,5 +33,5 @@ typedef struct Token {
 } Token;
 
 
-Token* tokens_make(String* text);
+Token* tokens_make(string* text);
 void print_tokens(Token* tokens);
