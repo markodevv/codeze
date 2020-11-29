@@ -380,42 +380,44 @@ render_buffer(Renderer* ren, Buffer* buf, Vec2 position, Token* tokens) {
 	static float xpos, ypos, w, h, offsetX,
 		texX, texY, advanceX, advanceY, tokLen;
 
+	string* text = buffer_get_text(buf);
+
 	advanceY = position.y;
 	advanceX = position.x;
 
 	u32 tokIndex = 0;
 	Vec4 color = global_Colors[0];
 
-	for (sizet i = 0; i < STR_LENGTH(buf->text); ++i) {
+	for (sizet i = 0; i < STR_LENGTH(text); ++i) {
 
 		if (i == buf->preLen) {
 			// TODO: figure out why this is
 			f32 wierdOffset = ren->fontSize / 5;
 			Vec2 pos = {advanceX, (advanceY + wierdOffset)};
-			Vec2 size = {ren->glyphs[buf->text[i]].advanceX, (f32)ren->fontSize};
+			Vec2 size = {ren->glyphs[text[i]].advanceX, (f32)ren->fontSize};
 
 			render_quad(ren, pos, size, global_CursorColor);
 		}
 
-		if (buf->text[i] == '\n') {
+		if (text[i] == '\n') {
 
 			advanceY += ren->fontSize;
 			advanceX = 0.0f;
 			continue;
 		}
-		else if (buf->text[i] == '\t') {
+		else if (text[i] == '\t') {
 
-			advanceX += ren->glyphs[buf->text[i]].advanceX;
+			advanceX += ren->glyphs[text[i]].advanceX;
 			continue;
 		}
 
 
-		xpos = advanceX + ren->glyphs[buf->text[i]].bearingX;
+		xpos = advanceX + ren->glyphs[text[i]].bearingX;
 		// this is stupid, idk how else to make it work
-		ypos = advanceY - ren->glyphs[buf->text[i]].bearingY + ren->fontSize;
-		w = ren->glyphs[buf->text[i]].width;
-		h = ren->glyphs[buf->text[i]].height;
-		offsetX = ren->glyphs[buf->text[i]].offsetX;
+		ypos = advanceY - ren->glyphs[text[i]].bearingY + ren->fontSize;
+		w = ren->glyphs[text[i]].width;
+		h = ren->glyphs[text[i]].height;
+		offsetX = ren->glyphs[text[i]].offsetX;
 		texX = w / ren->bitmapW;
 		texY = h / ren->bitmapH;
 
@@ -457,8 +459,10 @@ render_buffer(Renderer* ren, Buffer* buf, Vec2 position, Token* tokens) {
 		tokLen--;
 
 		ren->vertexCount += VERTICES_PER_QUAD;
-		advanceX += ren->glyphs[buf->text[i]].advanceX;
+		advanceX += ren->glyphs[text[i]].advanceX;
 	}
+
+	str_release(text);
 }
 
 void

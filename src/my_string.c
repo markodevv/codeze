@@ -21,7 +21,6 @@ str_create_c(const char* text) {
 	str[S_LENGTH] = strLen;
 	str[S_CAPACITY] = strLen;
 
-	//return (void*)(str + S_FIELDS);
 	return out;
 
 }
@@ -56,9 +55,10 @@ str_field_set(void* str, sizet field, sizet value) {
 }
 
 void
-str_free(void *str) {
-
-    free(str - S_FIELDS * sizeof(sizet));
+str_release(void* str) {
+  
+	ASSERT(str);
+	free(str - S_FIELDS * sizeof(sizet));
 }
 
 
@@ -87,6 +87,7 @@ str_copy(string* dest, string* src) {
 
 }
 
+
 void*
 str_resize(void* str) {
 	
@@ -95,7 +96,7 @@ str_resize(void* str) {
 	str_field_set(temp, S_LENGTH, STR_LENGTH(str));
 
 	memcpy(temp, str, STR_LENGTH(str) * sizeof(char));
-	str_free(str);
+	str_release(str);
 
 	return temp;
 
@@ -142,6 +143,8 @@ str_concat(string* s1, string* s2) {
 
 void
 str_pop(string* str) {
+
+	if (STR_LENGTH(str) == 0) return;
 
 	str[STR_LENGTH(str)] = '\0';
 	STR_LEN_SUBTRACT_ONE(str);

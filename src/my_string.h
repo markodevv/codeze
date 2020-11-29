@@ -14,7 +14,7 @@ enum {
 
 void* str_create_c(const char* text);
 void* str_create_s(sizet size);
-void str_free(void *str);
+void str_release(void* str);
 sizet cstr_len(const char* str);
 void str_copy(string* dest, string* src);
 void* str_push(void *str, char c);

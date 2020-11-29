@@ -1,6 +1,8 @@
 #include "buffer.h"
+#include <string.h>
 
 #define TAB_SIZE 4
+#define BUFFER_RESIZE_FACTOR 2
 
 Buffer*
 buffer_create(File* file) {
@@ -169,10 +171,60 @@ buffer_cursor_up(Buffer* b) {
 
 }
 
+	#include <stdio.h>
+string*
+buffer_get_text(Buffer* b) {
+	
+	string* newstr = str_create_s(b->preLen + b->postLen);
+
+	for (sizet i = 0; i < b->preLen; ++i) {
+		newstr = str_push(newstr, b->text[i]);
+	}
+
+	for (sizet i = b->preLen; i + b->gapLen < STR_LENGTH(b->text); ++i) {
+		newstr = str_push(newstr, b->text[i + b->gapLen]);
+	}
+
+	return newstr;
+
+}
+
+void
 buffer_insert_char(Buffer* b, char c) {
 	
 	if (b->gapLen == 0) {
 		
-		
+		sizet gap = STR_LENGTH(b->text);
+		string* newstr = str_create_s(gap * BUFFER_RESIZE_FACTOR);
+
+		// copy first part of string
+		for (sizet i = 0; i < b->preLen; ++i) {
+			newstr = str_push(newstr, b->text[i]);
+		}
+
+		for (sizet i = b->preLen; i < gap; ++i) {
+			newstr = str_push(newstr, 'a');
+		}
+
+		//copy second part of the string
+		for (sizet i = b->preLen; i < STR_LENGTH(b->text); ++i) {
+			newstr = str_push(newstr, b->text[i]);
+		}
+
+		str_release(b->text);
+		b->text = newstr;
 	}
+
+	b->text[b->preLen] = c;
+	b->preLen++;
+	if (c == '\t') {
+		b->lineLengths[b->currentLine] += 4;
+		b->cursorX += 4;
+	}
+	else {
+		b->lineLengths[b->currentLine]++;
+		b->cursorX++;
+	}
+
+	b->gapLen = STR_LENGTH(b->text) - (b->preLen + b->postLen);
 }

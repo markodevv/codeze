@@ -53,8 +53,11 @@ int main() {
 	Buffer* buffer = buffer_create(file);
 	Token* tokens = tokens_make(file->buffer);
 
+
+	//buffer_insert_char(buffer, 'A');
 	file_close(file);
 
+	//	string* text = buffer_get_text(buffer);
 
 	// thrd_t thread;
 	// thrd_t thread2;
@@ -71,15 +74,18 @@ int main() {
 		while(event_queue_next(event)) { 
 			if (event->type == KEY_PRESSED || event->type == KEY_REPEAT) {
 				switch(event->key) {
-				case KEY_H:
+				case KEY_Left:
 					buffer_cursor_previous(buffer); break;
-				case KEY_L:
+				case KEY_Right:
 					buffer_cursor_next(buffer); break;
-				case KEY_J:
+				case KEY_Down:
 					buffer_cursor_down(buffer); break;
-				case KEY_K:
+				case KEY_Up:
 					buffer_cursor_up(buffer); break;
 				}
+			}
+			else if (event->type == CHAR_INPUTED) {
+				buffer_insert_char(buffer, event->character);
 			}
 			else if	(event->type == WINDOW_RESIZED) {
 				ortho(renderer->projection, 0.0f, event->width, event->height, 0.0f); break;

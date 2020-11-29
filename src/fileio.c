@@ -45,7 +45,7 @@ File* file_open(const char* path, const char* flags) {
 
 File* file_close(File* file) {
 
-	str_free(file->buffer);
+	str_release(file->buffer);
 	free(file);
 	
 }

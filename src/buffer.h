@@ -24,5 +24,7 @@ void buffer_cursor_down(Buffer* b);
 void buffer_cursor_up(Buffer* b);
 void buffer_cursor_previous(Buffer* b);
 void buffer_cursor_next(Buffer* b);
+void buffer_insert_char(Buffer* b, char c);
+string* buffer_get_text(Buffer* b);
 
 
