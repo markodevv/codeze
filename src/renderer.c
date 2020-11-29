@@ -8,7 +8,8 @@
 #define MAX_VERTICES 100000
 #define VERTICES_PER_QUAD 6
 
-static Vec4 gColors[TOK_TOTAL];
+static Vec4 global_Colors[TOK_TOTAL];
+static Vec4 global_CursorColor = {1.0f, 1.0f, 1.0f, 0.5f};
 
 static void
 error_callback(int code, const char* description) {
@@ -29,20 +30,20 @@ renderer_create_window() {
 	Vec4 redish = {0.7f, 0.3f, 0.1f, 0.8f};
 	Vec4 purple = {0.5f, 0.2f, 0.6f, 0.8f};
 
-	gColors[TOK_IDENTIFIER] = white;
-	gColors[TOK_HASH] = white;
-	gColors[TOK_NUMBER] = green;
-	gColors[TOK_OPEN_PAREN] = orange;
-	gColors[TOK_CLOSED_PAREN] = orange;
-	gColors[TOK_OPEN_CURLY] = orange;
-	gColors[TOK_CLOSED_CURLY] = orange;
-	gColors[TOK_OPEN_SQUARE] = orange;
-	gColors[TOK_CLOSED_SQUARE] = orange;
-	gColors[TOK_KEYWORD] = orange;
-	gColors[TOK_TYPE] = blue;
-	gColors[TOK_STRING] = green2;
-	gColors[TOK_SEMICOLON] = redish;
-	gColors[TOK_COMMENT] = purple;
+	global_Colors[TOK_IDENTIFIER] = white;
+	global_Colors[TOK_HASH] = white;
+	global_Colors[TOK_NUMBER] = green;
+	global_Colors[TOK_OPEN_PAREN] = orange;
+	global_Colors[TOK_CLOSED_PAREN] = orange;
+	global_Colors[TOK_OPEN_CURLY] = orange;
+	global_Colors[TOK_CLOSED_CURLY] = orange;
+	global_Colors[TOK_OPEN_SQUARE] = orange;
+	global_Colors[TOK_CLOSED_SQUARE] = orange;
+	global_Colors[TOK_KEYWORD] = orange;
+	global_Colors[TOK_TYPE] = blue;
+	global_Colors[TOK_STRING] = green2;
+	global_Colors[TOK_SEMICOLON] = redish;
+	global_Colors[TOK_COMMENT] = purple;
 
 	GLFWwindow* window;
 
@@ -166,8 +167,6 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 
 	}
 
-
-
 	file_close(vertexFile);
 	file_close(fragmentFile);
 
@@ -217,7 +216,7 @@ renderer_load_font(Renderer* ren, const char* fontFile, i32 fontSize) {
 
 	for (u8 i = 0; i < 128; ++i) {
 
-		i32 success = FT_Load_Char(ren->fontFace, i, FT_LOAD_RENDER);
+		i8 success = FT_Load_Char(ren->fontFace, i, FT_LOAD_RENDER);
 		ASSERT(success == 0);
 
 		glTexSubImage2D(GL_TEXTURE_2D, 0, texOffset, 0, 
@@ -238,13 +237,9 @@ renderer_load_font(Renderer* ren, const char* fontFile, i32 fontSize) {
 		texOffset += glyph->bitmap.width;
 	}
 
-	// i32 location = glGetUniformLocation(ren->program, "uTextures[2]");
-	// ASSERT(location != -1);
 
-	// glUniform1i(location, FONT_TEXTURE_INDEX);
-
-	// Hardcoded tab size
 	ren->glyphs['\t'].advanceX = ren->glyphs[' '].advanceX * 4;
+
 
 	FT_Done_Face(ren->fontFace);
 	FT_Done_FreeType(ren->ftLib);
@@ -378,29 +373,119 @@ render_text(Renderer* ren, string* text, Vec2 position, Vec4 color) {
 	}
 }
 
-void
-render_text_syntax(Renderer* ren, string* text, Vec2 position, Token* tokens) {
 
-	static float xpos, ypos, w, h, offsetX, texX, texY, advanceX, advanceY;
+void
+render_buffer(Renderer* ren, Buffer* buf, Vec2 position, Token* tokens) {
+
+	static float xpos, ypos, w, h, offsetX,
+		texX, texY, advanceX, advanceY, tokLen;
+
 	advanceY = position.y;
 	advanceX = position.x;
 
-	i32 tokIndex = 0;
-	Vec4 color = gColors[0];
+	u32 tokIndex = 0;
+	Vec4 color = global_Colors[0];
 
-	for (sizet i = 0; i < STR_LENGTH(text); ++i) {
+	for (sizet i = 0; i < STR_LENGTH(buf->text); ++i) {
 
-		if (text[i] == '\n') {
+		if (i == buf->preLen) {
+			// TODO: figure out why this is
+			f32 wierdOffset = ren->fontSize / 5;
+			Vec2 pos = {advanceX, (advanceY + wierdOffset)};
+			Vec2 size = {ren->glyphs[buf->text[i]].advanceX, (f32)ren->fontSize};
+
+			render_quad(ren, pos, size, global_CursorColor);
+		}
+
+		if (buf->text[i] == '\n') {
 
 			advanceY += ren->fontSize;
 			advanceX = 0.0f;
 			continue;
 		}
-		else if (text[i] == '\t') {
+		else if (buf->text[i] == '\t') {
 
-			advanceX += ren->glyphs[text[i]].advanceX;
+			advanceX += ren->glyphs[buf->text[i]].advanceX;
 			continue;
 		}
+
+
+		xpos = advanceX + ren->glyphs[buf->text[i]].bearingX;
+		// this is stupid, idk how else to make it work
+		ypos = advanceY - ren->glyphs[buf->text[i]].bearingY + ren->fontSize;
+		w = ren->glyphs[buf->text[i]].width;
+		h = ren->glyphs[buf->text[i]].height;
+		offsetX = ren->glyphs[buf->text[i]].offsetX;
+		texX = w / ren->bitmapW;
+		texY = h / ren->bitmapH;
+
+		Vec4 quadVertices[] = {
+			{xpos,     ypos,     offsetX,        0.0f},
+			{xpos + w, ypos,     offsetX + texX, 0.0f},
+			{xpos + w, ypos + h, offsetX + texX, texY},
+			{xpos,     ypos,     offsetX,        0.0f},
+			{xpos,     ypos + h, offsetX,        texY},
+			{xpos + w, ypos + h, offsetX + texX, texY}
+		};
+
+		if (ren->vertexCount >= MAX_VERTICES) {
+
+			renderer_end(ren);
+		}
+
+
+		if (i == tokens[tokIndex].pos) {
+
+			color = global_Colors[tokens[tokIndex].type];
+			tokLen = tokens[tokIndex].length;
+			tokIndex++;
+		}
+
+		if (tokLen <= 0) {
+
+			color = global_Colors[TOK_IDENTIFIER];
+		}
+
+		for (int j = 0; j < VERTICES_PER_QUAD; ++j) {
+
+			ren->vertexArrayIndex->color = color;
+			ren->vertexArrayIndex->posData = quadVertices[j];
+			ren->vertexArrayIndex->texIndex = FONT_TEXTURE_INDEX;
+			ren->vertexArrayIndex++;
+		}
+
+		tokLen--;
+
+		ren->vertexCount += VERTICES_PER_QUAD;
+		advanceX += ren->glyphs[buf->text[i]].advanceX;
+	}
+}
+
+void
+renderer_end(Renderer* ren) {
+
+	static i32 count, dataSize;
+	count = (ren->vertexArrayIndex - ren->vertexArray);
+	dataSize = (ren->vertexArrayIndex - ren->vertexArray) * sizeof(Vertex);
+
+	glBufferSubData(GL_ARRAY_BUFFER, 0, dataSize, ren->vertexArray);
+
+	glDrawArrays(GL_TRIANGLES, 0, ren->vertexCount);
+
+	ren->vertexCount = 0;
+	ren->vertexArrayIndex = ren->vertexArray;
+
+}
+
+#ifdef DEBUG
+void
+render_text_debug(Renderer* ren, char* text, Vec2 position, Vec4 color) {
+
+	static float xpos, ypos, w, h, offsetX, texX, texY, advanceX, advanceY;
+	advanceY = position.y;
+	advanceX = position.x;
+
+	for (sizet i = 0; text[i] != '\0'; ++i) {
 
 		xpos = advanceX + ren->glyphs[text[i]].bearingX;
 		// this is stupid, idk how else to make it work
@@ -425,19 +510,6 @@ render_text_syntax(Renderer* ren, string* text, Vec2 position, Token* tokens) {
 			renderer_end(ren);
 		}
 
-		static i32 len = 0;
-
-		if (i == tokens[tokIndex].pos) {
-
-			color = gColors[tokens[tokIndex].type];
-			len = tokens[tokIndex].length;
-			tokIndex++;
-		}
-
-		if (len <= 0) {
-			color = gColors[0];
-		}
-
 		for (int j = 0; j < VERTICES_PER_QUAD; ++j) {
 
 			ren->vertexArrayIndex->color = color;
@@ -446,25 +518,9 @@ render_text_syntax(Renderer* ren, string* text, Vec2 position, Token* tokens) {
 			ren->vertexArrayIndex++;
 		}
 
-		len--;
-
 		ren->vertexCount += VERTICES_PER_QUAD;
 		advanceX += ren->glyphs[text[i]].advanceX;
 	}
 }
 
-void
-renderer_end(Renderer* ren) {
-
-	static i32 count, dataSize;
-	count = (ren->vertexArrayIndex - ren->vertexArray);
-	dataSize = (ren->vertexArrayIndex - ren->vertexArray) * sizeof(Vertex);
-
-	glBufferSubData(GL_ARRAY_BUFFER, 0, dataSize, ren->vertexArray);
-
-	glDrawArrays(GL_TRIANGLES, 0, ren->vertexCount);
-
-	ren->vertexCount = 0;
-	ren->vertexArrayIndex = ren->vertexArray;
-
-}
+#endif

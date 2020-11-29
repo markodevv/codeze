@@ -151,11 +151,13 @@ tokens_make(string* text) {
 
 	Token* tokens = array_create(INITIAL_TOKEN_CAPACITY, sizeof(Token));
 
-	for (sizet i = 0; i < STR_LENGTH(text); ++i) {
+	sizet i = 0;
+	while (i < STR_LENGTH(text)) {
 		
 		switch(text[i]) {
 		default:
-			continue;
+			i++;
+			break;
 		case 'a':
 		case 'b':
 		case 'c':
@@ -210,7 +212,6 @@ tokens_make(string* text) {
 		case 'Z': {
 			Token token = {TOK_UNKNOWN, 0, i};
 			static char word[256];
-			i++;
 			while (is_char_identifier(text[i])) {
 
 				word[token.length] = text[i];
@@ -233,7 +234,7 @@ tokens_make(string* text) {
 			}
 
 			tokens = array_push(tokens, &token);
-			continue;
+			break;
 		}
 
 		case '0':
@@ -253,7 +254,7 @@ tokens_make(string* text) {
 				i++;
 			}
 			tokens = array_push(tokens, &token);
-			continue;
+			break;
 		}
 
 		case '(': {
@@ -281,8 +282,7 @@ tokens_make(string* text) {
 			Token token = {TOK_CLOSED_CURLY, 1, i};
 			i++;
 			tokens = array_push(tokens, &token);
-			continue;
-		}
+			continue;}
 		case '#': {
 			Token token = {TOK_HASH, 1, i};
 			i++;
@@ -318,21 +318,21 @@ tokens_make(string* text) {
 			continue;
 		}
 		case '/': {
-			Token token = {TOK_COMMENT, 1, i};
-			i++;
-			if (text[i] == '/') {
+			Token token = {TOK_COMMENT, 0, i};
+			if (text[i + 1] == '/') {
 				while (text[i] != '\n' && text[i] != '\0') {
 					token.length++;
 					i++;
 				}
 			}
-			else if (text[i] == '*') {
+			else if (text[i + 1] == '*') {
 				i++;
 				while (text[i] != '\0' && (text[i] != '*' && text[i + 1] != '/')) {
 					token.length++;
 					i++;
 				}
 			}
+			i++;
 			tokens = array_push(tokens, &token);
 			continue;
 		}

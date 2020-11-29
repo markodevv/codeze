@@ -13,14 +13,14 @@
 
 /* TODO:
 
-   - tiny up code
    - gap buffer
-   - syntax highliting
 
  */
 
 /* DONE:
 
+   - syntax highliting
+   - tiny up code
    - Font rendering
    - string struct
    - fix offscreen rendering
@@ -32,13 +32,6 @@ typedef struct Editor {
 
 } Editor;
 
-int some_function() {
-	
-	for (sizet i = 0; i < 10000; ++i) {
-		printf("running thread \n");
-	}
-
-}
 
 int main() {
   
@@ -53,39 +46,58 @@ int main() {
 
 
 	Vec2 pos = {};
-	Vec2 ryukSize = {1920.0f, 1080.0f};
-	Vec4 ryukColor = {1.0f, 1.0f, 1.0f, 0.5f};
+	Vec4 cursorColor = {1.0f, 1.0f, 1.0f, 1.0f};
 
 	File* file = file_open("test.c", "r");
-	//String* textFile = str_create_c(file->buffer);
+
 	Buffer* buffer = buffer_create(file);
 	Token* tokens = tokens_make(file->buffer);
 
 	file_close(file);
 
 
-	/* thrd_t* thread; */
-	/* i32 success = thrd_create(thread, some_function, (void*)0); */
-	/* ASSERT(success == thrd_success); */
+	// thrd_t thread;
+	// thrd_t thread2;
+	// i32 success = thrd_create(&thread, some_function, "thread1");
+	// ASSERT(success == thrd_success);
+
+	// i32 result;
+	// thrd_join(thread, &result);
+	// printf("\n");
 
 
 	while (!glfwWindowShouldClose(editor->window)) {
 		
 		while(event_queue_next(event)) { 
-			switch(event->type) { 
-		 		case KEY_PRESSED: 
-					break;
-				case WINDOW_RESIZED:
-					ortho(renderer->projection, 0.0f, event->width, event->height, 0.0f);
-					break;
+			if (event->type == KEY_PRESSED || event->type == KEY_REPEAT) {
+				switch(event->key) {
+				case KEY_H:
+					buffer_cursor_previous(buffer); break;
+				case KEY_L:
+					buffer_cursor_next(buffer); break;
+				case KEY_J:
+					buffer_cursor_down(buffer); break;
+				case KEY_K:
+					buffer_cursor_up(buffer); break;
 				}
+			}
+			else if	(event->type == WINDOW_RESIZED) {
+				ortho(renderer->projection, 0.0f, event->width, event->height, 0.0f); break;
+			}
 		} 
 
 		renderer_begin(renderer);
 
 
-		render_text_syntax(renderer, buffer->text, pos, tokens);
-		//render_textured_quad(renderer, pos, ryukSize, ryukColor, RYUK_TEXTURE_INDEX);
+		render_buffer(renderer, buffer, pos, tokens);
+
+		DEBUG_TEXT(renderer, 0, "- DEBUG TEXT -", NULL);
+		DEBUG_TEXT(renderer, 1, "cursorX %i", buffer->cursorX);
+		DEBUG_TEXT(renderer, 2, "current line %i", buffer->currentLine);
+		DEBUG_TEXT(renderer, 3, "pre length %i", buffer->preLen);
+		DEBUG_TEXT(renderer, 4, "post length %i", buffer->postLen);
+		DEBUG_TEXT(renderer, 5, "line length %i", buffer->lineLengths[buffer->currentLine]);
+		DEBUG_TEXT(renderer, 6, "char under cursor %c", buffer->text[buffer->preLen]);
 
 		renderer_end(renderer);
 

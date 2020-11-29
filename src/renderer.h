@@ -3,6 +3,7 @@
 #include "math.h"
 #include "my_string.h"
 #include "tokenizer.h"
+#include "buffer.h"
 
 #include <GLFW/glfw3.h>
 #include <ft2build.h>
@@ -78,4 +79,23 @@ void renderer_end(Renderer* ren);
 void render_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color);
 void render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color, u32 texID);
 void render_text(Renderer* ren, string* text, Vec2 position, Vec4 color);
-void render_text_syntax(Renderer* ren, string* text, Vec2 position, Token* tokens);
+void render_buffer(Renderer* ren, Buffer* buffer, Vec2 position, Token* tokens);
+
+#ifdef DEBUG
+#include "stdio.h" 
+
+void render_text_debug(Renderer* ren, char* text, Vec2 position, Vec4 color);
+static char DebugString[64];
+static Vec2 DebugPos = {1200.0f, 0.0f};
+static Vec4 DebugColor = {0.8f, 0.8f, 0.0f, 1.0f};
+
+#define DEBUG_TEXT(ren, row, text, ...)	\
+	sprintf(DebugString, text, __VA_ARGS__); \
+	DebugPos.y = row * ren->fontSize; \
+	render_text_debug(ren, DebugString, DebugPos, DebugColor);
+#else
+#define DEBUG_TEXT(ren, row, text, ...)	
+
+#endif
+  
+

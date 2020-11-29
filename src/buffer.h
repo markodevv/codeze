@@ -12,13 +12,17 @@ typedef struct Buffer {
 	sizet postLen;
 	sizet gapLen;
 
-	sizet lineCount;
-	sizet* lineData;
+	u32 currentLine;
+	u32* lineLengths;
+
+	u32 cursorX;
 
 } Buffer;
 
 Buffer* buffer_create(File* file);
-void buffer_cursor_forward(Buffer* b);
-void buffer_cursor_backward(Buffer* b);
+void buffer_cursor_down(Buffer* b);
+void buffer_cursor_up(Buffer* b);
+void buffer_cursor_previous(Buffer* b);
+void buffer_cursor_next(Buffer* b);
 
 
