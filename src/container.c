@@ -37,7 +37,7 @@ array_field_set(void* arr, sizet field, sizet value) {
 }
 
 void
-array_destroy(void *arr) {
+array_release(void *arr) {
 
     free(arr - _FIELDS * sizeof(sizet));
 }
@@ -50,19 +50,19 @@ array_resize(void *arr) {
     array_field_set(temp, _LENGTH, ARRAY_LENGTH(arr));
     memcpy(temp, arr, ARRAY_LENGTH(arr) * ARRAY_STRIDE(arr));
 
-    array_destroy(arr);
+    array_release(arr);
 
 	return temp;
 }
 
 void*
-array_push(void *arr, void *xptr) {
+array_push(void *arr, void *item) {
 
 	if (ARRAY_LENGTH(arr) >= ARRAY_CAPACITY(arr)) {
 		arr = array_resize(arr);
 	}
 
-    memcpy(arr + ARRAY_LENGTH(arr) * ARRAY_STRIDE(arr), xptr, ARRAY_STRIDE(arr));
+    memcpy(arr + ARRAY_LENGTH(arr) * ARRAY_STRIDE(arr), item, ARRAY_STRIDE(arr));
     array_field_set(arr, _LENGTH, ARRAY_LENGTH(arr) + 1);
     return arr;
 }
@@ -74,3 +74,34 @@ array_pop(void *arr, void *dest) {
     memcpy(dest, arr + (ARRAY_LENGTH(arr) - 1) * ARRAY_STRIDE(arr), ARRAY_STRIDE(arr));
     array_field_set(arr, _LENGTH, ARRAY_LENGTH(arr) - 1); // Decrement length.
 }
+
+void
+array_erase(void *arr, sizet pos) {
+  
+	void* src = arr + (pos * ARRAY_STRIDE(arr));
+	void* dest = arr + ((pos + 1) * ARRAY_STRIDE(arr));
+	sizet size = (ARRAY_LENGTH(arr) - pos) * ARRAY_STRIDE(arr);
+    memcpy(src, dest, size);
+
+	array_field_set(arr, _LENGTH, ARRAY_LENGTH(arr) - 1);
+}
+
+void*
+array_insert(void *arr, sizet pos, void* item) {
+	
+	// Resize if not enough capacity
+	if (ARRAY_LENGTH(arr) >= ARRAY_CAPACITY(arr)) {
+		arr = array_resize(arr);
+	}
+
+	void* dest = arr + ((pos + 1) * ARRAY_STRIDE(arr));
+	void* src = arr + (pos * ARRAY_STRIDE(arr));
+	sizet size = (ARRAY_LENGTH(arr) - pos) * ARRAY_STRIDE(arr);
+    memcpy(dest, src, size);
+    memcpy(arr + pos * ARRAY_STRIDE(arr), item, ARRAY_STRIDE(arr));
+
+	array_field_set(arr, _LENGTH, ARRAY_LENGTH(arr) + 1);
+
+	return arr;
+}
+

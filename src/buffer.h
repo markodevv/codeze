@@ -6,16 +6,16 @@
 
 typedef struct Buffer {
   
-	string* text;
+	string text;
 
 	sizet preLen;
 	sizet postLen;
 	sizet gapLen;
 
-	u32 currentLine;
-	u32* lineLengths;
+	i32 currentLine;
+	i32* lineLengths;
 
-	u32 cursorX;
+	i32 cursorX;
 
 } Buffer;
 
@@ -25,6 +25,9 @@ void buffer_cursor_up(Buffer* b);
 void buffer_cursor_previous(Buffer* b);
 void buffer_cursor_next(Buffer* b);
 void buffer_insert_char(Buffer* b, char c);
-string* buffer_get_text(Buffer* b);
+string buffer_get_text(Buffer* b);
+void buffer_insert_tab(Buffer* b);
+void buffer_insert_newline(Buffer* b);
+void buffer_backspace_delete(Buffer* b);
 
 

@@ -68,6 +68,13 @@ typedef struct Renderer {
 
 } Renderer;
 
+typedef struct Window {
+  
+	Vec2 position;
+	Vec2 size;
+
+} Window;
+
 
 GLFWwindow* renderer_create_window();
 
@@ -78,8 +85,8 @@ void renderer_end(Renderer* ren);
 
 void render_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color);
 void render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color, u32 texID);
-void render_text(Renderer* ren, string* text, Vec2 position, Vec4 color);
-void render_buffer(Renderer* ren, Buffer* buffer, Vec2 position, Token* tokens);
+void render_text(Renderer* ren, string text, Vec2 position, Vec4 color);
+void render_buffer(Renderer* ren, Buffer* buffer, Window* window, Token* tokens);
 
 #ifdef DEBUG
 #include "stdio.h" 

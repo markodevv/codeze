@@ -317,7 +317,7 @@ render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color, u32 te
 }
 
 void
-render_text(Renderer* ren, string* text, Vec2 position, Vec4 color) {
+render_text(Renderer* ren, string text, Vec2 position, Vec4 color) {
 
 	static float xpos, ypos, w, h, offsetX, texX, texY, advanceX, advanceY;
 	advanceY = position.y;
@@ -375,20 +375,28 @@ render_text(Renderer* ren, string* text, Vec2 position, Vec4 color) {
 
 
 void
-render_buffer(Renderer* ren, Buffer* buf, Vec2 position, Token* tokens) {
+render_buffer(Renderer* ren, Buffer* buf, Window *window, TokenArray tokens) {
 
 	static float xpos, ypos, w, h, offsetX,
 		texX, texY, advanceX, advanceY, tokLen;
 
-	string* text = buffer_get_text(buf);
+	string text = buffer_get_text(buf);
 
-	advanceY = position.y;
-	advanceX = position.x;
+	advanceY = window->position.y;
+	advanceX = window->position.x;
 
 	u32 tokIndex = 0;
 	Vec4 color = global_Colors[0];
 
 	for (sizet i = 0; i < STR_LENGTH(text); ++i) {
+
+		if (advanceY >= window->size.y) {
+			break;
+		}
+		if (advanceX >= window->position.x + window->size.x) {
+			advanceX = window->position.x;
+			advanceY += ren->fontSize;
+		}
 
 		if (i == buf->preLen) {
 			// TODO: figure out why this is
@@ -402,7 +410,7 @@ render_buffer(Renderer* ren, Buffer* buf, Vec2 position, Token* tokens) {
 		if (text[i] == '\n') {
 
 			advanceY += ren->fontSize;
-			advanceX = 0.0f;
+			advanceX = window->position.x;
 			continue;
 		}
 		else if (text[i] == '\t') {
@@ -448,7 +456,7 @@ render_buffer(Renderer* ren, Buffer* buf, Vec2 position, Token* tokens) {
 			color = global_Colors[TOK_IDENTIFIER];
 		}
 
-		for (int j = 0; j < VERTICES_PER_QUAD; ++j) {
+		for (i32 j = 0; j < VERTICES_PER_QUAD; ++j) {
 
 			ren->vertexArrayIndex->color = color;
 			ren->vertexArrayIndex->posData = quadVertices[j];

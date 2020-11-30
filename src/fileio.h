@@ -4,7 +4,7 @@
 
 typedef struct File {
   
-	string* buffer;
+	string buffer;
 	sizet lineCount;
 
 } File;

@@ -15,7 +15,7 @@ str_create_c(const char* text) {
 	sizet* str = (sizet*)malloc(strSize + headerSize);
 	ASSERT_MSG(str, "string malloc failed");
 
-	string* out = (void*)(str + S_FIELDS);
+	string out = (void*)(str + S_FIELDS);
 	memcpy(out, text, strLen * sizeof(char));
 
 	str[S_LENGTH] = strLen;
@@ -74,7 +74,7 @@ cstr_len(const char* str) {
 }
 
 void
-str_copy(string* dest, string* src) {
+str_copy(string dest, string src) {
 
 	ASSERT(STR_CAPACITY(dest) >= STR_LENGTH(src));
 
@@ -109,12 +109,12 @@ str_push(void *str, char c) {
 		str = str_resize(str);
 	}
 
-	((string*)str)[STR_LENGTH(str)] = c;
+	((string)str)[STR_LENGTH(str)] = c;
 	STR_LEN_ADD_ONE(str);
     return str;
 }
 
-char* str_as_cstr(string* str) {
+char* str_as_cstr(string str) {
 	
 	str[STR_LENGTH(str) - 1] = '\0';
 	return str;
@@ -123,7 +123,7 @@ char* str_as_cstr(string* str) {
 
 
 void*
-str_concat(string* s1, string* s2) {
+str_concat(string s1, string s2) {
 	
 	if ((STR_LENGTH(s1) + STR_LENGTH(s2)) >= STR_CAPACITY(s1)) {
 
@@ -142,7 +142,7 @@ str_concat(string* s1, string* s2) {
 
 
 void
-str_pop(string* str) {
+str_pop(string str) {
 
 	if (STR_LENGTH(str) == 0) return;
 

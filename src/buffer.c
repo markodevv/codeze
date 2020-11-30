@@ -1,4 +1,5 @@
 #include "buffer.h"
+#include "debug.h"
 #include <string.h>
 
 #define TAB_SIZE 4
@@ -13,7 +14,7 @@ buffer_create(File* file) {
 	buf->gapLen = 0;
 	buf->cursorX = 0;
 	buf->postLen = STR_LENGTH(file->buffer);
-	buf->lineLengths = array_create(file->lineCount, sizeof(sizet));
+	buf->lineLengths = array_create(file->lineCount, sizeof(i32));
 
 	buf->text = str_create_s(STR_LENGTH(file->buffer));
 	str_copy(buf->text, file->buffer);
@@ -171,11 +172,10 @@ buffer_cursor_up(Buffer* b) {
 
 }
 
-	#include <stdio.h>
-string*
+string
 buffer_get_text(Buffer* b) {
 	
-	string* newstr = str_create_s(b->preLen + b->postLen);
+	string newstr = str_create_s(b->preLen + b->postLen);
 
 	for (sizet i = 0; i < b->preLen; ++i) {
 		newstr = str_push(newstr, b->text[i]);
@@ -195,19 +195,20 @@ buffer_insert_char(Buffer* b, char c) {
 	if (b->gapLen == 0) {
 		
 		sizet gap = STR_LENGTH(b->text);
-		string* newstr = str_create_s(gap * BUFFER_RESIZE_FACTOR);
+		string newstr = str_create_s(gap * BUFFER_RESIZE_FACTOR);
 
 		// copy first part of string
-		for (sizet i = 0; i < b->preLen; ++i) {
+		sizet i = 0;
+		for (i; i < b->preLen; ++i) {
 			newstr = str_push(newstr, b->text[i]);
 		}
 
-		for (sizet i = b->preLen; i < gap; ++i) {
+		for (i; i < gap; ++i) {
 			newstr = str_push(newstr, 'a');
 		}
 
 		//copy second part of the string
-		for (sizet i = b->preLen; i < STR_LENGTH(b->text); ++i) {
+		for (i = b->preLen; i < STR_LENGTH(b->text); ++i) {
 			newstr = str_push(newstr, b->text[i]);
 		}
 
@@ -217,14 +218,62 @@ buffer_insert_char(Buffer* b, char c) {
 
 	b->text[b->preLen] = c;
 	b->preLen++;
-	if (c == '\t') {
-		b->lineLengths[b->currentLine] += 4;
-		b->cursorX += 4;
-	}
-	else {
-		b->lineLengths[b->currentLine]++;
-		b->cursorX++;
-	}
+	b->lineLengths[b->currentLine]++;
+	b->cursorX++;
 
 	b->gapLen = STR_LENGTH(b->text) - (b->preLen + b->postLen);
+}
+
+void
+buffer_insert_tab(Buffer* b) {
+	
+	b->lineLengths[b->currentLine] += TAB_SIZE - 1;
+	b->cursorX += TAB_SIZE - 1;
+	buffer_insert_char(b, '\t');
+}
+
+void
+buffer_insert_newline(Buffer* b) {
+	
+	buffer_insert_char(b, '\n');
+	u32 one = 0;
+	b->lineLengths = array_insert(b->lineLengths, b->currentLine, &one);
+
+	if (b->lineLengths[b->currentLine] != b->cursorX) {
+
+		u32 splitLineLen = b->lineLengths[b->currentLine] - b->cursorX;
+		b->lineLengths[b->currentLine] -= splitLineLen;
+		b->lineLengths[b->currentLine + 1] += splitLineLen;
+	}
+	b->currentLine++;
+	b->cursorX = 0;
+}
+
+void
+buffer_backspace_delete(Buffer* b) {
+	
+	if (b->preLen == 0) return;
+	b->preLen--;
+	b->gapLen++;
+
+	if (b->text[b->preLen] == '\n') {
+
+		u32 deletedLine = b->lineLengths[b->currentLine];
+
+		array_erase(b->lineLengths, b->currentLine);
+		b->currentLine--;
+		b->cursorX = b->lineLengths[b->currentLine];
+		b->lineLengths[b->currentLine] += deletedLine;
+
+
+	}
+	else if (b->text[b->preLen] == '\t') {
+		b->lineLengths[b->currentLine] -= TAB_SIZE - 1;
+		b->cursorX -= TAB_SIZE - 1;
+	}
+
+	b->cursorX--;
+	b->lineLengths[b->currentLine]--;
+
+
 }

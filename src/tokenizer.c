@@ -146,10 +146,10 @@ in_quote(char c) {
 
 }
 
-Token*
-tokens_make(string* text) {
+TokenArray 
+tokens_make(string text) {
 
-	Token* tokens = array_create(INITIAL_TOKEN_CAPACITY, sizeof(Token));
+	TokenArray tokens = array_create(INITIAL_TOKEN_CAPACITY, sizeof(Token));
 
 	sizet i = 0;
 	while (i < STR_LENGTH(text)) {
@@ -282,7 +282,8 @@ tokens_make(string* text) {
 			Token token = {TOK_CLOSED_CURLY, 1, i};
 			i++;
 			tokens = array_push(tokens, &token);
-			continue;}
+			continue;
+		}
 		case '#': {
 			Token token = {TOK_HASH, 1, i};
 			i++;
@@ -327,10 +328,14 @@ tokens_make(string* text) {
 			}
 			else if (text[i + 1] == '*') {
 				i++;
-				while (text[i] != '\0' && (text[i] != '*' && text[i + 1] != '/')) {
+				while (i < STR_LENGTH(text) && (text[i] != '*' && text[i + 1] != '/')) {
 					token.length++;
 					i++;
 				}
+			}
+			else {
+			  token.length = 1;
+			  token.type = TOK_IDENTIFIER;
 			}
 			i++;
 			tokens = array_push(tokens, &token);
@@ -340,6 +345,7 @@ tokens_make(string* text) {
 		}
 	}
 
+	str_release(text);
 	return tokens;
 
 }
