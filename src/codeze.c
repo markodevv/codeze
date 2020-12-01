@@ -200,10 +200,10 @@ main() {
 				else if (cursorAdvanceX < mouseX){
 					while (cursorAdvanceX < mouseX &&
 						   (mouseX - cursorAdvanceX) >=
-						   renderer->glyphs[buffer_char_before_cursor(buffer)].advanceX) {
+						   renderer->glyphs[buffer_char_under_cursor(buffer)].advanceX) {
 						
 						cursorAdvanceX +=
-							renderer->glyphs[buffer_char_before_cursor(buffer)].advanceX;
+							renderer->glyphs[buffer_char_under_cursor(buffer)].advanceX;
 						buffer_cursor_next(buffer);
 					}
 						   
