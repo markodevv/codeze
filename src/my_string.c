@@ -62,6 +62,7 @@ str_release(void* str) {
 }
 
 
+
 sizet
 cstr_len(const char* str) {
 	

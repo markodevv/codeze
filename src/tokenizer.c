@@ -321,14 +321,15 @@ tokens_make(string text) {
 		case '/': {
 			Token token = {TOK_COMMENT, 0, i};
 			if (text[i + 1] == '/') {
-				while (text[i] != '\n' && text[i] != '\0') {
+				while (text[i] != '\n' && i < STR_LENGTH(text)) {
 					token.length++;
 					i++;
 				}
 			}
 			else if (text[i + 1] == '*') {
 				i++;
-				while (i < STR_LENGTH(text) && (text[i] != '*' && text[i + 1] != '/')) {
+				while (i < STR_LENGTH(text) &&
+					   (text[i] != '*' && text[i + 1] != '/')) {
 					token.length++;
 					i++;
 				}

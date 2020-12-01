@@ -3,7 +3,7 @@
 
 
 void
-ortho(f32 mat[4][4], f32 left, f32 right, f32 bottom, f32 top) {
+mat_ortho(f32 mat[4][4], f32 left, f32 right, f32 bottom, f32 top) {
 
     mat[0][0] = 2 / (right - left);
     mat[0][1] = 0;

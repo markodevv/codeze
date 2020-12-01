@@ -1,5 +1,6 @@
 workspace "codeze"
 
+toolset "clang"
 configurations {"Debug", "Release"}
 
 include "third_party/glfw/"

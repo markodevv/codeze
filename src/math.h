@@ -2,8 +2,20 @@
 #include "types.h"
 
 typedef struct Vec2 {
-
-	f32 x, y;
+	union {
+		struct {
+			
+			f32 x, y;
+		};
+		struct {
+			
+			f32 start, end;
+		};
+		struct {
+			
+			f32 w, h;
+		};
+	};
 
 } Vec2;
 
@@ -37,5 +49,5 @@ typedef struct Vec4i {
 
 } Vec4i;
 
-void ortho(f32 mat[4][4], f32 left, f32 right, f32 bottom, f32 top);
+void mat_ortho(f32 mat[4][4], f32 left, f32 right, f32 bottom, f32 top);
 void vec4_print(Vec4 vec);

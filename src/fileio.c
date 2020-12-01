@@ -43,7 +43,7 @@ File* file_open(const char* path, const char* flags) {
   
 }
 
-File* file_close(File* file) {
+void file_close(File* file) {
 
 	str_release(file->buffer);
 	free(file);

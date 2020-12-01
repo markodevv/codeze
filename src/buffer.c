@@ -1,5 +1,6 @@
 #include "buffer.h"
 #include "debug.h"
+#include "math.h"
 #include <string.h>
 
 #define TAB_SIZE 4
@@ -26,8 +27,7 @@ buffer_create(File* file) {
 		
 		buf->lineLengths = array_push(buf->lineLengths, &zero);
 		// foreach char in line
-		for (i; buf->text, buf->text[i] != '\n'; ++i) {
-
+		for (i; buf->text[i] != '\n'; ++i) {
 			// add to line length
 			if (buf->text[i] == '\t') 
 				buf->lineLengths[line] += TAB_SIZE;
@@ -275,5 +275,74 @@ buffer_backspace_delete(Buffer* b) {
 	b->cursorX--;
 	b->lineLengths[b->currentLine]--;
 
+}
 
+Vec2
+buffer_get_cursor_line_vec(Buffer* b) {
+
+	Vec2 out;
+  
+	sizet i = b->preLen;
+	if (b->currentLine != 0) {
+		
+		while(b->text[i - 1] != '\n') {
+			i--;
+		}
+		out.start = i;
+	}
+	else {
+		out.start = 0;
+	}
+
+	i = b->preLen;
+	while(b->text[i + b->gapLen] != '\n') {
+		i++;
+	}
+
+	out.end = i;
+
+	return out;
+}
+
+string
+buffer_string_before_cursor(Buffer* b) {
+	
+	string line = str_create_s(b->lineLengths[b->currentLine]);
+
+	i32 i = b->preLen - 1;
+	if (b->currentLine == 0) {
+		while (i >= 0) {
+			line = str_push(line, b->text[i]);
+			i--;
+		}
+	}
+	else {
+		while (b->text[i] != '\n')  {
+			line = str_push(line, b->text[i]);
+			i--;
+		}
+		//	line = str_push(line, b->text[i]);
+		//line = str_push(line, b->text[i]);
+	}
+
+	printf("string before cursor:[");
+	for (sizet j = STR_LENGTH(line); j > 0; --j) {
+		
+		printf("%c", line[j - 1]);
+	}
+	printf("]\n");
+
+	return line;
+}
+
+char
+buffer_char_under_cursor(Buffer* b) {
+	
+	return b->text[b->preLen + b->gapLen];
+}
+
+char
+buffer_char_before_cursor(Buffer* b) {
+	
+	return b->text[b->preLen];
 }

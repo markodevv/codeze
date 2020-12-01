@@ -70,6 +70,8 @@ typedef struct Renderer {
 
 typedef struct Window {
   
+	i8 active;
+
 	Vec2 position;
 	Vec2 size;
 

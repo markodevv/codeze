@@ -13,12 +13,13 @@
 
 /* TODO:
 
-   - gap buffer
+   - mouse input
 
  */
 
 /* DONE:
 
+   - gap buffer
    - syntax highliting
    - tiny up code
    - Font rendering
@@ -31,6 +32,7 @@ typedef struct Editor {
 	GLFWwindow* window;
 	i16 width;
 	i16 height;
+  
 
 } Editor;
 
@@ -44,6 +46,17 @@ print_array(i32* arr) {
 	}
 	printf("\n");
 }
+
+
+static void
+initialize_window(Window* window, f32 width, f32 height, f32 x, f32 y) {
+	
+	window->position.x = x;
+	window->position.y = y;
+	window->size.x = width;
+	window->size.y = height;
+}
+	
 
 int
 main() {
@@ -66,11 +79,11 @@ main() {
 	// print_array(arr);
 
 	// return 0;
+
 	Editor* editor = malloc(sizeof(Editor));
 	editor->width = 1920;
 	editor->height = 1080;
 
-	Event* event = malloc(sizeof(Event));
 	Renderer* renderer = malloc(sizeof(Renderer));
 
 	editor->window = renderer_create_window();
@@ -88,19 +101,25 @@ main() {
 
 	file_close(file);
 
-	Window* windows = array_create(2, sizeof(Window));
-	i32 activeWindow = 0;
-	windows[activeWindow].position.x = 0.0f;
-	windows[activeWindow].position.y = 0.0f;
-	windows[activeWindow].size.x = editor->width / 2;
-	windows[activeWindow].size.y = editor->height;
+	Window* windows = array_create(4, sizeof(Window));
+	for (sizet i = 0; i < ARRAY_LENGTH(windows); ++i) {
+
+		windows[i].active = 0;
+	}
+
+	i32 windowFocused = 0;
+	{
+		Window window = {1, {0.0f, 0.0f}, {editor->width, editor->height}};
+		windows = array_push(windows, &window);
+	}
 
 
 	while (!glfwWindowShouldClose(editor->window)) {
 		
-		while(event_queue_next(event)) { 
-			if (event->type == KEY_PRESSED || event->type == KEY_REPEAT) {
-				switch(event->key) {
+		Event event;
+		while(event_queue_next(&event)) { 
+			if (event.type == KEY_PRESSED || event.type == KEY_REPEAT) {
+				switch(event.key) {
 				case KEY_Left:
 					buffer_cursor_previous(buffer); break;
 				case KEY_Right:
@@ -115,40 +134,126 @@ main() {
 					buffer_insert_tab(buffer); break;
 				case KEY_Enter:
 					buffer_insert_newline(buffer); break;
+				case KEY_S:
+					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
+						
+						Window window = {
+							1,
+							{windows[windowFocused].size.x / 2, 0.0f},
+							{windows[windowFocused].size.x / 2, windows[windowFocused].size.y}
+						};
+						windows[windowFocused].size.x /= 2;
+
+						windows = array_push(windows, &window);
+					}
+					break;
+				case KEY_L:
+					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
+						
+						
+					}
+					break;
+				}
+				
+			}
+			else if (event.type == CHAR_INPUTED) {
+
+				buffer_insert_char(buffer, event.character);
+			}
+			else if (event.type == MOUSE_BUTTON_PRESSED) {
+
+				f64 xpos, ypos;
+				glfwGetCursorPos(editor->window, &xpos, &ypos);
+
+				i32 mouseY = (i32)ypos;
+				i32 mouseX = (i32)xpos;
+
+				mouseY -= (mouseY % renderer->fontSize);
+
+				while (mouseY > buffer->currentLine * renderer->fontSize) {
+
+					buffer_cursor_down(buffer);
+				}
+				while (mouseY < buffer->currentLine * renderer->fontSize) {
+
+					buffer_cursor_up(buffer);
 				}
 
+
+				string lineStr = buffer_string_before_cursor(buffer);
+
+				i32 cursorAdvanceX = 0;
+
+				for (sizet i = 0; i < STR_LENGTH(lineStr); ++i) {
+					
+					cursorAdvanceX += renderer->glyphs[lineStr[i]].advanceX;
+				}
+
+				if (cursorAdvanceX > mouseX) {
+					while (cursorAdvanceX > mouseX) {
+						//printf("curosrX %i, mouseX %i, \n", cursorAdvanceX, mouseX);
+						cursorAdvanceX -=
+							renderer->glyphs[buffer_char_before_cursor(buffer)].advanceX;
+						buffer_cursor_previous(buffer);
+					}
+				}
+				else if (cursorAdvanceX < mouseX){
+					while (cursorAdvanceX < mouseX &&
+						   (mouseX - cursorAdvanceX) >=
+						   renderer->glyphs[buffer_char_before_cursor(buffer)].advanceX) {
+						
+						cursorAdvanceX +=
+							renderer->glyphs[buffer_char_before_cursor(buffer)].advanceX;
+						buffer_cursor_next(buffer);
+					}
+						   
+				}
+
+
+				str_release(lineStr);
 			}
-			else if (event->type == CHAR_INPUTED) {
-				buffer_insert_char(buffer, event->character);
-			}
-			else if	(event->type == WINDOW_RESIZED) {
-				editor->width = event->width;
-				editor->height = event->height;
-				ortho(renderer->projection, 0.0f, event->width, event->height, 0.0f); break;
-				windows[activeWindow].position.x = 0.0f;
-				windows[activeWindow].position.y = 0.0f;
-				windows[activeWindow].size.x = editor->width / 2;
-				windows[activeWindow].size.y = editor->height;
+			else if	(event.type == WINDOW_RESIZED) {
+				editor->width = event.width;
+				editor->height = event.height;
+				mat_ortho(renderer->projection, 0.0f, event.width, event.height, 0.0f); break;
+				windows[windowFocused].position.x = 0.0f;
+				windows[windowFocused].position.y = 0.0f;
+				windows[windowFocused].size.x = editor->width / 2;
+				windows[windowFocused].size.y = editor->height;
 			}
 		} 
 
+
 		renderer_begin(renderer);
 
-		TokenArray tokens = tokens_make(buffer_get_text(buffer));
+		string bufferText = buffer_get_text(buffer);
+		Vec2 cursorLine = buffer_get_cursor_line_vec(buffer);
+		Vec2 cursorAdvance;
 
-		render_buffer(renderer, buffer, &windows[activeWindow], tokens);
+		for (sizet i = cursorLine.start; i < cursorLine.end; ++i) {
+
+			cursorAdvance.x += renderer->glyphs[buffer->text[i]].advanceX;
+		}
+		cursorAdvance.y = renderer->fontSize * buffer->currentLine + renderer->fontSize / 5;
+
+		TokenArray tokens = tokens_make(bufferText);
+
+		for (i8 i = 0; i < ARRAY_LENGTH(windows); ++i) {
+			
+			render_buffer(renderer, buffer, &windows[i], tokens);
+		}
 
 		array_release(tokens);
 
 		DEBUG_TEXT(renderer, 0, "- DEBUG TEXT -", NULL);
-		DEBUG_TEXT(renderer, 1, "cursorX %i", buffer->cursorX);
-		DEBUG_TEXT(renderer, 2, "current line %i", buffer->currentLine);
-		DEBUG_TEXT(renderer, 3, "pre length %i", buffer->preLen);
-		DEBUG_TEXT(renderer, 4, "post length %i", buffer->postLen);
-		DEBUG_TEXT(renderer, 5, "gap length %i", buffer->gapLen);
-		DEBUG_TEXT(renderer, 6, "line length %i", buffer->lineLengths[buffer->currentLine]);
-		DEBUG_TEXT(renderer, 7, "char under cursor %c", buffer->text[buffer->preLen + buffer->gapLen]);
-		DEBUG_TEXT(renderer, 8, "line count %i", ARRAY_LENGTH(buffer->lineLengths));
+		DEBUG_TEXT(renderer, 1, "cursorX %i", (i32)buffer->cursorX);
+		DEBUG_TEXT(renderer, 2, "current line %i", (i32)buffer->currentLine);
+		DEBUG_TEXT(renderer, 3, "pre length %i", (i32)buffer->preLen);
+		DEBUG_TEXT(renderer, 4, "post length %i", (i32)buffer->postLen);
+		DEBUG_TEXT(renderer, 5, "gap length %i", (i32)buffer->gapLen);
+		DEBUG_TEXT(renderer, 6, "line length %i", (i32)buffer->lineLengths[buffer->currentLine]);
+		DEBUG_TEXT(renderer, 7, "char under cursor %c", (i32)buffer->text[buffer->preLen + buffer->gapLen]);
+		DEBUG_TEXT(renderer, 8, "line count %i", (i32)ARRAY_LENGTH(buffer->lineLengths));
 
 		renderer_end(renderer);
 

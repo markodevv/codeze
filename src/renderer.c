@@ -145,7 +145,7 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(f32) * 4 * 2));
 
-	ortho(ren->projection, 0.0f, width, height, 0.0f);
+	mat_ortho(ren->projection, 0.0f, width, height, 0.0f);
 
 	texture_load("assets/green.png", &ren->texIDs[GREEN_TEXTURE_INDEX], GREEN_TEXTURE_INDEX);
 	texture_load("assets/white.png", &ren->texIDs[WHITE_TEXTURE_INDEX], WHITE_TEXTURE_INDEX);
