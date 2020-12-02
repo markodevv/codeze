@@ -4,6 +4,7 @@
 #include "my_string.h"
 #include "tokenizer.h"
 #include "buffer.h"
+#include "window.h"
 
 #include <GLFW/glfw3.h>
 #include <ft2build.h>
@@ -68,40 +69,36 @@ typedef struct Renderer {
 
 } Renderer;
 
-typedef struct Window {
-  
-	i8 active;
-
-	Vec2 position;
-	Vec2 size;
-
-} Window;
 
 
 GLFWwindow* renderer_create_window();
 
-void renderer_initialize(Renderer* ren, f32 width, f32 height);
-void renderer_load_font(Renderer* ren, const char* fontFile, i32 fontSize);
-void renderer_begin(Renderer* ren);
-void renderer_end(Renderer* ren);
+void renderer_initialize(f32 width, f32 height);
+void renderer_load_font(const char* fontFile, i32 fontSize);
+void renderer_begin();
+void renderer_end();
 
-void render_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color);
-void render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color, u32 texID);
-void render_text(Renderer* ren, string text, Vec2 position, Vec4 color);
-void render_buffer(Renderer* ren, Buffer* buffer, Window* window, Token* tokens);
+void render_quad(Vec2 position, Vec2 size, Vec4 color);
+void render_textured_quad(Vec2 position, Vec2 size, Vec4 color, u32 texID);
+void render_text(string text, Vec2 position, Vec4 color);
+void render_buffer(Buffer* buffer, Window* window, Token* tokens);
+void render_cursor(Buffer* b, Window* window);
+void renderer_on_window_resize(f32 width, f32 height);
+GlyphData* renderer_get_glyphs();
+i32 renderer_font_size();
 
 #ifdef DEBUG
 #include "stdio.h" 
 
-void render_text_debug(Renderer* ren, char* text, Vec2 position, Vec4 color);
+void render_text_debug(char* text, Vec2 position, Vec4 color);
 static char DebugString[64];
 static Vec2 DebugPos = {1200.0f, 0.0f};
 static Vec4 DebugColor = {0.8f, 0.8f, 0.0f, 1.0f};
 
-#define DEBUG_TEXT(ren, row, text, ...)	\
+#define DEBUG_TEXT(row, text, ...)	\
 	sprintf(DebugString, text, __VA_ARGS__); \
-	DebugPos.y = row * ren->fontSize; \
-	render_text_debug(ren, DebugString, DebugPos, DebugColor);
+	DebugPos.y = row; \
+	render_text_debug(DebugString, DebugPos, DebugColor);
 #else
 #define DEBUG_TEXT(ren, row, text, ...)	
 

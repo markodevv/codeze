@@ -30,7 +30,6 @@ string buffer_get_text(Buffer* b);
 void buffer_insert_tab(Buffer* b);
 void buffer_insert_newline(Buffer* b);
 void buffer_backspace_delete(Buffer* b);
-Vec2 buffer_get_cursor_line_vec(Buffer* b);
 string buffer_string_before_cursor(Buffer* b);
 char buffer_char_under_cursor(Buffer* b);
 char buffer_char_before_cursor(Buffer* b);

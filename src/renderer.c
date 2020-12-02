@@ -2,6 +2,7 @@
 #include "fileio.h"
 #include "shader.h"
 #include "debug.h"
+#include "cursor.h"
 
 #include <glad/glad.h>
 
@@ -10,6 +11,7 @@
 
 static Vec4 global_Colors[TOK_TOTAL];
 static Vec4 global_CursorColor = {1.0f, 1.0f, 1.0f, 0.5f};
+static Renderer g_Renderer;
 
 static void
 error_callback(int code, const char* description) {
@@ -116,10 +118,10 @@ texture_load(const char* path, u32* texID, u8 slot) {
 }
 
 void
-renderer_initialize(Renderer* ren, f32 width, f32 height) {
+renderer_initialize(f32 width, f32 height) {
 
-	ren->vertexArray = malloc(sizeof(Vertex) * MAX_VERTICES);
-	ren->vertexArrayIndex = ren->vertexArray;
+	g_Renderer.vertexArray = malloc(sizeof(Vertex) * MAX_VERTICES);
+	g_Renderer.vertexArrayIndex = g_Renderer.vertexArray;
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -127,15 +129,15 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 	File* vertexFile = file_open("src/vertex_shader.txt", "r");
 	File* fragmentFile = file_open("src/fragment_shader.txt", "r");
 
-	ren->program = shader_create(str_as_cstr(vertexFile->buffer), str_as_cstr(fragmentFile->buffer));
+	g_Renderer.program = shader_create(str_as_cstr(vertexFile->buffer), str_as_cstr(fragmentFile->buffer));
 	
-	glUseProgram(ren->program);
+	glUseProgram(g_Renderer.program);
 
-	glGenVertexArrays(1, &ren->VAO);
-	glGenBuffers(1, &ren->VBO);
+	glGenVertexArrays(1, &g_Renderer.VAO);
+	glGenBuffers(1, &g_Renderer.VBO);
 
-	glBindVertexArray(ren->VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, ren->VBO);
+	glBindVertexArray(g_Renderer.VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, g_Renderer.VBO);
 	glBufferData(GL_ARRAY_BUFFER, MAX_VERTICES * sizeof(Vertex), NULL, GL_DYNAMIC_DRAW);
 
 	glEnableVertexAttribArray(0);
@@ -145,11 +147,11 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(f32) * 4 * 2));
 
-	mat_ortho(ren->projection, 0.0f, width, height, 0.0f);
+	mat_ortho(g_Renderer.projection, 0.0f, width, height, 0.0f);
 
-	texture_load("assets/green.png", &ren->texIDs[GREEN_TEXTURE_INDEX], GREEN_TEXTURE_INDEX);
-	texture_load("assets/white.png", &ren->texIDs[WHITE_TEXTURE_INDEX], WHITE_TEXTURE_INDEX);
-	texture_load("assets/ryuk.png", &ren->texIDs[RYUK_TEXTURE_INDEX], RYUK_TEXTURE_INDEX);
+	texture_load("assets/green.png", &g_Renderer.texIDs[GREEN_TEXTURE_INDEX], GREEN_TEXTURE_INDEX);
+	texture_load("assets/white.png", &g_Renderer.texIDs[WHITE_TEXTURE_INDEX], WHITE_TEXTURE_INDEX);
+	texture_load("assets/ryuk.png", &g_Renderer.texIDs[RYUK_TEXTURE_INDEX], RYUK_TEXTURE_INDEX);
 
 	const i8 subscriptIndex = 10;
 	char str[] = "uTextures[ ]";
@@ -160,7 +162,7 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 
 		str[subscriptIndex] = '0' + i;
 
-		location = glGetUniformLocation(ren->program, str);
+		location = glGetUniformLocation(g_Renderer.program, str);
 		ASSERT_MSG(location != -1, "invalid uniform location");
 
 		glUniform1i(location, i);
@@ -173,36 +175,36 @@ renderer_initialize(Renderer* ren, f32 width, f32 height) {
 }
 
 void
-renderer_load_font(Renderer* ren, const char* fontFile, i32 fontSize) {
+renderer_load_font(const char* fontFile, i32 fontSize) {
 
-	ren->fontSize = fontSize;
+	g_Renderer.fontSize = fontSize;
 
-	i32 success = FT_Init_FreeType(&ren->ftLib);
+	i32 success = FT_Init_FreeType(&g_Renderer.ftLib);
 	ASSERT(success == 0);
-	success = FT_New_Face(ren->ftLib, fontFile, 0, &ren->fontFace);
+	success = FT_New_Face(g_Renderer.ftLib, fontFile, 0, &g_Renderer.fontFace);
 	ASSERT(success == 0);
 
-	FT_Set_Pixel_Sizes(ren->fontFace, 0, ren->fontSize);
+	FT_Set_Pixel_Sizes(g_Renderer.fontFace, 0, g_Renderer.fontSize);
 
 	i32 w = 0, h = 0;
-	FT_GlyphSlot glyph = ren->fontFace->glyph;
+	FT_GlyphSlot glyph = g_Renderer.fontFace->glyph;
 
 	for (u8 i = 0; i < 128; i++) {
 
-		i32 success = FT_Load_Char(ren->fontFace, i, FT_LOAD_RENDER);
+		i32 success = FT_Load_Char(g_Renderer.fontFace, i, FT_LOAD_RENDER);
 		ASSERT(success == 0);
 		w += glyph->bitmap.width;
 		glyph->bitmap.rows > h ? h = glyph->bitmap.rows : h;
 	}
 
-	ren->bitmapW = w;
-	ren->bitmapH = h;
+	g_Renderer.bitmapW = w;
+	g_Renderer.bitmapH = h;
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glActiveTexture(GL_TEXTURE0 + FONT_TEXTURE_INDEX);
 
-	glGenTextures(1, &ren->texIDs[FONT_TEXTURE_INDEX]);
-	glBindTexture(GL_TEXTURE_2D, ren->texIDs[FONT_TEXTURE_INDEX]);
+	glGenTextures(1, &g_Renderer.texIDs[FONT_TEXTURE_INDEX]);
+	glBindTexture(GL_TEXTURE_2D, g_Renderer.texIDs[FONT_TEXTURE_INDEX]);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -216,52 +218,52 @@ renderer_load_font(Renderer* ren, const char* fontFile, i32 fontSize) {
 
 	for (u8 i = 0; i < 128; ++i) {
 
-		i8 success = FT_Load_Char(ren->fontFace, i, FT_LOAD_RENDER);
+		i8 success = FT_Load_Char(g_Renderer.fontFace, i, FT_LOAD_RENDER);
 		ASSERT(success == 0);
 
 		glTexSubImage2D(GL_TEXTURE_2D, 0, texOffset, 0, 
 			glyph->bitmap.width, glyph->bitmap.rows, 
 			GL_RED, GL_UNSIGNED_BYTE, glyph->bitmap.buffer);
 
-		ren->glyphs[i].advanceX = glyph->advance.x >> 6;
-		ren->glyphs[i].advanceY = glyph->advance.y >> 6;
+		g_Renderer.glyphs[i].advanceX = glyph->advance.x >> 6;
+		g_Renderer.glyphs[i].advanceY = glyph->advance.y >> 6;
 
-		ren->glyphs[i].width = glyph->bitmap.width;
-		ren->glyphs[i].height = glyph->bitmap.rows;
+		g_Renderer.glyphs[i].width = glyph->bitmap.width;
+		g_Renderer.glyphs[i].height = glyph->bitmap.rows;
 
-		ren->glyphs[i].bearingX = glyph->bitmap_left;
-		ren->glyphs[i].bearingY = glyph->bitmap_top;
+		g_Renderer.glyphs[i].bearingX = glyph->bitmap_left;
+		g_Renderer.glyphs[i].bearingY = glyph->bitmap_top;
 	
-		ren->glyphs[i].offsetX = (f32)texOffset / w;
+		g_Renderer.glyphs[i].offsetX = (f32)texOffset / w;
 
 		texOffset += glyph->bitmap.width;
 	}
 
 
-	ren->glyphs['\t'].advanceX = ren->glyphs[' '].advanceX * 4;
+	g_Renderer.glyphs['\t'].advanceX = g_Renderer.glyphs[' '].advanceX * 4;
 
 
-	FT_Done_Face(ren->fontFace);
-	FT_Done_FreeType(ren->ftLib);
+	FT_Done_Face(g_Renderer.fontFace);
+	FT_Done_FreeType(g_Renderer.ftLib);
 
   
 }
 
 void
-renderer_begin(Renderer* ren) {
+renderer_begin() {
 
 	glClearColor(0.1f, 0.1f, 0.13, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	i32 projectionLocation = glGetUniformLocation(ren->program, "uProjection");
+	i32 projectionLocation = glGetUniformLocation(g_Renderer.program, "uProjection");
 	ASSERT(projectionLocation != -1);
 
-	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &ren->projection[0][0]);
+	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, &g_Renderer.projection[0][0]);
 
 }
 
 void
-render_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color) {
+render_quad(Vec2 position, Vec2 size, Vec4 color) {
 
 		Vec4 quadVertices[] = {
 				{position.x,          position.y,          0.0f, 0.0f},
@@ -272,24 +274,24 @@ render_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color) {
 				{position.x + size.x, position.y + size.y, 1.0f, 1.0f}
 		};
 
-		if (ren->vertexCount >= MAX_VERTICES) {
-			renderer_end(ren);
+		if (g_Renderer.vertexCount >= MAX_VERTICES) {
+			renderer_end();
 		}
 
 		for (int i = 0; i < VERTICES_PER_QUAD; ++i) {
 
-			ren->vertexArrayIndex->color = color;
-			ren->vertexArrayIndex->posData = quadVertices[i];
-			ren->vertexArrayIndex->texIndex = NO_TEXTURE;
-			ren->vertexArrayIndex++;
+			g_Renderer.vertexArrayIndex->color = color;
+			g_Renderer.vertexArrayIndex->posData = quadVertices[i];
+			g_Renderer.vertexArrayIndex->texIndex = NO_TEXTURE;
+			g_Renderer.vertexArrayIndex++;
 		}
 
-		ren->vertexCount += VERTICES_PER_QUAD;
+		g_Renderer.vertexCount += VERTICES_PER_QUAD;
 
 }
 
 void
-render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color, u32 texID) {
+render_textured_quad(Vec2 position, Vec2 size, Vec4 color, u32 texID) {
 
 		Vec4 quadVertices[] = {
 				{position.x,          position.y,          0.0f, 0.0f},
@@ -300,24 +302,24 @@ render_textured_quad(Renderer* ren, Vec2 position, Vec2 size, Vec4 color, u32 te
 				{position.x + size.x, position.y + size.y, 1.0f, 1.0f}
 		};
 
-		if (ren->vertexCount >= MAX_VERTICES) {
-			renderer_end(ren);
+		if (g_Renderer.vertexCount >= MAX_VERTICES) {
+			renderer_end();
 		}
 
 		for (int k = 0; k < VERTICES_PER_QUAD; ++k) {
 
-			ren->vertexArrayIndex->color = color;
-			ren->vertexArrayIndex->posData = quadVertices[k];
-			ren->vertexArrayIndex->texIndex = texID;
-			ren->vertexArrayIndex++;
+			g_Renderer.vertexArrayIndex->color = color;
+			g_Renderer.vertexArrayIndex->posData = quadVertices[k];
+			g_Renderer.vertexArrayIndex->texIndex = texID;
+			g_Renderer.vertexArrayIndex++;
 		}
 
-		ren->vertexCount += VERTICES_PER_QUAD;
+		g_Renderer.vertexCount += VERTICES_PER_QUAD;
 	
 }
 
 void
-render_text(Renderer* ren, string text, Vec2 position, Vec4 color) {
+render_text(string text, Vec2 position, Vec4 color) {
 
 	static float xpos, ypos, w, h, offsetX, texX, texY, advanceX, advanceY;
 	advanceY = position.y;
@@ -327,24 +329,24 @@ render_text(Renderer* ren, string text, Vec2 position, Vec4 color) {
 
 		if (text[i] == '\n') {
 
-			advanceY += ren->fontSize;
+			advanceY += g_Renderer.fontSize;
 			advanceX = 0.0f;
 			continue;
 		}
 		else if (text[i] == '\t') {
 
-			advanceX += ren->glyphs[text[i]].advanceX;
+			advanceX += g_Renderer.glyphs[text[i]].advanceX;
 			continue;
 		}
 
-		xpos = advanceX + ren->glyphs[text[i]].bearingX;
+		xpos = advanceX + g_Renderer.glyphs[text[i]].bearingX;
 		// this is stupid, idk how else to make it work
-		ypos = advanceY - ren->glyphs[text[i]].bearingY + ren->fontSize;
-		w = ren->glyphs[text[i]].width;
-		h = ren->glyphs[text[i]].height;
-		offsetX = ren->glyphs[text[i]].offsetX;
-		texX = w / ren->bitmapW;
-		texY = h / ren->bitmapH;
+		ypos = advanceY - g_Renderer.glyphs[text[i]].bearingY + g_Renderer.fontSize;
+		w = g_Renderer.glyphs[text[i]].width;
+		h = g_Renderer.glyphs[text[i]].height;
+		offsetX = g_Renderer.glyphs[text[i]].offsetX;
+		texX = w / g_Renderer.bitmapW;
+		texY = h / g_Renderer.bitmapH;
 
 		Vec4 quadVertices[] = {
 			{xpos,     ypos,     offsetX,        0.0f},
@@ -355,27 +357,27 @@ render_text(Renderer* ren, string text, Vec2 position, Vec4 color) {
 			{xpos + w, ypos + h, offsetX + texX, texY}
 		};
 
-		if (ren->vertexCount >= MAX_VERTICES) {
+		if (g_Renderer.vertexCount >= MAX_VERTICES) {
 
-			renderer_end(ren);
+			renderer_end();
 		}
 
 		for (int j = 0; j < VERTICES_PER_QUAD; ++j) {
 
-			ren->vertexArrayIndex->color = color;
-			ren->vertexArrayIndex->posData = quadVertices[j];
-			ren->vertexArrayIndex->texIndex = FONT_TEXTURE_INDEX;
-			ren->vertexArrayIndex++;
+			g_Renderer.vertexArrayIndex->color = color;
+			g_Renderer.vertexArrayIndex->posData = quadVertices[j];
+			g_Renderer.vertexArrayIndex->texIndex = FONT_TEXTURE_INDEX;
+			g_Renderer.vertexArrayIndex++;
 		}
 
-		ren->vertexCount += VERTICES_PER_QUAD;
-		advanceX += ren->glyphs[text[i]].advanceX;
+		g_Renderer.vertexCount += VERTICES_PER_QUAD;
+		advanceX += g_Renderer.glyphs[text[i]].advanceX;
 	}
 }
 
 
 void
-render_buffer(Renderer* ren, Buffer* buf, Window *window, TokenArray tokens) {
+render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 
 	static float xpos, ypos, w, h, offsetX,
 		texX, texY, advanceX, advanceY, tokLen;
@@ -388,46 +390,54 @@ render_buffer(Renderer* ren, Buffer* buf, Window *window, TokenArray tokens) {
 	u32 tokIndex = 0;
 	Vec4 color = global_Colors[0];
 
+	{
+	  Vec2 winFramePos, winFrameSize;
+	  winFramePos.x = window->position.x;
+	  winFramePos.y = window->position.y;
+	  winFrameSize.x = 0.8f;
+	  winFrameSize.y = window->size.h;
+
+	  render_quad(winFramePos, winFrameSize, global_Colors[0]);
+
+	  winFramePos.x = window->position.x;
+	  winFramePos.y = window->position.y + window->size.h;
+	  winFrameSize.x = window->size.w;
+	  winFrameSize.y = 0.8f;
+
+	  render_quad(winFramePos, winFrameSize, global_Colors[0]);
+	}
+
 	for (sizet i = 0; i < STR_LENGTH(text); ++i) {
 
-		if (advanceY >= window->size.y) {
+		if (advanceY >= window->size.h + window->position.y - g_Renderer.fontSize) {
 			break;
 		}
 		if (advanceX >= window->position.x + window->size.x) {
 			advanceX = window->position.x;
-			advanceY += ren->fontSize;
-		}
-
-		if (i == buf->preLen) {
-			// TODO: figure out why this is
-			f32 wierdOffset = ren->fontSize / 5;
-			Vec2 pos = {advanceX, (advanceY + wierdOffset)};
-			Vec2 size = {ren->glyphs[text[i]].advanceX, (f32)ren->fontSize};
-
-			render_quad(ren, pos, size, global_CursorColor);
+			advanceY += g_Renderer.fontSize;
 		}
 
 		if (text[i] == '\n') {
 
-			advanceY += ren->fontSize;
+			advanceY += g_Renderer.fontSize;
 			advanceX = window->position.x;
 			continue;
 		}
 		else if (text[i] == '\t') {
 
-			advanceX += ren->glyphs[text[i]].advanceX;
+			advanceX += g_Renderer.glyphs[text[i]].advanceX;
 			continue;
 		}
 
 
-		xpos = advanceX + ren->glyphs[text[i]].bearingX;
+		xpos = advanceX + g_Renderer.glyphs[text[i]].bearingX;
 		// this is stupid, idk how else to make it work
-		ypos = advanceY - ren->glyphs[text[i]].bearingY + ren->fontSize;
-		w = ren->glyphs[text[i]].width;
-		h = ren->glyphs[text[i]].height;
-		offsetX = ren->glyphs[text[i]].offsetX;
-		texX = w / ren->bitmapW;
-		texY = h / ren->bitmapH;
+		ypos = advanceY - g_Renderer.glyphs[text[i]].bearingY + g_Renderer.fontSize;
+		w = g_Renderer.glyphs[text[i]].width;
+		h = g_Renderer.glyphs[text[i]].height;
+		offsetX = g_Renderer.glyphs[text[i]].offsetX;
+		texX = w / g_Renderer.bitmapW;
+		texY = h / g_Renderer.bitmapH;
 
 		Vec4 quadVertices[] = {
 			{xpos,     ypos,     offsetX,        0.0f},
@@ -438,9 +448,9 @@ render_buffer(Renderer* ren, Buffer* buf, Window *window, TokenArray tokens) {
 			{xpos + w, ypos + h, offsetX + texX, texY}
 		};
 
-		if (ren->vertexCount >= MAX_VERTICES) {
+		if (g_Renderer.vertexCount >= MAX_VERTICES) {
 
-			renderer_end(ren);
+			renderer_end();
 		}
 
 
@@ -458,55 +468,84 @@ render_buffer(Renderer* ren, Buffer* buf, Window *window, TokenArray tokens) {
 
 		for (i32 j = 0; j < VERTICES_PER_QUAD; ++j) {
 
-			ren->vertexArrayIndex->color = color;
-			ren->vertexArrayIndex->posData = quadVertices[j];
-			ren->vertexArrayIndex->texIndex = FONT_TEXTURE_INDEX;
-			ren->vertexArrayIndex++;
+			g_Renderer.vertexArrayIndex->color = color;
+			g_Renderer.vertexArrayIndex->posData = quadVertices[j];
+			g_Renderer.vertexArrayIndex->texIndex = FONT_TEXTURE_INDEX;
+			g_Renderer.vertexArrayIndex++;
 		}
 
 		tokLen--;
 
-		ren->vertexCount += VERTICES_PER_QUAD;
-		advanceX += ren->glyphs[text[i]].advanceX;
+		g_Renderer.vertexCount += VERTICES_PER_QUAD;
+		advanceX += g_Renderer.glyphs[text[i]].advanceX;
 	}
 
 	str_release(text);
 }
 
 void
-renderer_end(Renderer* ren) {
+render_cursor(Buffer* buf, Window* win) {
+
+	static Vec2 cursorPos, cursorSize;
+
+	cursorPos = cursor_render_pos(buf, win);
+	cursorSize = cursor_render_size(buf);
+	// TODO: fix wierd offset
+	cursorPos.y += renderer_font_size() / 5;
+	render_quad(cursorPos, cursorSize, global_Colors[0]);
+}
+
+void
+renderer_end() {
 
 	static i32 count, dataSize;
-	count = (ren->vertexArrayIndex - ren->vertexArray);
-	dataSize = (ren->vertexArrayIndex - ren->vertexArray) * sizeof(Vertex);
+	count = (g_Renderer.vertexArrayIndex - g_Renderer.vertexArray);
+	dataSize = (g_Renderer.vertexArrayIndex - g_Renderer.vertexArray) * sizeof(Vertex);
 
-	glBufferSubData(GL_ARRAY_BUFFER, 0, dataSize, ren->vertexArray);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, dataSize, g_Renderer.vertexArray);
 
-	glDrawArrays(GL_TRIANGLES, 0, ren->vertexCount);
+	glDrawArrays(GL_TRIANGLES, 0, g_Renderer.vertexCount);
 
-	ren->vertexCount = 0;
-	ren->vertexArrayIndex = ren->vertexArray;
+	g_Renderer.vertexCount = 0;
+	g_Renderer.vertexArrayIndex = g_Renderer.vertexArray;
 
 }
 
+void
+renderer_on_window_resize(f32 width, f32 height) {
+  
+	mat_ortho(g_Renderer.projection, 0.0f, width, height, 0.0f);
+}
+
+GlyphData* renderer_get_glyphs() {
+
+	return g_Renderer.glyphs;
+}
+
+i32 renderer_font_size() {
+
+	return g_Renderer.fontSize;
+}
 #ifdef DEBUG
 void
-render_text_debug(Renderer* ren, char* text, Vec2 position, Vec4 color) {
+render_text_debug(char* text, Vec2 position, Vec4 color) {
 
 	static float xpos, ypos, w, h, offsetX, texX, texY, advanceX, advanceY;
+
+	position.y *= g_Renderer.fontSize;
 	advanceY = position.y;
 	advanceX = position.x;
 
 	for (sizet i = 0; text[i] != '\0'; ++i) {
 
-		xpos = advanceX + ren->glyphs[text[i]].bearingX;
+		xpos = advanceX + g_Renderer.glyphs[text[i]].bearingX;
 		// this is stupid, idk how else to make it work
-		ypos = advanceY - ren->glyphs[text[i]].bearingY + ren->fontSize;
-		w = ren->glyphs[text[i]].width;
-		h = ren->glyphs[text[i]].height;
-		offsetX = ren->glyphs[text[i]].offsetX;
-		texX = w / ren->bitmapW;
-		texY = h / ren->bitmapH;
+		ypos = advanceY - g_Renderer.glyphs[text[i]].bearingY + g_Renderer.fontSize;
+		w = g_Renderer.glyphs[text[i]].width;
+		h = g_Renderer.glyphs[text[i]].height;
+		offsetX = g_Renderer.glyphs[text[i]].offsetX;
+		texX = w / g_Renderer.bitmapW;
+		texY = h / g_Renderer.bitmapH;
 
 		Vec4 quadVertices[] = {
 			{xpos,     ypos,     offsetX,        0.0f},
@@ -517,21 +556,21 @@ render_text_debug(Renderer* ren, char* text, Vec2 position, Vec4 color) {
 			{xpos + w, ypos + h, offsetX + texX, texY}
 		};
 
-		if (ren->vertexCount >= MAX_VERTICES) {
+		if (g_Renderer.vertexCount >= MAX_VERTICES) {
 
-			renderer_end(ren);
+			renderer_end();
 		}
 
 		for (int j = 0; j < VERTICES_PER_QUAD; ++j) {
 
-			ren->vertexArrayIndex->color = color;
-			ren->vertexArrayIndex->posData = quadVertices[j];
-			ren->vertexArrayIndex->texIndex = FONT_TEXTURE_INDEX;
-			ren->vertexArrayIndex++;
+			g_Renderer.vertexArrayIndex->color = color;
+			g_Renderer.vertexArrayIndex->posData = quadVertices[j];
+			g_Renderer.vertexArrayIndex->texIndex = FONT_TEXTURE_INDEX;
+			g_Renderer.vertexArrayIndex++;
 		}
 
-		ren->vertexCount += VERTICES_PER_QUAD;
-		advanceX += ren->glyphs[text[i]].advanceX;
+		g_Renderer.vertexCount += VERTICES_PER_QUAD;
+		advanceX += g_Renderer.glyphs[text[i]].advanceX;
 	}
 }
 

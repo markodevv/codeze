@@ -32,8 +32,20 @@ typedef struct Vec4 {
 } Vec4;
 
 typedef struct Vec2i {
-
-	i32 x, y;
+	union {
+		struct {
+			
+			i32 x, y;
+		};
+		struct {
+			
+			i32 start, end;
+		};
+		struct {
+			
+			i32 w, h;
+		};
+	};
 
 } Vec2i;
 
@@ -50,4 +62,13 @@ typedef struct Vec4i {
 } Vec4i;
 
 void mat_ortho(f32 mat[4][4], f32 left, f32 right, f32 bottom, f32 top);
+b8 is_point_in_rect(Vec2 point, Vec2 rectPos, Vec2 rectSize);
+b8 is_point_in_rect_i(Vec2i point, Vec2i rectPos, Vec2i rectSize);
+
 void vec4_print(Vec4 vec);
+void vec3_print(Vec3 vec);
+void vec2_print(Vec2 vec);
+
+void vec4i_print(Vec4i vec);
+void vec3i_print(Vec3i vec);
+void vec2i_print(Vec2i vec);

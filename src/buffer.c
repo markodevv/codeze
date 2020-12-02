@@ -277,33 +277,6 @@ buffer_backspace_delete(Buffer* b) {
 
 }
 
-Vec2
-buffer_get_cursor_line_vec(Buffer* b) {
-
-	Vec2 out;
-  
-	sizet i = b->preLen;
-	if (b->currentLine != 0) {
-		
-		while(b->text[i - 1] != '\n') {
-			i--;
-		}
-		out.start = i;
-	}
-	else {
-		out.start = 0;
-	}
-
-	i = b->preLen;
-	while(b->text[i + b->gapLen] != '\n') {
-		i++;
-	}
-
-	out.end = i;
-
-	return out;
-}
-
 string
 buffer_string_before_cursor(Buffer* b) {
 	
@@ -325,12 +298,12 @@ buffer_string_before_cursor(Buffer* b) {
 		//line = str_push(line, b->text[i]);
 	}
 
-	printf("string before cursor:[");
-	for (sizet j = STR_LENGTH(line); j > 0; --j) {
+	// printf("string before cursor:[");
+	// for (sizet j = STR_LENGTH(line); j > 0; --j) {
 		
-		printf("%c", line[j - 1]);
-	}
-	printf("]\n");
+	// 	printf("%c", line[j - 1]);
+	// }
+	// printf("]\n");
 
 	return line;
 }
