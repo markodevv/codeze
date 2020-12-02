@@ -405,6 +405,7 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 	  winFrameSize.y = 0.8f;
 
 	  render_quad(winFramePos, winFrameSize, global_Colors[0]);
+
 	}
 
 	for (sizet i = 0; i < STR_LENGTH(text); ++i) {
@@ -480,6 +481,14 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 		advanceX += g_Renderer.glyphs[text[i]].advanceX;
 	}
 
+	static char buffer[128];
+	Vec2 pos;
+	pos.x = (f32)window->position.x + 200.0f;
+	pos.y = (f32)window->position.y;
+	DEBUG_TEXT(pos, "position: [%i, %i]", window->position.x, window->position.y);
+	pos.y += 20.0f;
+	DEBUG_TEXT(pos, "size: [%i, %i]", window->size.x, window->size.y);
+
 	str_release(text);
 }
 
@@ -532,7 +541,7 @@ render_text_debug(char* text, Vec2 position, Vec4 color) {
 
 	static float xpos, ypos, w, h, offsetX, texX, texY, advanceX, advanceY;
 
-	position.y *= g_Renderer.fontSize;
+	//position.y *= g_Renderer.fontSize;
 	advanceY = position.y;
 	advanceX = position.x;
 

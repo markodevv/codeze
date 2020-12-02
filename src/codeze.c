@@ -142,12 +142,22 @@ main() {
 				case KEY_L:
 					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
 
-						focusedWindow = window_switch_right(buffer, windows, focusedWindow);
+						focusedWindow = window_switch(buffer, windows, focusedWindow, WIN_RIGHT);
 					} break;
 				case KEY_H:
 					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
 						
-						focusedWindow = window_switch_left(buffer, windows, focusedWindow);
+						focusedWindow = window_switch(buffer, windows, focusedWindow, WIN_LEFT);
+					} break;
+				case KEY_J:
+					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
+
+						focusedWindow = window_switch(buffer, windows, focusedWindow, WIN_DOWN);
+					} break;
+				case KEY_K:
+					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
+						
+						focusedWindow = window_switch(buffer, windows, focusedWindow, WIN_UP);
 					} break;
 				case KEY_Q:
 					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
@@ -243,16 +253,19 @@ main() {
 
 		array_release(tokens);
 
-		DEBUG_TEXT(0, "- DEBUG TEXT -", NULL);
-		DEBUG_TEXT(1, "cursorX %i", (i32)buffer->cursorX);
-		DEBUG_TEXT(2, "current line %i", (i32)buffer->currentLine);
-		DEBUG_TEXT(3, "pre length %i", (i32)buffer->preLen);
-		DEBUG_TEXT(4, "post length %i", (i32)buffer->postLen);
-		DEBUG_TEXT(5, "gap length %i", (i32)buffer->gapLen);
-		DEBUG_TEXT(6, "line length %i", (i32)buffer->lineLengths[buffer->currentLine]);
-		DEBUG_TEXT(7, "char under cursor %c", (i32)buffer->text[buffer->preLen + buffer->gapLen]);
-		DEBUG_TEXT(8, "line count %i", (i32)ARRAY_LENGTH(buffer->lineLengths));
-		DEBUG_TEXT(9, "Focused window %i", (i32)focusedWindow);
+		Vec2 pos;
+		pos.x = editor->width - 200.0f;
+		pos.y = 0;
+		DEBUG_TEXT(pos, "- DEBUG TEXT -", NULL); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "cursorX %i", (i32)buffer->cursorX); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "current line %i", (i32)buffer->currentLine); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "pre length %i", (i32)buffer->preLen); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "post length %i", (i32)buffer->postLen); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "gap length %i", (i32)buffer->gapLen); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "line length %i", (i32)buffer->lineLengths[buffer->currentLine]); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "char under cursor %c", (i32)buffer->text[buffer->preLen + buffer->gapLen]); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "line count %i", (i32)ARRAY_LENGTH(buffer->lineLengths)); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "Focused window %i", (i32)focusedWindow); pos.y += 20.0f;
 
 		renderer_end();
 

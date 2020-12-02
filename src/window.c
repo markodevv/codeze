@@ -51,53 +51,50 @@ window_destroy(Buffer* buf, WindowArray windows, i32 winId) {
 
 }
 
+
 i32
-window_switch_right(Buffer* buf, WindowArray windows, i32 winId) {
+window_switch(Buffer* buf, WindowArray windows, i32 winId, WinDirection dir) {
 	
 	Vec2 temp = cursor_render_pos(buf, windows);
-	Vec2i cursorPos;
-	Vec2i size;
-	cursorPos.x = (i32)temp.x;
-	cursorPos.y = (i32)temp.y;
+	Vec2i point;
+	Vec2i winSize;
+	point.x = (i32)temp.x;
+	point.y = (i32)temp.y;
 
-	cursorPos.x = windows[winId].position.x + windows[winId].size.w;
-	cursorPos.x += 1.0f;
-	cursorPos.y += 1.0f;
-
-	for (i32 i = 0; i < ARRAY_LENGTH(windows); ++i) {
-		
-		size.w = windows[i].size.w + windows[i].position.x;
-		size.h = windows[i].size.h + windows[i].position.y;
-
-
-		if (is_point_in_rect_i(cursorPos, windows[i].position, size)) {
-			return i;
-		}
+	switch (dir) {
+	case WIN_LEFT:
+		point.x = windows[winId].position.x;
+		point.y = windows[winId].position.y;
+		point.x -= 1.0f;
+		point.y += 1.0f;
+		break;
+	case WIN_RIGHT:
+		point.x = windows[winId].position.x + windows[winId].size.w;
+		point.y = windows[winId].position.y;
+		point.x += 1.0f;
+		point.y += 1.0f;
+		break;
+	case WIN_UP:
+		point.x = windows[winId].position.x;
+		point.y = windows[winId].position.y;
+		point.x += 1.0f;
+		point.y -= 1.0f;
+		break;
+	case WIN_DOWN:
+		point.x = windows[winId].position.x;
+		point.y = windows[winId].position.y + windows[winId].size.h;
+		point.x += 1.0f;
+		point.y += 1.0f;
+		break;
 	}
-	return winId;
-}
 
-i32
-window_switch_left(Buffer* buf, WindowArray windows, i32 winId) {
-	
-	Vec2 temp = cursor_render_pos(buf, windows);
-	Vec2i cursorPos;
-	Vec2i size;
-	cursorPos.x = (i32)temp.x;
-	cursorPos.y = (i32)temp.y;
-
-	cursorPos.x = windows[winId].position.x;
-	cursorPos.y = windows[winId].position.y;
-	cursorPos.x -= 1.0f;
-	cursorPos.y += 1.0f;
 
 	for (i32 i = 0; i < ARRAY_LENGTH(windows); ++i) {
 		
-		size.w = windows[i].size.w + windows[i].position.x;
-		size.h = windows[i].size.h + windows[i].position.y;
+		winSize.w = windows[i].size.w + windows[i].position.x;
+		winSize.h = windows[i].size.h + windows[i].position.y;
 
-
-		if (is_point_in_rect_i(cursorPos, windows[i].position, size)) {
+		if (is_point_in_rect_i(point, windows[i].position, winSize)) {
 			return i;
 		}
 	}

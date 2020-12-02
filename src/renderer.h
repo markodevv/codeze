@@ -92,15 +92,13 @@ i32 renderer_font_size();
 
 void render_text_debug(char* text, Vec2 position, Vec4 color);
 static char DebugString[64];
-static Vec2 DebugPos = {1200.0f, 0.0f};
 static Vec4 DebugColor = {0.8f, 0.8f, 0.0f, 1.0f};
 
-#define DEBUG_TEXT(row, text, ...)	\
+#define DEBUG_TEXT(pos, text, ...)	\
 	sprintf(DebugString, text, __VA_ARGS__); \
-	DebugPos.y = row; \
-	render_text_debug(DebugString, DebugPos, DebugColor);
+	render_text_debug(DebugString, pos, DebugColor);
 #else
-#define DEBUG_TEXT(ren, row, text, ...)	
+#define DEBUG_TEXT(row, text, ...)	
 
 #endif
   
