@@ -72,9 +72,9 @@ typedef struct Renderer {
 
 
 GLFWwindow* renderer_create_window();
-
 void renderer_initialize(f32 width, f32 height);
 void renderer_load_font(const char* fontFile, i32 fontSize);
+
 void renderer_begin();
 void renderer_end();
 

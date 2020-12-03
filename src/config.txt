@@ -1,4 +1,0 @@
-BIND("j" : codeze_cursor_down)
-BIND("k" : codeze_cursor_up)
-BIND("h" : codeze_cursor_left)
-BIND("l" : codeze_cursor_right)

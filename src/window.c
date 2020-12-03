@@ -15,6 +15,8 @@ window_split_verticaly(WindowArray windows, i32 winId) {
 
 	windows[winId].size.w /= 2;
 	Window window = {
+		0,
+		0,
 		{windows[winId].size.w + windows[winId].position.x, windows[winId].position.y},
 		{windows[winId].size.w, windows[winId].size.h}
 	};
@@ -32,6 +34,8 @@ window_split_horizontaly(WindowArray windows, i32 winId) {
 	
 	windows[winId].size.h /= 2;
 	Window window = {
+		0,
+		0,
 		{windows[winId].position.x, windows[winId].position.y + windows[winId].size.h},
 		{windows[winId].size.w, windows[winId].size.h}
 	};

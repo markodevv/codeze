@@ -3,6 +3,7 @@
 #include "shader.h"
 #include "debug.h"
 #include "cursor.h"
+#include "config.h"
 
 #include <glad/glad.h>
 
@@ -391,33 +392,46 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 	Vec4 color = global_Colors[0];
 
 	{
-	  Vec2 winFramePos, winFrameSize;
-	  winFramePos.x = window->position.x;
-	  winFramePos.y = window->position.y;
-	  winFrameSize.x = 0.8f;
-	  winFrameSize.y = window->size.h;
+		Vec2 borderPos, borderSize;
+		borderPos.x = window->position.x;
+		borderPos.y = window->position.y;
+		borderSize.x = 0.8f;
+		borderSize.y = window->size.h;
 
-	  render_quad(winFramePos, winFrameSize, global_Colors[0]);
+		render_quad(borderPos, borderSize, global_Colors[0]);
 
-	  winFramePos.x = window->position.x;
-	  winFramePos.y = window->position.y + window->size.h;
-	  winFrameSize.x = window->size.w;
-	  winFrameSize.y = 0.8f;
+		borderPos.x = window->position.x;
+		borderPos.y = window->position.y + window->size.h - 1.0f;
+		borderSize.x = window->size.w;
+		borderSize.y = 0.8f;
 
-	  render_quad(winFramePos, winFrameSize, global_Colors[0]);
-
+		render_quad(borderPos, borderSize, global_Colors[0]);
 	}
 
-	for (sizet i = 0; i < STR_LENGTH(text); ++i) {
+	window->endLine = window->startLine + window->size.h / g_Renderer.fontSize;
+	if (window->endLine >= ARRAY_LENGTH(buf->lineLengths))
+		window->endLine = ARRAY_LENGTH(buf->lineLengths);
+
+	sizet start = buffer_index_based_on_line(buf, window->startLine);
+	sizet end = buffer_index_based_on_line(buf, window->endLine);
+
+	// printf("endline %i\n", endline);
+	// printf("endindex %i\n", end);
+	// printf("endindex buf %i\n", STR_LENGTH(buf->text));
+
+	for (sizet i = start; i < end; ++i) {
 
 		if (advanceY >= window->size.h + window->position.y - g_Renderer.fontSize) {
 			break;
 		}
 		if (advanceX >= window->position.x + window->size.x) {
-			advanceX = window->position.x;
-			advanceY += g_Renderer.fontSize;
+		  //advanceX = window->position.x;
+		  //advanceY += g_Renderer.fontSize;
+			continue;
 		}
 
+		// TODO: can remove this and make
+		// it renderable by setting the newline glyph as empthy image
 		if (text[i] == '\n') {
 
 			advanceY += g_Renderer.fontSize;
@@ -501,7 +515,7 @@ render_cursor(Buffer* buf, Window* win) {
 	cursorSize = cursor_render_size(buf);
 	// TODO: fix wierd offset
 	cursorPos.y += renderer_font_size() / 5;
-	render_quad(cursorPos, cursorSize, global_Colors[0]);
+	render_quad(cursorPos, cursorSize, global_Colors[2]);
 }
 
 void

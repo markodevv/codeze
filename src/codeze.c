@@ -6,6 +6,7 @@
 #include "tokenizer.h"
 #include "container.h"
 #include "buffer.h"
+#include "cursor.h"
 #include "window.h"
 
 #include <stdio.h>
@@ -13,13 +14,13 @@
 #include <threads.h>
 
 /* TODO:
-   - split window feature
    - window scrolling
 
  */
 
 /* DONE:
 
+   - split window feature
    - mouse input basics
    - gap buffer basics
    - syntax highliting basics
@@ -39,17 +40,6 @@ typedef struct Editor {
 } Editor;
 
 
-void
-print_array(i32* arr) {
-	
-	for (sizet i = 0; i < ARRAY_LENGTH(arr); ++i) {
-		
-		printf("%i, ", arr[i]);
-	}
-	printf("\n");
-}
-
-
 static void
 initialize_window(Window* window, f32 width, f32 height, f32 x, f32 y) {
 	
@@ -63,28 +53,9 @@ initialize_window(Window* window, f32 width, f32 height, f32 x, f32 y) {
 int
 main() {
   
-	// i32* arr = array_create(10, sizeof(i32));
-
-	// for (sizet i = 0; i < 10; ++i) {
-		
-	// 	arr = array_push(arr, &i);
-	// }
-	// print_array(arr);
-
-	// int num = 69;
-	// arr = array_insert(arr, 5, &num);
-	// print_array(arr);
-	// arr = array_insert(arr, 5, &num);
-	// print_array(arr);
-	// num = 420;
-	// arr = array_insert(arr, 7, &num);
-	// print_array(arr);
-
-	// return 0;
-
 	Editor* editor = malloc(sizeof(Editor));
-	editor->width = 1920;
-	editor->height = 1080;
+	editor->width = 1916;
+	editor->height = 1041;
 
 	editor->window = renderer_create_window();
 	events_initialize(editor->window);
@@ -105,8 +76,7 @@ main() {
 	i32 focusedWindow = 0;
 	{
 		Window window = {
-			{0.0f, 0.0f},
-			{editor->width, editor->height}
+			0, 0, {0.0f, 0.0f}, {editor->width, editor->height}
 		};
 		windows = array_push(windows, &window);
 	}
@@ -121,13 +91,13 @@ main() {
 			if (event.type == KEY_PRESSED || event.type == KEY_REPEAT) {
 				switch(event.key) {
 				case KEY_Left:
-					buffer_cursor_previous(buffer); break;
+					cursor_left(buffer); break;
 				case KEY_Right:
-					buffer_cursor_next(buffer); break;
+					cursor_right(buffer); break;
 				case KEY_Down:
-					buffer_cursor_down(buffer); break;
+					cursor_down(buffer); break;
 				case KEY_Up:
-					buffer_cursor_up(buffer); break;
+					cursor_up(buffer); break;
 				case KEY_Backspace:
 					buffer_backspace_delete(buffer); break;
 				case KEY_Tab:
@@ -169,7 +139,29 @@ main() {
 						
 						windows = window_split_horizontaly(windows, focusedWindow);
 					} break;
+				case KEY_PageDown: {
+					if (windows[focusedWindow].startLine
+						!= ARRAY_LENGTH(buffer->lineLengths) - 1) {
+
+						if (buffer->currentLine == windows[focusedWindow].startLine)
+							cursor_down(buffer);
+
+						windows[focusedWindow].startLine++;
+					}
+				} break;
+				case KEY_PageUp: {
+					if (windows[focusedWindow].startLine != 0) {
+						
+						printf("%i \n", windows[focusedWindow].endLine);
+						if (buffer->currentLine == windows[focusedWindow].endLine)
+							cursor_up(buffer);
+
+						windows[focusedWindow].startLine--;
+					}
+				} break;
+
 				}
+			  
 			}
 			else if (event.type == CHAR_INPUTED) {
 
@@ -188,12 +180,12 @@ main() {
 
 				while (mouseY > buffer->currentLine * renderer_font_size()) {
 
-					buffer_cursor_down(buffer); 
+					cursor_down(buffer); 
 				} 
 
 				while (mouseY < buffer->currentLine * renderer_font_size()) {
 
-					buffer_cursor_up(buffer);
+					cursor_up(buffer);
 				} 
 
 
@@ -257,11 +249,13 @@ main() {
 		pos.x = editor->width - 200.0f;
 		pos.y = 0;
 		DEBUG_TEXT(pos, "- DEBUG TEXT -", NULL); pos.y += 20.0f;
-		DEBUG_TEXT(pos, "cursorX %i", (i32)buffer->cursorX); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "cursorX tabed %i", (i32)buffer->cursorXtabed); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "cursorX %i", (i32)buffer->curX); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "current line %i", (i32)buffer->currentLine); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "pre length %i", (i32)buffer->preLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "post length %i", (i32)buffer->postLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "gap length %i", (i32)buffer->gapLen); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "tabed line length %i", (i32)buffer->cursorLines[buffer->currentLine]); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "line length %i", (i32)buffer->lineLengths[buffer->currentLine]); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "char under cursor %c", (i32)buffer->text[buffer->preLen + buffer->gapLen]); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "line count %i", (i32)ARRAY_LENGTH(buffer->lineLengths)); pos.y += 20.0f;
