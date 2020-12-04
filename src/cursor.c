@@ -27,7 +27,7 @@ Vec2
 cursor_render_size(Buffer* buf) {
 	GlyphData* glyphs = renderer_get_glyphs();
 	Vec2 size = {
-		glyphs[buffer_char_before_cursor(buf)].advanceX,
+		glyphs[buffer_char_under_cursor(buf)].advanceX,
 		renderer_font_size()
 	};
 
@@ -47,6 +47,7 @@ cursor_right(Buffer* b) {
 	else 
 		b->cursorXtabed++;
 
+	b->curX++;
 	buffer_forward(b);
 }
 
@@ -62,6 +63,7 @@ cursor_left(Buffer* b) {
 	else 
 		b->cursorXtabed--;
 
+	b->curX--;
 	buffer_backward(b);
 
 }
@@ -99,6 +101,7 @@ cursor_down(Buffer* b) {
 	else {
 
 		b->cursorXtabed = 0;
+		b->curX = 0;
 		while (b->text[b->preLen + b->gapLen] != '\n') {
 			
 			if (b->text[b->preLen + b->gapLen] == '\t') {
@@ -107,6 +110,7 @@ cursor_down(Buffer* b) {
 			else {
 				b->cursorXtabed++;
 			}
+			b->curX++;
 			buffer_forward(b);
 		}
 	}
@@ -141,6 +145,7 @@ cursor_up(Buffer* b) {
 	else {
 		
 		b->cursorXtabed = b->cursorLines[b->currentLine] - 1;
+		b->curX = b->lineLengths[b->currentLine] - 1;
 	}
 
 }

@@ -259,16 +259,17 @@ main() {
 		pos.x = editor->width - 200.0f;
 		pos.y = 0;
 		DEBUG_TEXT(pos, "- DEBUG TEXT -", NULL); pos.y += 20.0f;
+
 		DEBUG_TEXT(pos, "cursorX tabed %i", (i32)buffer->cursorXtabed); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "cursorX %i", (i32)buffer->curX); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "tabed line length %i", (i32)buffer->cursorLines[buffer->currentLine]); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "line length %i", (i32)buffer->lineLengths[buffer->currentLine]); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "line count %i", (i32)ARRAY_LENGTH(buffer->lineLengths)); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "current line %i", (i32)buffer->currentLine); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "pre length %i", (i32)buffer->preLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "post length %i", (i32)buffer->postLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "gap length %i", (i32)buffer->gapLen); pos.y += 20.0f;
-		DEBUG_TEXT(pos, "tabed line length %i", (i32)buffer->cursorLines[buffer->currentLine]); pos.y += 20.0f;
-		DEBUG_TEXT(pos, "line length %i", (i32)buffer->lineLengths[buffer->currentLine]); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "char under cursor %c", (i32)buffer->text[buffer->preLen + buffer->gapLen]); pos.y += 20.0f;
-		DEBUG_TEXT(pos, "line count %i", (i32)ARRAY_LENGTH(buffer->lineLengths)); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "Focused window %i", (i32)focusedWindow); pos.y += 20.0f;
 
 		renderer_end();

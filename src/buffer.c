@@ -116,6 +116,7 @@ buffer_insert_char(Buffer* b, char c) {
 	b->preLen++;
 	b->cursorLines[b->currentLine]++;
 	b->lineLengths[b->currentLine]++;
+
 	b->cursorXtabed++;
 	b->curX++;
 
