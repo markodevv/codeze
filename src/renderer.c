@@ -408,16 +408,15 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 		render_quad(borderPos, borderSize, global_Colors[0]);
 	}
 
-	window->endLine = window->startLine + window->size.h / g_Renderer.fontSize;
-	if (window->endLine >= ARRAY_LENGTH(buf->lineLengths))
-		window->endLine = ARRAY_LENGTH(buf->lineLengths);
+	sizet visibleLines = (window->size.h -
+						  (window->size.h % g_Renderer.fontSize)) / g_Renderer.fontSize;
 
-	sizet start = buffer_index_based_on_line(buf, window->startLine);
-	sizet end = buffer_index_based_on_line(buf, window->endLine);
+	window->renderView.end = window->renderView.start + visibleLines - 1;
+	if (window->renderView.end > ARRAY_LENGTH(buf->lineLengths))
+		window->renderView.end = ARRAY_LENGTH(buf->lineLengths);
 
-	// printf("endline %i\n", endline);
-	// printf("endindex %i\n", end);
-	// printf("endindex buf %i\n", STR_LENGTH(buf->text));
+	sizet start = buffer_index_based_on_line(buf, window->renderView.start);
+	sizet end = buffer_index_based_on_line(buf, window->renderView.end);
 
 	for (sizet i = start; i < end; ++i) {
 
@@ -425,8 +424,8 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 			break;
 		}
 		if (advanceX >= window->position.x + window->size.x) {
-		  //advanceX = window->position.x;
-		  //advanceY += g_Renderer.fontSize;
+			advanceX = window->position.x;
+			advanceY += g_Renderer.fontSize;
 			continue;
 		}
 
@@ -495,13 +494,13 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 		advanceX += g_Renderer.glyphs[text[i]].advanceX;
 	}
 
-	static char buffer[128];
 	Vec2 pos;
 	pos.x = (f32)window->position.x + 200.0f;
 	pos.y = (f32)window->position.y;
-	DEBUG_TEXT(pos, "position: [%i, %i]", window->position.x, window->position.y);
-	pos.y += 20.0f;
-	DEBUG_TEXT(pos, "size: [%i, %i]", window->size.x, window->size.y);
+	DEBUG_TEXT(pos, "position: [%i, %i]", window->position.x, window->position.y); pos.y += 20.0f;
+	DEBUG_TEXT(pos, "size: [%i, %i]", window->size.x, window->size.y) pos.y += 20.0f;
+	DEBUG_TEXT(pos, "start line: %i", window->renderView.start) pos.y += 20.0f;
+	DEBUG_TEXT(pos, "end line: %i", window->renderView.end) pos.y += 20.0f;
 
 	str_release(text);
 }

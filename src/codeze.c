@@ -76,7 +76,7 @@ main() {
 	i32 focusedWindow = 0;
 	{
 		Window window = {
-			0, 0, {0.0f, 0.0f}, {editor->width, editor->height}
+			{0, 0}, {0.0f, 0.0f}, {editor->width, editor->height}
 		};
 		windows = array_push(windows, &window);
 	}
@@ -95,9 +95,17 @@ main() {
 				case KEY_Right:
 					cursor_right(buffer); break;
 				case KEY_Down:
-					cursor_down(buffer); break;
+					if (buffer->currentLine <
+						windows[focusedWindow].renderView.end) {
+						
+						cursor_down(buffer); 
+					} break;
 				case KEY_Up:
-					cursor_up(buffer); break;
+					if (buffer->currentLine >
+						windows[focusedWindow].renderView.start) {
+						
+						cursor_up(buffer);
+					} break;
 				case KEY_Backspace:
 					buffer_backspace_delete(buffer); break;
 				case KEY_Tab:
@@ -140,23 +148,24 @@ main() {
 						windows = window_split_horizontaly(windows, focusedWindow);
 					} break;
 				case KEY_PageDown: {
-					if (windows[focusedWindow].startLine
-						!= ARRAY_LENGTH(buffer->lineLengths) - 1) {
+					if (windows[focusedWindow].renderView.start
+						!= ARRAY_LENGTH(buffer->lineLengths) - 1 &&
+						windows[focusedWindow].renderView.end <
+						ARRAY_LENGTH(buffer->lineLengths)) {
 
-						if (buffer->currentLine == windows[focusedWindow].startLine)
+						if (buffer->currentLine == windows[focusedWindow].renderView.start)
 							cursor_down(buffer);
 
-						windows[focusedWindow].startLine++;
+						windows[focusedWindow].renderView.start++;
 					}
 				} break;
 				case KEY_PageUp: {
-					if (windows[focusedWindow].startLine != 0) {
+					if (windows[focusedWindow].renderView.start != 0) {
 						
-						printf("%i \n", windows[focusedWindow].endLine);
-						if (buffer->currentLine == windows[focusedWindow].endLine)
+						if (buffer->currentLine == windows[focusedWindow].renderView.end)
 							cursor_up(buffer);
 
-						windows[focusedWindow].startLine--;
+						windows[focusedWindow].renderView.start--;
 					}
 				} break;
 
@@ -167,7 +176,8 @@ main() {
 
 				buffer_insert_char(buffer, event.character);
 			}
-			else if (event.type == MOUSE_BUTTON_PRESSED) {
+			//                    TODO:
+			else if (event.type == -5) {
 
 				// TODO: make it work for last line 
 				f64 xpos, ypos;

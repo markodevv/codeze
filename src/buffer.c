@@ -15,6 +15,7 @@ buffer_create(File* file) {
 	buf->gapLen = 0;
 	buf->cursorXtabed = 0;
 	buf->curX = 0;
+	buf->currentLine = 0;
 	buf->postLen = STR_LENGTH(file->buffer);
 	buf->cursorLines = array_create(file->lineCount, sizeof(i32));
 	buf->lineLengths = array_create(file->lineCount, sizeof(i32));

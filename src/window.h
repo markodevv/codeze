@@ -13,8 +13,7 @@ typedef enum WinDirection {
 
 typedef struct Window {
   
-	i32 startLine;
-	i32 endLine;
+	Vec2i renderView;
 	Vec2i position;
 	Vec2i size;
 

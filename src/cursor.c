@@ -10,7 +10,7 @@ cursor_render_pos(Buffer* buf, Window* win) {
 	string cursorString = buffer_string_before_cursor(buf);
 	Vec2 pos;
 	pos.x = win->position.x;
-	pos.y = win->position.y + renderer_font_size() * (buf->currentLine - win->startLine);
+	pos.y = win->position.y + renderer_font_size() * (buf->currentLine - win->renderView.start);
 
 	GlyphData* glyphs = renderer_get_glyphs();
 
