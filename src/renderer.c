@@ -498,7 +498,7 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 	pos.x = (f32)window->position.x + 200.0f;
 	pos.y = (f32)window->position.y;
 	DEBUG_TEXT(pos, "position: [%i, %i]", window->position.x, window->position.y); pos.y += 20.0f;
-	DEBUG_TEXT(pos, "size: [%i, %i]", window->size.x, window->size.y) pos.y += 20.0f;
+	DEBUG_TEXT(pos, "size: [%i, %i]", window->size.w, window->size.h) pos.y += 20.0f;
 	DEBUG_TEXT(pos, "start line: %i", window->renderView.start) pos.y += 20.0f;
 	DEBUG_TEXT(pos, "end line: %i", window->renderView.end) pos.y += 20.0f;
 

@@ -24,3 +24,13 @@ void array_pop(void *arr, void *dest);
 void* array_insert(void *arr, sizet pos, void* item);
 void array_erase(void *arr, sizet pos);
 
+// List stuff
+
+typedef struct List {
+	
+	void* data;
+	void* next;
+
+} List;
+
+List* list_create(sizet capacity, sizet stride);
