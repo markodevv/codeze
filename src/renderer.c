@@ -420,14 +420,6 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 
 	for (sizet i = start; i < end; ++i) {
 
-		if (advanceY >= window->size.h + window->position.y - g_Renderer.fontSize) {
-			break;
-		}
-		if (advanceX >= window->position.x + window->size.x) {
-			advanceX = window->position.x;
-			advanceY += g_Renderer.fontSize;
-			continue;
-		}
 
 		// TODO: can remove this and make
 		// it renderable by setting the newline glyph as empthy image
@@ -443,6 +435,14 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 			continue;
 		}
 
+		if (advanceY >= window->size.h + window->position.y - g_Renderer.fontSize) {
+			break;
+		}
+		if (advanceX >= window->position.x + window->size.x) {
+			// advanceX = window->position.x;
+			// advanceY += g_Renderer.fontSize;
+			continue;
+		}
 
 		xpos = advanceX + g_Renderer.glyphs[text[i]].bearingX;
 		// this is stupid, idk how else to make it work

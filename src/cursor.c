@@ -5,7 +5,7 @@
 #include "config.h"
 
 Vec2
-cursor_render_pos(Buffer* buf, Window* win) {
+cursor_render_pos(Buffer* buf, Node* win) {
   
 	string cursorString = buffer_string_before_cursor(buf);
 	Vec2 pos;

@@ -42,6 +42,12 @@ array_release(void *arr) {
     free(arr - _FIELDS * sizeof(sizet));
 }
 
+void
+array_reset(void *arr) {
+
+	array_field_set(arr, _LENGTH, 0);
+}
+
 void*
 array_resize(void *arr) {
 
@@ -107,22 +113,3 @@ array_insert(void *arr, sizet pos, void* item) {
 
 
 
-// Linked list
-
-
-List*
-list_create(sizet capacity, sizet stride) {
-
-	List* base = malloc(sizeof(List));
-	List* curr = base;
-	for (sizet i = 0; i < capacity; ++i) {
-		
-		curr->next = malloc(sizeof(List));
-		curr->data = malloc(stride * sizeof(i8));
-		curr = curr->next;
-	}
-
-	curr->next = NULL;
-
-	return base;
-}

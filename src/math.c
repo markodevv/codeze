@@ -29,26 +29,23 @@ mat_ortho(f32 mat[4][4], f32 left, f32 right, f32 bottom, f32 top) {
 b8
 is_point_in_rect(Vec2 point, Vec2 rectPos, Vec2 rectSize) {
   
-if (point.x > rectPos.x && point.x < rectSize.w &&
-	point.y > rectPos.y && point.y < rectSize.h) {
-	return 1;
- }
- else {
-    return 0; 	
- }
+	if (point.x > rectPos.x && point.x < (rectPos.x + rectSize.w) &&
+		point.y > rectPos.y && point.y < (rectPos.y + rectSize.h))
+		return 1;
+	else 
+		return 0; 	
   
 }
 
 b8
 is_point_in_rect_i(Vec2i point, Vec2i rectPos, Vec2i rectSize) {
   
-if (point.x > rectPos.x && point.x < rectSize.w &&
-	point.y > rectPos.y && point.y < rectSize.h) {
-	return 1;
- }
- else {
-    return 0; 	
- }
+	if (point.x > rectPos.x && point.x < (rectPos.x + rectSize.w) &&
+		point.y > rectPos.y && point.y < (rectPos.y + rectSize.h))
+		return 1;
+	else
+		return 0; 	
+		
   
 }
 
@@ -126,3 +123,5 @@ vec2i_print(Vec2i vec) {
 	printf("%i", vec.y);
 	printf(" )\n");
 }
+
+
