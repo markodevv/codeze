@@ -20,13 +20,16 @@ array_create(sizet capacity, sizet stride) {
 	
 }
 
-
+void*
+array_top(void* arr) {
+  
+	return (u8*)arr + (ARRAY_LENGTH(arr) - 1) * ARRAY_STRIDE(arr);
+}
 
 sizet
 array_field_get(void* arr, sizet field) {
 	
 	return ((sizet*)(arr) - _FIELDS)[field];
-
 }
 
 void
@@ -84,10 +87,11 @@ array_pop(void *arr, void *dest) {
 void
 array_erase(void *arr, sizet pos) {
   
-	void* src = arr + (pos * ARRAY_STRIDE(arr));
-	void* dest = arr + ((pos + 1) * ARRAY_STRIDE(arr));
+	ASSERT(ARRAY_LENGTH(arr) > 1);
+	void* dest = arr + (pos * ARRAY_STRIDE(arr));
+	void* src = arr + ((pos + 1) * ARRAY_STRIDE(arr));
 	sizet size = (ARRAY_LENGTH(arr) - pos) * ARRAY_STRIDE(arr);
-    memcpy(src, dest, size);
+    memcpy(dest, src, size);
 
 	array_field_set(arr, _LENGTH, ARRAY_LENGTH(arr) - 1);
 }

@@ -501,6 +501,7 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 	DEBUG_TEXT(pos, "size: [%i, %i]", window->size.w, window->size.h) pos.y += 20.0f;
 	DEBUG_TEXT(pos, "start line: %i", window->renderView.start) pos.y += 20.0f;
 	DEBUG_TEXT(pos, "end line: %i", window->renderView.end) pos.y += 20.0f;
+	DEBUG_TEXT(pos, "window ID: %i", window->id) pos.y += 20.0f;
 
 	str_release(text);
 }

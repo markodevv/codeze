@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <threads.h>
+#include <time.h>
 
 /* TODO:
    - closing windows
@@ -55,20 +56,20 @@ initialize_window(Window* window, f32 width, f32 height, f32 x, f32 y) {
 int
 main() {
 
-	// Window** windows1 = array_create(1, sizeof(Window**));
-	// Window win;
-	// win.renderView.start = 0;
-	// win.renderView.end = 0;
-	// win.position.x = 1;
-	// win.position.y = 0;
-	// win.size.w = 0;
-	// win.size.h = 0;
-	// Window* wiptr = &win;
-	// windows1 = array_push(windows1, &wiptr);
+	// int* numbers = array_create(2, sizeof(int));
+	// for (sizet i = 1; i <= ARRAY_CAPACITY(numbers); ++i) {
 
-	// printf("window x %i \n", windows1[0]->position.x);
+	// 	numbers = array_push(numbers, &i);
+	// }
+	// for(sizet i = 0; i < ARRAY_LENGTH(numbers); ++i) {
+	// 	printf("%i \n", numbers[i]);
+	// }
+	// array_erase(numbers, 0);
+	// for(sizet i = 0; i < ARRAY_LENGTH(numbers); ++i) {
+	// 	printf("%i \n", numbers[i]);
+	// }
+	// return 0;
 
-  
 	Editor* editor = malloc(sizeof(Editor));
 	editor->width = 1916;
 	editor->height = 1041;
@@ -94,17 +95,18 @@ main() {
 	window.nodeType = NODE_WINDOW;
 	window.position.x = 0;
 	window.position.y = 0;
+	window.id = new_window_id();
 	window.size.w = editor->width;
 	window.size.h = editor->height;
 	NodeTree windowTree = window_tree_create(window);
-	Window* focusedWindow = &windowTree->children[0];
+	Window* focusedWindow = windowTree->children + 0;
+
 
 	while (!glfwWindowShouldClose(editor->window)) {
 		
 		Event event;
 		while(event_queue_next(&event)) { 
 			// mabey keys should be commands instead and commands are bound to keys
-			// because user needs to bind keys to commands
 			if (event.type == KEY_PRESSED || event.type == KEY_REPEAT) {
 				switch(event.key) {
 				case KEY_Left:
@@ -136,17 +138,24 @@ main() {
 
 						focusedWindow = window_split_verticaly(windowTree, focusedWindow);
 					} break;
-					/*
+				case KEY_Q:
+					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
+						
+						focusedWindow = window_close(focusedWindow);
+					} break;
 				case KEY_L:
 					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
 
-						focusedWindow = window_switch(buffer, windows, focusedWindow, WIN_RIGHT);
+						focusedWindow =
+							window_switch(windowTree, buffer, focusedWindow, WIN_RIGHT);
 					} break;
 				case KEY_H:
 					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
 						
-						focusedWindow = window_switch(buffer, windows, focusedWindow, WIN_LEFT);
+						focusedWindow =
+							window_switch(windowTree, buffer, focusedWindow, WIN_LEFT);
 					} break;
+					/*
 				case KEY_J:
 					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
 
@@ -156,11 +165,6 @@ main() {
 					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
 						
 						focusedWindow = window_switch(buffer, windows, focusedWindow, WIN_UP);
-					} break;
-				case KEY_Q:
-					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
-						
-						focusedWindow = window_close(buffer, windows, focusedWindow);
 					} break;
 				case KEY_S:
 					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
@@ -270,7 +274,7 @@ main() {
 		string bufferText = buffer_get_text(buffer);
 		TokenArray tokens = tokens_make(bufferText);
 
-		Window* windows = array_create(10, sizeof(Window));
+		WindowArray windows = array_create(26, sizeof(Window));
 		windows = tree_get_windows(windowTree, windows);
 
 		for (sizet i = 0; i < ARRAY_LENGTH(windows); ++i) {
@@ -279,8 +283,6 @@ main() {
 		}
 		render_cursor(buffer, focusedWindow);
 
-		array_release(tokens);
-		array_release(windows);
 
 		Vec2 pos;
 		pos.x = editor->width - 200.0f;
@@ -297,8 +299,12 @@ main() {
 		DEBUG_TEXT(pos, "post length %i", (i32)buffer->postLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "gap length %i", (i32)buffer->gapLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "char under cursor %c", (i32)buffer->text[buffer->preLen + buffer->gapLen]); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "Window count %i", ARRAY_LENGTH(windows)); pos.y += 20.0f;
 
 		renderer_end();
+
+		array_release(tokens);
+		array_release(windows);
 
 		glfwSwapBuffers(editor->window);
 

@@ -72,3 +72,4 @@ void vec2_print(Vec2 vec);
 void vec4i_print(Vec4i vec);
 void vec3i_print(Vec3i vec);
 void vec2i_print(Vec2i vec);
+int random_int();

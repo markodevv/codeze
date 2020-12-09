@@ -1,4 +1,5 @@
 #include "math.h"
+#include <stdlib.h>
 #include "debug.h"
 
 
@@ -49,6 +50,10 @@ is_point_in_rect_i(Vec2i point, Vec2i rectPos, Vec2i rectSize) {
   
 }
 
+int random_int() {
+  
+	return rand();
+}
 void
 vec4_print(Vec4 vec) {
 

@@ -24,4 +24,5 @@ void* array_push(void *arr, void *xptr);
 void array_pop(void *arr, void *dest);
 void* array_insert(void *arr, sizet pos, void* item);
 void array_erase(void *arr, sizet pos);
+void* array_top(void* arr);
 
