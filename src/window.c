@@ -6,6 +6,7 @@
 
 #define MIN_WINDOW_WIDTH 256
 #define MIN_WINDOW_HEIGHT 256
+#define BIG_NUMBER 69696969
 
 
 static Window*
@@ -307,7 +308,7 @@ window_close(Window* focusedWindow) {
 		if (parent->isVertical) {
 			
 			i32 totalWidth = 0;
-			i32 startx = 69696969;
+			i32 startx = BIG_NUMBER;
 			i32 eraseAt = 0;
 			i32 winCount = 0;
 
@@ -431,7 +432,7 @@ window_split_horizontal(NodeTree tree, Window* focusedWindow) {
 	Window win;
 	Node* parent = focusedWindow->parent;
 	i32 height = 0;
-	i32 ypos = 69696969;
+	i32 ypos = BIG_NUMBER;
 
 	if (parent->children[0].nodeType == NODE_WINDOW) {
 		
@@ -517,7 +518,7 @@ window_split_vertical(NodeTree tree, Window* focusedWindow) {
 	Window win;
 	Node* parent = focusedWindow->parent;
 	i32 width = 0;
-	i32 xpos = 69696969;
+	i32 xpos = BIG_NUMBER;
 
 	if (parent->children[0].nodeType == NODE_WINDOW) {
 		

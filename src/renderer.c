@@ -497,12 +497,11 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 	#ifdef DEBUG
 
 	Vec2 quadSize = {200.0f, 100.0f};
-	Vec2 quadPos = {window->position.x + 200.0f, window->position.y};
+	Vec2 pos = {window->position.x + window->size.w - 200.0f, window->position.y};
 	Vec4 quadColor = {0.2f, 0.2f, 0.2f, 0.8f};
-	render_quad(quadPos, quadSize, quadColor);
+	render_quad(pos, quadSize, quadColor);
 
-	Vec2 pos;
-	pos.x = (f32)window->position.x + 200.0f;
+	pos.x = (f32)window->position.x + window->size.w - 200.0f;
 	pos.y = (f32)window->position.y;
 	DEBUG_TEXT(pos, "position: [%i, %i]", window->position.x, window->position.y); pos.y += 20.0f;
 	DEBUG_TEXT(pos, "size: [%i, %i]", window->size.w, window->size.h) pos.y += 20.0f;
@@ -558,13 +557,13 @@ i32 renderer_font_size() {
 
 	return g_Renderer.fontSize;
 }
+
 #ifdef DEBUG
 void
 render_text_debug(char* text, Vec2 position, Vec4 color) {
 
 	static float xpos, ypos, w, h, offsetX, texX, texY, advanceX, advanceY;
 
-	//position.y *= g_Renderer.fontSize;
 	advanceY = position.y;
 	advanceX = position.x;
 

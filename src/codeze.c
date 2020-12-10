@@ -145,6 +145,18 @@ int main() {
 						focusedWindow =
 							window_switch(windowTree, buffer, focusedWindow, WIN_LEFT);
 					} break;
+				case KEY_J:
+					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
+						
+						focusedWindow =
+							window_switch(windowTree, buffer, focusedWindow, WIN_DOWN);
+					} break;
+				case KEY_K:
+					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
+						
+						focusedWindow =
+							window_switch(windowTree, buffer, focusedWindow, WIN_UP);
+					} break;
 					/*
 				case KEY_J:
 					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
