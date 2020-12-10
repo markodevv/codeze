@@ -53,22 +53,7 @@ initialize_window(Window* window, f32 width, f32 height, f32 x, f32 y) {
 }
 	
 
-int
-main() {
-
-	// int* numbers = array_create(2, sizeof(int));
-	// for (sizet i = 1; i <= ARRAY_CAPACITY(numbers); ++i) {
-
-	// 	numbers = array_push(numbers, &i);
-	// }
-	// for(sizet i = 0; i < ARRAY_LENGTH(numbers); ++i) {
-	// 	printf("%i \n", numbers[i]);
-	// }
-	// array_erase(numbers, 0);
-	// for(sizet i = 0; i < ARRAY_LENGTH(numbers); ++i) {
-	// 	printf("%i \n", numbers[i]);
-	// }
-	// return 0;
+int main() {
 
 	Editor* editor = malloc(sizeof(Editor));
 	editor->width = 1916;
@@ -136,7 +121,12 @@ main() {
 				case KEY_V:
 					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
 
-						focusedWindow = window_split_verticaly(windowTree, focusedWindow);
+						focusedWindow = window_split_vertical(windowTree, focusedWindow);
+					} break;
+				case KEY_S:
+					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
+
+						focusedWindow = window_split_horizontal(windowTree, focusedWindow);
 					} break;
 				case KEY_Q:
 					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {

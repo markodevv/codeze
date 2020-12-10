@@ -45,9 +45,11 @@ typedef Node* WindowArray;
 
 struct Buffer;
 
-Window* window_split_verticaly(NodeTree tree, Window* focusedWindow);
+Window* window_split_vertical(NodeTree tree, Window* focusedWindow);
+Window* window_split_horizontal(NodeTree tree, Window* focusedWindow);
 Window* window_switch(NodeTree tree, struct Buffer* buf, Window* focusedWindow, WinDirection dir);
 Window* window_close(Window* focusedWindow);
+Window empthy_window();
 NodeTree window_tree_create(Window window);
 WindowArray tree_get_windows(Node* node, WindowArray windows);
 void print_tree(Node* node);

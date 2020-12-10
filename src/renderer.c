@@ -494,6 +494,13 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 		advanceX += g_Renderer.glyphs[text[i]].advanceX;
 	}
 
+	#ifdef DEBUG
+
+	Vec2 quadSize = {200.0f, 100.0f};
+	Vec2 quadPos = {window->position.x + 200.0f, window->position.y};
+	Vec4 quadColor = {0.2f, 0.2f, 0.2f, 0.8f};
+	render_quad(quadPos, quadSize, quadColor);
+
 	Vec2 pos;
 	pos.x = (f32)window->position.x + 200.0f;
 	pos.y = (f32)window->position.y;
@@ -502,6 +509,8 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 	DEBUG_TEXT(pos, "start line: %i", window->renderView.start) pos.y += 20.0f;
 	DEBUG_TEXT(pos, "end line: %i", window->renderView.end) pos.y += 20.0f;
 	DEBUG_TEXT(pos, "window ID: %i", window->id) pos.y += 20.0f;
+
+	#endif
 
 	str_release(text);
 }
