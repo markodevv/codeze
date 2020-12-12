@@ -53,6 +53,12 @@ initialize_window(Window* window, f32 width, f32 height, f32 x, f32 y) {
 }
 	
 
+typedef struct test {
+	int* array;
+	int id;
+} test;
+
+
 int main() {
 
 	Editor* editor = malloc(sizeof(Editor));
@@ -132,6 +138,8 @@ int main() {
 					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
 						
 						focusedWindow = window_close(focusedWindow);
+						printf("-----TREE \n \n");
+						print_tree(windowTree);
 					} break;
 				case KEY_L:
 					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
@@ -281,7 +289,12 @@ int main() {
 
 		for (sizet i = 0; i < ARRAY_LENGTH(windows); ++i) {
 
-			render_buffer(buffer, &windows[i], tokens);
+			b8 focused = 0;
+			if (windows[i].id == focusedWindow->id) {
+				focused = 1;
+			}
+			render_buffer(buffer, &windows[i], tokens, focused);
+			focused = 0;
 		}
 		render_cursor(buffer, focusedWindow);
 

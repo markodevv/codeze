@@ -378,7 +378,7 @@ render_text(string text, Vec2 position, Vec4 color) {
 
 
 void
-render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
+render_buffer(Buffer* buf, Window *window, TokenArray tokens, b8 focused) {
 
 	static float xpos, ypos, w, h, offsetX,
 		texX, texY, advanceX, advanceY, tokLen;
@@ -398,14 +398,19 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 		borderSize.x = 0.8f;
 		borderSize.y = window->size.h;
 
-		render_quad(borderPos, borderSize, global_Colors[0]);
+		Vec4 borderColor = global_Colors[0];
+
+		if (focused) 
+			borderColor = global_Colors[5];
+
+		render_quad(borderPos, borderSize, borderColor);
 
 		borderPos.x = window->position.x;
 		borderPos.y = window->position.y + window->size.h - 1.0f;
 		borderSize.x = window->size.w;
 		borderSize.y = 0.8f;
 
-		render_quad(borderPos, borderSize, global_Colors[0]);
+		render_quad(borderPos, borderSize, borderColor);
 	}
 
 	sizet visibleLines = (window->size.h -
@@ -434,6 +439,12 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 			advanceX += g_Renderer.glyphs[text[i]].advanceX;
 			continue;
 		}
+
+		if (tokLen <= 0) {
+
+			color = global_Colors[TOK_IDENTIFIER];
+		}
+		tokLen--;
 
 		if (advanceY >= window->size.h + window->position.y - g_Renderer.fontSize) {
 			break;
@@ -475,10 +486,6 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 			tokIndex++;
 		}
 
-		if (tokLen <= 0) {
-
-			color = global_Colors[TOK_IDENTIFIER];
-		}
 
 		for (i32 j = 0; j < VERTICES_PER_QUAD; ++j) {
 
@@ -488,7 +495,6 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens) {
 			g_Renderer.vertexArrayIndex++;
 		}
 
-		tokLen--;
 
 		g_Renderer.vertexCount += VERTICES_PER_QUAD;
 		advanceX += g_Renderer.glyphs[text[i]].advanceX;

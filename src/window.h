@@ -30,6 +30,7 @@ typedef struct Node {
 		};
 		struct {
 			b8 isVertical;
+			Vec2i containerSize;
 			struct Node* children;
 		};
 	};

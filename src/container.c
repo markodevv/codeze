@@ -87,7 +87,7 @@ array_pop(void *arr, void *dest) {
 void
 array_erase(void *arr, sizet pos) {
   
-	ASSERT(ARRAY_LENGTH(arr) > 1);
+	ASSERT(ARRAY_LENGTH(arr) >= 1);
 	void* dest = arr + (pos * ARRAY_STRIDE(arr));
 	void* src = arr + ((pos + 1) * ARRAY_STRIDE(arr));
 	sizet size = (ARRAY_LENGTH(arr) - pos) * ARRAY_STRIDE(arr);
