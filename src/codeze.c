@@ -130,8 +130,6 @@ int main() {
 					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
 						
 						focusedWindow = window_close(windowTree, focusedWindow);
-						printf("--------- \nTREE _______ \n");
-						print_tree(windowTree);
 					} break;
 				case KEY_L:
 					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
