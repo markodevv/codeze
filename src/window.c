@@ -237,7 +237,7 @@ resize_windows_recursively_height(Node* parent, i32 startY, i32 height) {
 
 
 static Window*
-get_first_window_recursively(Node* node) {
+find_first_window_recursively(Node* node) {
 
 	for (sizet i = 0; i < (ARRAY_LENGTH(node->children)); ++i) {
 
@@ -249,11 +249,23 @@ get_first_window_recursively(Node* node) {
 	for (sizet i = 0; i < (ARRAY_LENGTH(node->children)); ++i) {
 
 		if (node->children[i].nodeType == NODE_CONTAINER) {
-			Window* out = get_first_window_recursively(&node->children[i]);
+			Window* out = find_first_window_recursively(&node->children[i]);
 			return out;
 		}
 	}
 
+	// ASSERT_MSG(NULL, "now window found");
+	return NULL;
+}
+
+static Window*
+find_first_window(Node* parent) {
+
+	for (sizet i = 0; i < ARRAY_LENGTH(parent->children); ++i) {
+
+		if (parent->children[i].nodeType == NODE_WINDOW)
+			return &parent->children[i];
+	}
 	return NULL;
 }
 
@@ -262,22 +274,27 @@ window_find(Node* parent, i32 id) {
 	
 	for (sizet i = 0; i < ARRAY_LENGTH(parent->children); ++i) {
 
-		if (parent->children[i].nodeType == NODE_WINDOW &&
-			parent->children[i].id == id) 
-			return &parent->children[i];
+		if (parent->children[i].nodeType == NODE_WINDOW) {
+			if (parent->children[i].id == id) {
+				return &parent->children[i];
+			}
+		}
+		else {
+			window_find(&parent->children[i], id);
+		}
 	}
 	return NULL;
 }
 
 Window*
-window_close(Window* focusedWindow) {
+window_close(NodeTree tree, Window* focusedWindow) {
 
 	// check is there is container or window at parent
 	if (ARRAY_LENGTH(focusedWindow->parent->children) == 1) return focusedWindow;
 
 
 	if (ARRAY_LENGTH(focusedWindow->parent->children) == 2) {
-		Window* outWindow = focusedWindow;
+		Window* outWindow;
 		Node* parent = focusedWindow->parent;
 		Node* node;
 		Window focusWinData = *focusedWindow;
@@ -290,11 +307,11 @@ window_close(Window* focusedWindow) {
 
 		if (node->nodeType == NODE_CONTAINER) {
 
-			Node* childWindow = get_first_window_recursively(node);
+			Node* childWindow = find_first_window_recursively(node);
 
 			if (parent->isVertical) {
 				
-				i32 xpos = childWindow->position.x;
+				i32 xpos;
 
 				if (parent->children[0].id == focusedWindow->id)
 					array_erase(parent->children, 0);
@@ -304,20 +321,17 @@ window_close(Window* focusedWindow) {
 				node = &parent->children[0];
 
 				// if child window is to the right
-				if (childWindow->position.x > focusWinData.position.x) {
-
+				if (childWindow->position.x > focusWinData.position.x)
 					xpos = focusWinData.position.x;
-					resize_windows_recursively_width(node, xpos, focusWinData.size.w);
-				}
-				else {
-					
-					resize_windows_recursively_width(node, xpos, focusWinData.size.w);
-				}
-				outWindow = get_first_window_recursively(parent);
+				else
+					xpos = childWindow->position.x;
+
+				resize_windows_recursively_width(node, xpos, focusWinData.size.w);
+
 
 			} else {
 				
-				i32 ypos = childWindow->position.y;
+				i32 ypos;
 
 				if (parent->children[0].id == focusedWindow->id)
 					array_erase(parent->children, 0);
@@ -327,16 +341,13 @@ window_close(Window* focusedWindow) {
 				node = &parent->children[0];
 
 				// if child window is down
-				if (childWindow->position.y > focusWinData.position.y) {
-
+				if (childWindow->position.y > focusWinData.position.y) 
 					ypos = focusWinData.position.y;
-					resize_windows_recursively_height(node, ypos, focusWinData.size.h);
-				}
-				else {
-					
-					resize_windows_recursively_height(node, ypos, focusWinData.size.h);
-				}
-				outWindow = get_first_window_recursively(parent);
+				else 
+					ypos = childWindow->position.y;
+
+				resize_windows_recursively_height(node, ypos, focusWinData.size.h);
+
 			}
 		} else {
 
@@ -391,41 +402,45 @@ window_close(Window* focusedWindow) {
 
 			Node* root = parent->parent;
 			b8 isContainer = parent->children[0].nodeType == NODE_CONTAINER;
-			i32 outWindowId = outWindow->id;
 
 			// move child children to parent children
 			// delete parent container
+			Node* nodesToMoveUp;
 			Node* toDelete;
-			Node* toDelete2;
 
-			if (!isContainer)
+			if (isContainer) {
+				// if its a container we move parent->children->children
+				// to root
+
+				nodesToMoveUp = parent->children->children;
 				toDelete = parent->children;
+			}
 			else {
-				toDelete = parent->children->children;
-				toDelete2 = parent->children;
+				// if not we only move the window parent->children[0]
+				nodesToMoveUp = parent->children;
 			}
 
 
-			sizet parentIndex = 0;
+			sizet insertIndex = 0;
+			// get parent index
 			for (sizet i = 0; i < ARRAY_LENGTH(root->children); ++i) {
 
 				if (&root->children[i] == parent) {
-					parentIndex = i;
+					insertIndex = i;
 					break;
 				}
 			}
-			root->children[parentIndex] = toDelete[0];
-			root->children[parentIndex].parent = root;
+			// convert parent to 1 window
+			root->children[insertIndex] = nodesToMoveUp[0];
+			root->children[insertIndex].parent = root;
 
 			if (isContainer) {
 
-				for (sizet i = 0; i < ARRAY_LENGTH(toDelete); ++i) {
+				for (sizet i = 1; i < ARRAY_LENGTH(nodesToMoveUp); ++i) {
 
-					if (i == parentIndex)
-						continue;
-
-					root->children = array_push(root->children, &toDelete[i]);
-					root->children[i].parent = root;
+					root->children = array_insert(root->children, insertIndex, &nodesToMoveUp[i]);
+					root->children[insertIndex].parent = root;
+					insertIndex++;
 				}
 
 				for (sizet i = 0; i < ARRAY_LENGTH(root->children); ++i) {
@@ -440,20 +455,40 @@ window_close(Window* focusedWindow) {
 			}
 
 
-			array_release(toDelete);
+			array_release(nodesToMoveUp);
 			if (isContainer)
-				array_release(toDelete2);
+				array_release(toDelete);
 
-			outWindow = window_find(root, outWindowId);
-			ASSERT(outWindow);
-			return outWindow;
+			outWindow = find_first_window_recursively(root);
+
 		}
+		ASSERT(outWindow);
 		return outWindow;
 
 	} else if (ARRAY_LENGTH(focusedWindow->parent->children) > 2) {
 		
+		// Node* parent = focusedWindow->parent;
+		// Window focusWinData = *focusedWindow;
+		// i32 xpos;
+		// if (parent->isVertical) {
+
+		// 	for (sizet i = 0; i < ARRAY_LENGTH(parent->children); ++i) {
+
+		// 		if (parent->children[i].nodeType == NODE_WINDOW) {
+		// 			xpos = parent->children[i].position.x;
+		// 		}
+		// 	}
+		// 	for (sizet i = 0; i < ARRAY_LENGTH(parent->children); ++i) {
+
+		// 		if (parent->children[i].id == focusedWindow->id) {
+		// 			array_erase(parent->children, i);
+		// 		}
+		// 	}
+		// 	resize_windows_recursively_width(parent->children, xpos, focusWinData.size.w);
+		// }
 	}
 
+	ASSERT(0);
 	return focusedWindow;
 }
 

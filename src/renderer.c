@@ -414,7 +414,7 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens, b8 focused) {
 	}
 
 	sizet visibleLines = (window->size.h -
-						  (window->size.h % g_Renderer.fontSize)) / g_Renderer.fontSize;
+						  (window->size.h % g_Renderer.fontSize) - 1) / g_Renderer.fontSize;
 
 	window->renderView.end = window->renderView.start + visibleLines - 1;
 	if (window->renderView.end > ARRAY_LENGTH(buf->lineLengths))
@@ -502,7 +502,7 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens, b8 focused) {
 
 	#ifdef DEBUG
 
-	Vec2 quadSize = {200.0f, 100.0f};
+	Vec2 quadSize = {200.0f, 140.0f};
 	Vec2 pos = {window->position.x + window->size.w - 200.0f, window->position.y};
 	Vec4 quadColor = {0.2f, 0.2f, 0.2f, 0.8f};
 	render_quad(pos, quadSize, quadColor);
@@ -514,6 +514,8 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens, b8 focused) {
 	DEBUG_TEXT(pos, "start line: %i", window->renderView.start) pos.y += 20.0f;
 	DEBUG_TEXT(pos, "end line: %i", window->renderView.end) pos.y += 20.0f;
 	DEBUG_TEXT(pos, "window ID: %i", window->id) pos.y += 20.0f;
+	DEBUG_TEXT(pos, "parent: %p", window->parent) pos.y += 20.0f;
+	DEBUG_TEXT(pos, "adress: %p", window) pos.y += 20.0f;
 
 	#endif
 

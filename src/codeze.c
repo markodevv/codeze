@@ -104,20 +104,12 @@ int main() {
 					cursor_left(buffer); break;
 				case KEY_Right:
 					cursor_right(buffer); break;
-					/*
 				case KEY_Down:
-					if (buffer->currentLine <
-						windows[focusedWindow].renderView.end) {
-						
-						cursor_down(buffer); 
-					} break;
+					cursor_down(buffer, focusedWindow); 
+					break;
 				case KEY_Up:
-					if (buffer->currentLine >
-						windows[focusedWindow].renderView.start) {
-						
-						cursor_up(buffer);
-					} break;
-					*/
+					cursor_up(buffer, focusedWindow);
+					break;
 				case KEY_Backspace:
 					buffer_backspace_delete(buffer); break;
 				case KEY_Tab:
@@ -137,8 +129,8 @@ int main() {
 				case KEY_Q:
 					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
 						
-						focusedWindow = window_close(focusedWindow);
-						printf("-----TREE \n \n");
+						focusedWindow = window_close(windowTree, focusedWindow);
+						printf("--------- \nTREE _______ \n");
 						print_tree(windowTree);
 					} break;
 				case KEY_L:
@@ -165,49 +157,14 @@ int main() {
 						focusedWindow =
 							window_switch(windowTree, buffer, focusedWindow, WIN_UP);
 					} break;
-					/*
-				case KEY_J:
-					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
-
-						focusedWindow = window_switch(buffer, windows, focusedWindow, WIN_DOWN);
-					} break;
-				case KEY_K:
-					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
-						
-						focusedWindow = window_switch(buffer, windows, focusedWindow, WIN_UP);
-					} break;
-				case KEY_S:
-					if ((event.mods & MOD_CONTROL) == MOD_CONTROL) {
-						
-						windows = window_split_horizontaly(windows, focusedWindow);
-					} break;
 				case KEY_PageDown: {
-					if (windows[focusedWindow].renderView.start
-						!= ARRAY_LENGTH(buffer->lineLengths) - 1 &&
-						windows[focusedWindow].renderView.end <
-						ARRAY_LENGTH(buffer->lineLengths)) {
-
-						if (buffer->currentLine == windows[focusedWindow].renderView.start)
-							cursor_down(buffer);
-
-						windows[focusedWindow].renderView.start++;
-					}
 				} break;
 				case KEY_PageUp: {
-					if (windows[focusedWindow].renderView.start != 0) {
-						
-						if (buffer->currentLine == windows[focusedWindow].renderView.end)
-							cursor_up(buffer);
-
-						windows[focusedWindow].renderView.start--;
-					}
 				} break;
 
 				}
-				*/
 			  
 			}
-			/*
 			else if (event.type == CHAR_INPUTED) {
 
 				buffer_insert_char(buffer, event.character);
@@ -215,65 +172,65 @@ int main() {
 			//                    TODO:
 			else if (event.type == -5) {
 
-				// TODO: make it work for last line 
-				f64 xpos, ypos;
-				glfwGetCursorPos(editor->window, &xpos, &ypos);
+				// // TODO: make it work for last line 
+				// f64 xpos, ypos;
+				// glfwGetCursorPos(editor->window, &xpos, &ypos);
 
-				i32 mouseY = (i32)ypos;
-				i32 mouseX = (i32)xpos;
+				// i32 mouseY = (i32)ypos;
+				// i32 mouseX = (i32)xpos;
 
-				mouseY -= (mouseY % renderer_font_size());
+				// mouseY -= (mouseY % renderer_font_size());
 
-				while (mouseY > buffer->currentLine * renderer_font_size()) {
+				// while (mouseY > buffer->currentLine * renderer_font_size()) {
 
-					cursor_down(buffer); 
-				} 
-
-				while (mouseY < buffer->currentLine * renderer_font_size()) {
-
-					cursor_up(buffer);
-				} 
-
-
-				string lineStr = buffer_string_before_cursor(buffer);
-
-				i32 cursorAdvanceX = 0; 
-
-				for (sizet i = 0; i < STR_LENGTH(lineStr); ++i) {
-					
-					//cursorAdvanceX += renderer->glyphs[lineStr[i]].advanceX;
-				} 
-
-				// if (cursorAdvanceX > mouseX) { 
-				// 	while (cursorAdvanceX > mouseX) {
-				// 		//cursorAdvanceX -= 0;
-				// 			//	renderer->glyphs[buffer_char_before_cursor(buffer)].advanceX;
-				// 		buffer_cursor_previous(buffer); 
-				//  	} 
+				// 	cursor_down(buffer); 
 				// } 
-				// else if (cursorAdvanceX < mouseX){ 
-				// 	while (cursorAdvanceX < mouseX && 
-				// 	   (mouseX - cursorAdvanceX) >= 
-				// 		   //renderer->glyphs[buffer_char_under_cursor(buffer)].advanceX) {
+
+				// while (mouseY < buffer->currentLine * renderer_font_size()) {
+
+				// 	cursor_up(buffer);
+				// } 
+
+
+				// string lineStr = buffer_string_before_cursor(buffer);
+
+				// i32 cursorAdvanceX = 0; 
+
+				// for (sizet i = 0; i < STR_LENGTH(lineStr); ++i) {
+					
+				// 	//cursorAdvanceX += renderer->glyphs[lineStr[i]].advanceX;
+				// } 
+
+				// // if (cursorAdvanceX > mouseX) { 
+				// // 	while (cursorAdvanceX > mouseX) {
+				// // 		//cursorAdvanceX -= 0;
+				// // 			//	renderer->glyphs[buffer_char_before_cursor(buffer)].advanceX;
+				// // 		buffer_cursor_previous(buffer); 
+				// //  	} 
+				// // } 
+				// // else if (cursorAdvanceX < mouseX){ 
+				// // 	while (cursorAdvanceX < mouseX && 
+				// // 	   (mouseX - cursorAdvanceX) >= 
+				// // 		   //renderer->glyphs[buffer_char_under_cursor(buffer)].advanceX) {
 						
-				// 		   // cursorAdvanceX += 0;
-				// 		   //renderer->glyphs[buffer_char_under_cursor(buffer)].advanceX;
-				// 		buffer_cursor_next(buffer); 
-				// 	}
+				// // 		   // cursorAdvanceX += 0;
+				// // 		   //renderer->glyphs[buffer_char_under_cursor(buffer)].advanceX;
+				// // 		buffer_cursor_next(buffer); 
+				// // 	}
 					
-				// } 
+				// // } 
 
-				str_release(lineStr);
+				// str_release(lineStr);
 			}
 			else if	(event.type == WINDOW_RESIZED) {
+
 				editor->width = event.width;
 				editor->height = event.height;
 				renderer_on_window_resize(event.width, event.height);
-				windows[focusedWindow].position.x = 0.0f;
-				windows[focusedWindow].position.y = 0.0f;
-				windows[focusedWindow].size.w = editor->width;
-				windows[focusedWindow].size.h = editor->height;
-			*/
+				focusedWindow->position.x = 0.0f;
+				focusedWindow->position.y = 0.0f;
+				focusedWindow->size.w = editor->width;
+				focusedWindow->size.h = editor->height;
 			}
 		} 
 
@@ -314,7 +271,9 @@ int main() {
 		DEBUG_TEXT(pos, "post length %i", (i32)buffer->postLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "gap length %i", (i32)buffer->gapLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "char under cursor %c", (i32)buffer->text[buffer->preLen + buffer->gapLen]); pos.y += 20.0f;
-		DEBUG_TEXT(pos, "Window count %i", ARRAY_LENGTH(windows)); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "Window count %zu", ARRAY_LENGTH(windows)); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "RenderView start %i", focusedWindow->renderView.start); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "RenderView  end %i", focusedWindow->renderView.end); pos.y += 20.0f;
 
 		renderer_end();
 

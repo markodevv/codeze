@@ -69,7 +69,7 @@ cursor_left(Buffer* b) {
 }
 
 void
-cursor_down(Buffer* b) {
+cursor_down(Buffer* b, Window* win) {
 	
 	if (b->currentLine == ARRAY_LENGTH(b->cursorLines) - 1) return;
 
@@ -118,7 +118,7 @@ cursor_down(Buffer* b) {
 }
 
 void
-cursor_up(Buffer* b) {
+cursor_up(Buffer* b, Window* win) {
 	
 	if (b->currentLine == 0) return;
 
