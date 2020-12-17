@@ -1,5 +1,6 @@
 #pragma once
 #include "types.h"
+#include "event.h"
 
 #define ARRAY_RESIZE_FACTOR 2
 

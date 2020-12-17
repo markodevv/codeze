@@ -320,11 +320,13 @@ render_textured_quad(Vec2 position, Vec2 size, Vec4 color, u32 texID) {
 }
 
 void
-render_text(string text, Vec2 position, Vec4 color) {
+render_text(Buffer* buf, Vec2 position, Vec4 color) {
 
 	static float xpos, ypos, w, h, offsetX, texX, texY, advanceX, advanceY;
 	advanceY = position.y;
 	advanceX = position.x;
+
+	string text = buffer_get_text(buf);
 
 	for (sizet i = 0; i < STR_LENGTH(text); ++i) {
 
@@ -374,6 +376,7 @@ render_text(string text, Vec2 position, Vec4 color) {
 		g_Renderer.vertexCount += VERTICES_PER_QUAD;
 		advanceX += g_Renderer.glyphs[text[i]].advanceX;
 	}
+	str_release(text);
 }
 
 
@@ -533,6 +536,8 @@ render_cursor(Buffer* buf, Window* win) {
 	cursorPos.y += renderer_font_size() / 5;
 	render_quad(cursorPos, cursorSize, global_Colors[2]);
 }
+
+
 
 void
 renderer_end() {

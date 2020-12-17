@@ -5,6 +5,7 @@
 #include "fileio.h"
 #include "container.h"
 
+
 typedef struct Buffer {
   
 	string text;
@@ -22,15 +23,19 @@ typedef struct Buffer {
 
 } Buffer;
 
-void buffer_forward(Buffer* b);
-void buffer_backward(Buffer* b);
-Buffer* buffer_create(File* file);
-void buffer_insert_char(Buffer* b, char c);
-string buffer_get_text(Buffer* b);
-void buffer_insert_tab(Buffer* b);
-void buffer_insert_newline(Buffer* b);
-void buffer_backspace_delete(Buffer* b);
-string buffer_string_before_cursor(Buffer* b);
-char buffer_char_under_cursor(Buffer* b);
-char buffer_char_before_cursor(Buffer* b);
-sizet buffer_index_based_on_line(Buffer* b, i32 line);
+extern Buffer* CurBuffer;
+
+void buffer_forward();
+void buffer_backward();
+Buffer buffer_create(File* file);
+Buffer buffer_create_empthy();
+void buffer_insert_char(char c);
+string buffer_get_text();
+void buffer_insert_tab();
+void buffer_insert_newline();
+void buffer_backspace_delete();
+string buffer_string_before_cursor();
+char buffer_char_under_cursor();
+char buffer_char_before_cursor();
+sizet buffer_index_based_on_line(Buffer* buf, i32 line);
+void buffer_clear();

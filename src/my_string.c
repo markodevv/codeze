@@ -115,6 +115,12 @@ str_push(void *str, char c) {
     return str;
 }
 
+void
+str_skip(void* str, sizet count) {
+  
+	str_field_set(str, S_LENGTH, STR_LENGTH(str) + count);
+}
+
 char* str_as_cstr(string str) {
 	
 	str[STR_LENGTH(str) - 1] = '\0';

@@ -6,9 +6,12 @@
 #include "stb_image.h"
 
 #include <stdio.h>
+#include <dirent.h>
+#include <unistd.h>
 
 
-File* file_open(const char* path, const char* flags) {
+File*
+file_open(const char* path, const char* flags) {
 
 	FILE* fp = fopen(path, flags);
 	ASSERT_MSG(fp, "Failed to load file ");
@@ -43,21 +46,48 @@ File* file_open(const char* path, const char* flags) {
   
 }
 
-void file_close(File* file) {
+void
+file_close(File* file) {
 
 	str_release(file->buffer);
 	free(file);
 	
 }
 
-u8* image_load_png(const char* path, i32* x, i32* y, i32* bpp) {
+u8*
+image_load_png(const char* path, i32* x, i32* y, i32* bpp) {
 
 	return stbi_load(path, x, y, bpp, 0);
 	
 }
 
-void image_free(u8* data) {
+void
+image_free(u8* data) {
 	
 	stbi_image_free(data);
 
 }
+
+static DIR* dir;
+static struct dirent* entry;
+
+void
+open_directory(const char* path) {
+
+	dir = opendir(path);
+
+	if (!dir) {
+		
+		printf("Cound't load %s directory \n", path);
+	} else {
+		printf("File loaded %s \n", path);
+	}
+
+}
+
+void
+open_new_file(const char* path) {
+
+	
+}
+

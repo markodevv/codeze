@@ -17,9 +17,7 @@ typedef enum TextureIndex {
 	WHITE_TEXTURE_INDEX  = 1,
 	FONT_TEXTURE_INDEX  = 2,
 	RYUK_TEXTURE_INDEX  = 3,
-
 	TEXTURE_SLOTS = 4
-
 	
 } TextureIndex;
 
@@ -80,9 +78,9 @@ void renderer_end();
 
 void render_quad(Vec2 position, Vec2 size, Vec4 color);
 void render_textured_quad(Vec2 position, Vec2 size, Vec4 color, u32 texID);
-void render_text(string text, Vec2 position, Vec4 color);
-void render_buffer(Buffer* buffer, Window* window, Token* tokens, b8 focused);
-void render_cursor(Buffer* b, Window* window);
+void render_text(Buffer* buf, Vec2 position, Vec4 color);
+void render_buffer(Buffer* buf, Window* window, Token* tokens, b8 focused);
+void render_cursor(Buffer* buf, Window* window);
 void renderer_on_window_resize(f32 width, f32 height);
 GlyphData* renderer_get_glyphs();
 i32 renderer_font_size();

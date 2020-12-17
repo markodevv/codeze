@@ -5,80 +5,109 @@
 #include <string.h>
 
 #define BUFFER_RESIZE_FACTOR 2
+#define BUFFER_EMPTHY_SIZE 20
 
-Buffer*
+Buffer* CurBuffer;
+
+Buffer
 buffer_create(File* file) {
   
-	Buffer* buf = malloc(sizeof(Buffer));
+	Buffer buf;
 
-	buf->preLen = 0;
-	buf->gapLen = 0;
-	buf->cursorXtabed = 0;
-	buf->curX = 0;
-	buf->currentLine = 0;
-	buf->postLen = STR_LENGTH(file->buffer);
-	buf->cursorLines = array_create(file->lineCount, sizeof(i32));
-	buf->lineLengths = array_create(file->lineCount, sizeof(i32));
+	buf.preLen = 0;
+	buf.gapLen = 0;
+	buf.cursorXtabed = 0;
+	buf.curX = 0;
+	buf.currentLine = 0;
+	buf.postLen = STR_LENGTH(file->buffer);
+	buf.cursorLines = array_create(file->lineCount, sizeof(i32));
+	buf.lineLengths = array_create(file->lineCount, sizeof(i32));
 
-	buf->text = str_create_s(STR_LENGTH(file->buffer));
-	str_copy(buf->text, file->buffer);
+	buf.text = str_create_s(STR_LENGTH(file->buffer));
+	str_copy(buf.text, file->buffer);
 
 	sizet i = 0;
 	// foreach line
 	sizet zero = 0;
 	for (sizet line = 0; line < file->lineCount; ++line) {
 		
-		buf->lineLengths = array_push(buf->lineLengths, &zero);
-		buf->cursorLines = array_push(buf->cursorLines, &zero);
+		buf.lineLengths = array_push(buf.lineLengths, &zero);
+		buf.cursorLines = array_push(buf.cursorLines, &zero);
 		// foreach char in line
-		for (i; buf->text[i] != '\n'; ++i) {
+		for (i; buf.text[i] != '\n'; ++i) {
 			// add to line length
-			if (buf->text[i] == '\t') 
-				buf->cursorLines[line] += TAB_SIZE;
+			if (buf.text[i] == '\t') 
+				buf.cursorLines[line] += TAB_SIZE;
 			else
-				buf->cursorLines[line]++;
+				buf.cursorLines[line]++;
 
-			buf->lineLengths[line]++;
+			buf.lineLengths[line]++;
 		}
 		i++;
-		buf->cursorLines[line]++;
-		buf->lineLengths[line]++;
+		buf.cursorLines[line]++;
+		buf.lineLengths[line]++;
 
 	}
 
 	return buf;
 }
 
-void
-buffer_forward(Buffer* b) {
+Buffer
+buffer_create_empthy() {
 	
-	b->text[b->preLen] = b->text[b->preLen + b->gapLen];
-	b->preLen++;
-	b->postLen--;
+	Buffer buf;
+
+	buf.preLen = 0;
+	buf.gapLen = BUFFER_EMPTHY_SIZE;
+	buf.cursorXtabed = 0;
+	buf.curX = 0;
+	buf.currentLine = 0;
+	buf.postLen = 0;
+	buf.cursorLines = array_create(1, sizeof(i32));
+	buf.lineLengths = array_create(1, sizeof(i32));
+
+
+	sizet zero = 0;
+	buf.lineLengths = array_push(buf.lineLengths, &zero);
+	buf.cursorLines = array_push(buf.cursorLines, &zero);
+
+	buf.text = str_create_s(BUFFER_EMPTHY_SIZE);
+
+	str_skip(buf.text, BUFFER_EMPTHY_SIZE);
+
+	return buf;
 
 }
 
 void
-buffer_backward(Buffer* b) {
+buffer_forward() {
 	
-	b->text[b->preLen + b->gapLen - 1] = b->text[b->preLen - 1];
-	b->preLen--;
-	b->postLen++;
+	CurBuffer->text[CurBuffer->preLen] = CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen];
+	CurBuffer->preLen++;
+	CurBuffer->postLen--;
 
 }
 
+void
+buffer_backward() {
+	
+	CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen - 1] = CurBuffer->text[CurBuffer->preLen - 1];
+	CurBuffer->preLen--;
+	CurBuffer->postLen++;
+
+}
 
 string
-buffer_get_text(Buffer* b) {
+buffer_get_text() {
 	
-	string newstr = str_create_s(b->preLen + b->postLen);
+	string newstr = str_create_s(CurBuffer->preLen + CurBuffer->postLen);
 
-	for (sizet i = 0; i < b->preLen; ++i) {
-		newstr = str_push(newstr, b->text[i]);
+	for (sizet i = 0; i < CurBuffer->preLen; ++i) {
+		newstr = str_push(newstr, CurBuffer->text[i]);
 	}
 
-	for (sizet i = b->preLen; i + b->gapLen < STR_LENGTH(b->text); ++i) {
-		newstr = str_push(newstr, b->text[i + b->gapLen]);
+	for (sizet i = CurBuffer->preLen; i + CurBuffer->gapLen < STR_CAPACITY(CurBuffer->text); ++i) {
+		newstr = str_push(newstr, CurBuffer->text[i + CurBuffer->gapLen]);
 	}
 
 	return newstr;
@@ -86,126 +115,123 @@ buffer_get_text(Buffer* b) {
 }
 
 void
-buffer_insert_char(Buffer* b, char c) {
+buffer_insert_char(char c) {
 	
-	if (b->gapLen == 0) {
+	if (CurBuffer->gapLen == 0) {
 		
-		sizet gap = STR_LENGTH(b->text);
+		sizet gap = STR_CAPACITY(CurBuffer->text);
 		string newstr = str_create_s(gap * BUFFER_RESIZE_FACTOR);
 
 		// copy first part of string
 		sizet i = 0;
-		for (i; i < b->preLen; ++i) {
-			newstr = str_push(newstr, b->text[i]);
+		for (i; i < CurBuffer->preLen; ++i) {
+			newstr = str_push(newstr, CurBuffer->text[i]);
 		}
 
-		for (i; i < gap; ++i) {
-			newstr = str_push(newstr, 'a');
-		}
-
+		str_skip(newstr, gap);
 		//copy second part of the string
-		for (i = b->preLen; i < STR_LENGTH(b->text); ++i) {
-			newstr = str_push(newstr, b->text[i]);
+		for (i = CurBuffer->preLen; i < STR_CAPACITY(CurBuffer->text); ++i) {
+			newstr = str_push(newstr, CurBuffer->text[i]);
 		}
 
-		str_release(b->text);
-		b->text = newstr;
+		str_release(CurBuffer->text);
+		CurBuffer->text = newstr;
 	}
 
-	b->text[b->preLen] = c;
-	b->preLen++;
-	b->cursorLines[b->currentLine]++;
-	b->lineLengths[b->currentLine]++;
+	CurBuffer->text[CurBuffer->preLen] = c;
+	CurBuffer->preLen++;
+	CurBuffer->cursorLines[CurBuffer->currentLine]++;
+	CurBuffer->lineLengths[CurBuffer->currentLine]++;
 
-	b->cursorXtabed++;
-	b->curX++;
+	CurBuffer->cursorXtabed++;
+	CurBuffer->curX++;
 
-	b->gapLen = STR_LENGTH(b->text) - (b->preLen + b->postLen);
+	CurBuffer->gapLen = STR_CAPACITY(CurBuffer->text) - (CurBuffer->preLen + CurBuffer->postLen);
 }
 
 void
-buffer_insert_tab(Buffer* b) {
+buffer_insert_tab() {
 	
-	b->cursorLines[b->currentLine] += TAB_SIZE - 1;
-	b->cursorXtabed += TAB_SIZE - 1;
-	buffer_insert_char(b, '\t');
+	CurBuffer->cursorLines[CurBuffer->currentLine] += TAB_SIZE - 1;
+	CurBuffer->cursorXtabed += TAB_SIZE - 1;
+	buffer_insert_char('\t');
 }
 
 
 void
-buffer_insert_newline(Buffer* b) {
+buffer_insert_newline() {
 	
-	buffer_insert_char(b, '\n');
+	buffer_insert_char('\n');
 	u32 zero = 0;
-	b->cursorLines = array_insert(b->cursorLines, b->currentLine, &zero);
-	b->lineLengths = array_insert(b->lineLengths, b->currentLine, &zero);
+	CurBuffer->cursorLines = array_insert(CurBuffer->cursorLines, CurBuffer->currentLine, &zero);
+	CurBuffer->lineLengths = array_insert(CurBuffer->lineLengths, CurBuffer->currentLine, &zero);
 
-	if (b->cursorLines[b->currentLine] != b->cursorXtabed) {
+	if (CurBuffer->cursorLines[CurBuffer->currentLine] != CurBuffer->cursorXtabed) {
 
-		u32 splitLineLen = b->cursorLines[b->currentLine] - b->cursorXtabed;
-		b->cursorLines[b->currentLine] -= splitLineLen;
-		b->cursorLines[b->currentLine + 1] += splitLineLen;
+		u32 splitLineLen = CurBuffer->cursorLines[CurBuffer->currentLine] - CurBuffer->cursorXtabed;
+		CurBuffer->cursorLines[CurBuffer->currentLine] -= splitLineLen;
+		CurBuffer->cursorLines[CurBuffer->currentLine + 1] += splitLineLen;
 
-		splitLineLen = b->lineLengths[b->currentLine] - b->curX;
-		b->lineLengths[b->currentLine] -= splitLineLen;
-		b->lineLengths[b->currentLine + 1] += splitLineLen;
+		splitLineLen = CurBuffer->lineLengths[CurBuffer->currentLine] - CurBuffer->curX;
+		CurBuffer->lineLengths[CurBuffer->currentLine] -= splitLineLen;
+		CurBuffer->lineLengths[CurBuffer->currentLine + 1] += splitLineLen;
 	}
-	b->currentLine++;
-	b->cursorXtabed = 0;
-	b->curX = 0;
+	CurBuffer->currentLine++;
+	CurBuffer->cursorXtabed = 0;
+	CurBuffer->curX = 0;
 }
 
 void
-buffer_backspace_delete(Buffer* b) {
+buffer_backspace_delete() {
 	
-	if (b->preLen == 0) return;
-	b->preLen--;
-	b->gapLen++;
+	if (CurBuffer->preLen == 0) return;
+	CurBuffer->preLen--;
+	CurBuffer->gapLen++;
 
-	if (b->text[b->preLen] == '\n') {
+	if (CurBuffer->text[CurBuffer->preLen] == '\n') {
 
-		i32 delCurosrLine = b->cursorLines[b->currentLine];
-		i32 delLine = b->lineLengths[b->currentLine];
+		i32 delCurosrLine = CurBuffer->cursorLines[CurBuffer->currentLine];
+		i32 delLine = CurBuffer->lineLengths[CurBuffer->currentLine];
 
-		array_erase(b->cursorLines, b->currentLine);
-		array_erase(b->lineLengths, b->currentLine);
+		array_erase(CurBuffer->cursorLines, CurBuffer->currentLine);
+		array_erase(CurBuffer->lineLengths, CurBuffer->currentLine);
 
-		b->currentLine--;
+		CurBuffer->currentLine--;
 
-		b->cursorXtabed = b->cursorLines[b->currentLine];
-		b->curX = b->lineLengths[b->currentLine];
-		b->cursorLines[b->currentLine] += delCurosrLine;
-		b->lineLengths[b->currentLine] += delLine;
+		CurBuffer->cursorXtabed = CurBuffer->cursorLines[CurBuffer->currentLine];
+		CurBuffer->curX = CurBuffer->lineLengths[CurBuffer->currentLine];
+		CurBuffer->cursorLines[CurBuffer->currentLine] += delCurosrLine;
+		CurBuffer->lineLengths[CurBuffer->currentLine] += delLine;
 
 
 	}
-	else if (b->text[b->preLen] == '\t') {
-		b->cursorLines[b->currentLine] -= TAB_SIZE - 1;
-		b->cursorXtabed -= TAB_SIZE - 1;
+	else if (CurBuffer->text[CurBuffer->preLen] == '\t') {
+		CurBuffer->cursorLines[CurBuffer->currentLine] -= TAB_SIZE - 1;
+		CurBuffer->cursorXtabed -= TAB_SIZE - 1;
 	}
 
-	b->cursorXtabed--;
-	b->curX--;
-	b->cursorLines[b->currentLine]--;
-	b->lineLengths[b->currentLine]--;
+	CurBuffer->cursorXtabed--;
+	CurBuffer->curX--;
+	CurBuffer->cursorLines[CurBuffer->currentLine]--;
+	CurBuffer->lineLengths[CurBuffer->currentLine]--;
 
 }
 
 string
-buffer_string_before_cursor(Buffer* b) {
+buffer_string_before_cursor() {
 	
-	string line = str_create_s(b->lineLengths[b->currentLine]);
+	string line = str_create_s(CurBuffer->lineLengths[CurBuffer->currentLine]);
 
-	i32 i = b->preLen - 1;
-	if (b->currentLine == 0) {
+	i32 i = CurBuffer->preLen - 1;
+	if (CurBuffer->currentLine == 0) {
 		while (i >= 0) {
-			line = str_push(line, b->text[i]);
+			line = str_push(line, CurBuffer->text[i]);
 			i--;
 		}
 	}
 	else {
-		while (b->text[i] != '\n')  {
-			line = str_push(line, b->text[i]);
+		while (CurBuffer->text[i] != '\n')  {
+			line = str_push(line, CurBuffer->text[i]);
 			i--;
 		}
 	}
@@ -214,25 +240,42 @@ buffer_string_before_cursor(Buffer* b) {
 }
 
 char
-buffer_char_under_cursor(Buffer* b) {
+buffer_char_under_cursor() {
 	
-	return b->text[b->preLen + b->gapLen];
+	return CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen];
 }
 
 char
-buffer_char_before_cursor(Buffer* b) {
+buffer_char_before_cursor() {
 	
-	return b->text[b->preLen];
+	return CurBuffer->text[CurBuffer->preLen];
 }
 
 sizet
-buffer_index_based_on_line(Buffer* b, i32 line) {
+buffer_index_based_on_line(Buffer* buf, i32 line) {
 
 	sizet result = 0;
 	for (sizet i = 0; i < line; ++i) {
 		
-		result += b->lineLengths[i];
+		result += buf->lineLengths[i];
 	}
 
 	return result;
+}
+
+void
+buffer_clear() {
+
+	array_reset(CurBuffer->lineLengths);
+	array_reset(CurBuffer->cursorLines);
+	i32 zero = 0;
+	CurBuffer->lineLengths = array_push(CurBuffer->lineLengths, &zero);
+	CurBuffer->cursorLines = array_push(CurBuffer->cursorLines, &zero);
+
+	CurBuffer->preLen = 0;
+	CurBuffer->postLen = 0;
+	CurBuffer->gapLen = STR_CAPACITY(CurBuffer->text);
+	CurBuffer->currentLine = 0;
+	CurBuffer->curX = 0;
+	CurBuffer->cursorXtabed = 0;
 }

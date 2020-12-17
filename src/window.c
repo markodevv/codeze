@@ -8,6 +8,8 @@
 #define MIN_WINDOW_HEIGHT 256
 #define BIG_NUMBER 69696969
 
+Window* FocusedWindow;
+WindowTree* WinTree;
 
 static Window*
 find_window_at_point(Node* node, Vec2i point) {
@@ -35,9 +37,10 @@ find_window_at_point(Node* node, Vec2i point) {
 }
 
 Window
-empthy_window() {
+window_create_empthy() {
 	Window window = {
 		new_window_id(),
+		0,
 		{0, 0},
 		{0, 0},
 		{0, 0},
@@ -47,60 +50,61 @@ empthy_window() {
 	return window;
 }
 
-Window*
-window_switch(NodeTree tree, Buffer* buf, Window* focusedWindow, WinDirection dir) {
+void
+window_switch(WinDirection dir) {
 	
-	Vec2 temp = cursor_render_pos(buf, focusedWindow);
+	Vec2 cursorPos = cursor_render_pos();
 	Vec2i point;
-	point.x = (i32)temp.x;
-	point.y = (i32)temp.y;
+	point.x = (i32)cursorPos.x;
+	point.y = (i32)cursorPos.y;
 
 	switch (dir) {
 	case WIN_LEFT:
-		point.x = focusedWindow->position.x;
-		point.y = focusedWindow->position.y;
+		point.x = FocusedWindow->position.x;
+		point.y = FocusedWindow->position.y;
 		point.x -= 10.0f;
 		point.y += 10.0f;
 		break;
 	case WIN_RIGHT:
-		point.x = focusedWindow->position.x + focusedWindow->size.w;
-		point.y = focusedWindow->position.y;
+		point.x = FocusedWindow->position.x + FocusedWindow->size.w;
+		point.y = FocusedWindow->position.y;
 		point.x += 10.0f;
 		point.y += 10.0f;
 		break;
 	case WIN_UP:
-		point.x = focusedWindow->position.x;
-		point.y = focusedWindow->position.y;
+		point.x = FocusedWindow->position.x;
+		point.y = FocusedWindow->position.y;
 		point.x += 10.0f;
 		point.y -= 10.0f;
 		break;
 	case WIN_DOWN:
-		point.x = focusedWindow->position.x;
-		point.y = focusedWindow->position.y + focusedWindow->size.h;
+		point.x = FocusedWindow->position.x;
+		point.y = FocusedWindow->position.y + FocusedWindow->size.h;
 		point.x += 10.0f;
 		point.y += 10.0f;
 		break;
 	}
 
-	Window* out = find_window_at_point(tree, point);
+	Window* out = find_window_at_point(WinTree, point);
 	if (out != NULL)  {
-		return out;
+		FocusedWindow = out;
 	}
-	return focusedWindow;
 }
 
-NodeTree
+void
 window_tree_create(Window window) {
   
-	NodeTree tree = malloc(sizeof(Node));
-	tree->isVertical = 0;
-	tree->children = array_create(1, sizeof(Window));
-	tree->nodeType = NODE_CONTAINER;
-	window.parent = tree;
-	tree->children = array_push(tree->children, &window);
-	tree->parent = NULL;
+	WinTree = malloc(sizeof(Node));
+	WinTree->isVertical = 0;
+	WinTree->children = array_create(1, sizeof(Window));
+	WinTree->nodeType = NODE_CONTAINER;
+	WinTree->children = array_push(WinTree->children, &window);
+	FocusedWindow = WinTree->children + 0;
+	FocusedWindow->parent = WinTree;
+	WinTree->containerSize.w = window.size.w;
+	WinTree->containerSize.h = window.size.h;
+	WinTree->parent = NULL;
 
-	return tree;
 }
 
 static WindowArray
@@ -143,6 +147,7 @@ resize_windows_evenly_width(Node* parent, i32 xpos, i32 totalWidth, i32 winCount
 	}
 
 }
+
 static void
 resize_windows_evenly_height(Node* parent, i32 ypos, i32 totalHeight, i32 winCount) {
 	
@@ -270,7 +275,7 @@ find_first_window(Node* parent) {
 }
 
 static inline Window*
-window_find(Node* parent, i32 id) {
+find_window(Node* parent, i32 id) {
 	
 	for (sizet i = 0; i < ARRAY_LENGTH(parent->children); ++i) {
 
@@ -280,27 +285,26 @@ window_find(Node* parent, i32 id) {
 			}
 		}
 		else {
-			window_find(&parent->children[i], id);
+			find_window(&parent->children[i], id);
 		}
 	}
 	return NULL;
 }
 
-Window*
-window_close(NodeTree tree, Window* focusedWindow) {
+void
+window_close() {
 
 	// check is there is container or window at parent
-	if (ARRAY_LENGTH(focusedWindow->parent->children) == 1) return focusedWindow;
+	if (ARRAY_LENGTH(FocusedWindow->parent->children) == 1) return;
 
 
-	if (ARRAY_LENGTH(focusedWindow->parent->children) == 2) {
-		Window* outWindow;
-		Node* parent = focusedWindow->parent;
-		Node* node;
-		Window focusWinData = *focusedWindow;
+	if (ARRAY_LENGTH(FocusedWindow->parent->children) == 2) {
+		Node* parent = FocusedWindow->parent;
+		Window focusWinData = *FocusedWindow;
 
 		// get the other child
-		if (parent->children[0].id == focusedWindow->id)
+		Node* node;
+		if (parent->children[0].id == FocusedWindow->id)
 		  node = &parent->children[1];
 		else
 		  node = &parent->children[0];
@@ -313,7 +317,7 @@ window_close(NodeTree tree, Window* focusedWindow) {
 				
 				i32 xpos;
 
-				if (parent->children[0].id == focusedWindow->id)
+				if (parent->children[0].id == FocusedWindow->id)
 					array_erase(parent->children, 0);
 				else
 					array_erase(parent->children, 1);
@@ -333,7 +337,7 @@ window_close(NodeTree tree, Window* focusedWindow) {
 				
 				i32 ypos;
 
-				if (parent->children[0].id == focusedWindow->id)
+				if (parent->children[0].id == FocusedWindow->id)
 					array_erase(parent->children, 0);
 				else
 					array_erase(parent->children, 1);
@@ -355,7 +359,7 @@ window_close(NodeTree tree, Window* focusedWindow) {
 				
 				Window* other;
 
-				if (parent->children[0].id == focusedWindow->id)
+				if (parent->children[0].id == FocusedWindow->id)
 					array_erase(parent->children, 0);
 				else
 					array_erase(parent->children, 1);
@@ -372,12 +376,12 @@ window_close(NodeTree tree, Window* focusedWindow) {
 					other->size.w += focusWinData.size.w;
 				}
 
-				outWindow = other;
+				FocusedWindow = other;
 			} else {
 				
 				Window* other;
 
-				if (parent->children[0].id == focusedWindow->id)
+				if (parent->children[0].id == FocusedWindow->id)
 					array_erase(parent->children, 0);
 				else
 					array_erase(parent->children, 1);
@@ -394,7 +398,7 @@ window_close(NodeTree tree, Window* focusedWindow) {
 					other->size.h += focusWinData.size.h;
 				}
 
-				outWindow = other;
+				FocusedWindow = other;
 			}
 		}
 
@@ -457,76 +461,84 @@ window_close(NodeTree tree, Window* focusedWindow) {
 			if (isContainer)
 				array_release(toDelete);
 
-			outWindow = find_first_window_recursively(root);
+			FocusedWindow = find_first_window_recursively(root);
 
 		}
 		printf("--------- \nTREE _______ \n");
-		print_tree(tree);
-		ASSERT(outWindow);
-		return outWindow;
+		print_tree(WinTree);
 
-	} else if (ARRAY_LENGTH(focusedWindow->parent->children) > 2) {
+	} else if (ARRAY_LENGTH(FocusedWindow->parent->children) > 2) {
+		// TODO:
 		
-		// Node* parent = focusedWindow->parent;
-		// Window focusWinData = *focusedWindow;
-		// i32 xpos;
-		// if (parent->isVertical) {
+		/*
+		Node* parent = FocusedWindow.parent;
+		Window focusWinData = focusedWindow;
 
-		// 	for (sizet i = 0; i < ARRAY_LENGTH(parent->children); ++i) {
+		i32 xpos = BIG_NUMBER;
+		if (parent->isVertical) {
 
-		// 		if (parent->children[i].nodeType == NODE_WINDOW) {
-		// 			xpos = parent->children[i].position.x;
-		// 		}
-		// 	}
-		// 	for (sizet i = 0; i < ARRAY_LENGTH(parent->children); ++i) {
+			for (sizet i = 0; i < ARRAY_LENGTH(parent->children); ++i) {
 
-		// 		if (parent->children[i].id == focusedWindow->id) {
-		// 			array_erase(parent->children, i);
-		// 		}
-		// 	}
-		// 	resize_windows_recursively_width(parent->children, xpos, focusWinData.size.w);
-		// }
+				if (parent->children[i].nodeType == NODE_WINDOW) {
+					
+					if (xpos > parent->children[i].position.x) 
+						xpos = parent->children[i].position.x;
+				}
+			}
+
+			for (sizet i = 0; i < ARRAY_LENGTH(parent->children); ++i) {
+
+				if (parent->children[i].nodeType == NODE_WINDOW) {
+
+					if (parent->children[i].id == focusWinData.id) 
+						array_erase(parent->children, i);
+				}
+			}
+
+		}
+		Window* out = find_first_window(parent);
+		*/
 	}
 
-	ASSERT(0);
-	return focusedWindow;
 }
 
 
 
-Window*
-window_split_horizontal(NodeTree tree, Window* focusedWindow) {
+void
+window_split_horizontal() {
 	
-	if (focusedWindow->size.h / 2 <= MIN_WINDOW_HEIGHT)
-		return focusedWindow;
+	if (FocusedWindow->size.h / 2 <= MIN_WINDOW_HEIGHT) return;
 
-	Node* parent = focusedWindow->parent;
+	Node* parent = FocusedWindow->parent;
 
 	if (parent->isVertical) {
 		
 		Window* children = array_create(2, sizeof(Window));
-		children = array_push(children, focusedWindow);
+		children = array_push(children, FocusedWindow);
 
-		Node* container = focusedWindow;
+		Vec2i winSize = FocusedWindow->size;
+		Node* container = FocusedWindow;
 		container->nodeType = NODE_CONTAINER;
 		container->isVertical = 0;
 		container->children = children;
+		container->containerSize = winSize;
 
-		focusedWindow = children + 0;
-		focusedWindow->parent = container;
-		focusedWindow->size.h /= 2;
+		FocusedWindow = children + 0;
+		FocusedWindow->parent = container;
+		FocusedWindow->size.h /= 2;
 
-		Window newWindow = empthy_window();
-		newWindow.position.x = focusedWindow->position.x;
-		newWindow.position.y = focusedWindow->position.y + focusedWindow->size.h;
-		newWindow.size = focusedWindow->size;
+		Window newWindow = window_create_empthy();
+		newWindow.position.x = FocusedWindow->position.x;
+		newWindow.position.y = FocusedWindow->position.y + FocusedWindow->size.h;
+		newWindow.size = FocusedWindow->size;
 		newWindow.parent = container;
 
 		container->children = array_push(container->children, &newWindow);
 
-	printf("\n\n TREE \n\n");
-	print_tree(tree);
-		return &container->children[0];
+		printf("\n\n TREE \n\n");
+		print_tree(WinTree);
+
+		return;
 	}
 
 	Window win;
@@ -535,14 +547,15 @@ window_split_horizontal(NodeTree tree, Window* focusedWindow) {
 
 	Window* childWindow = find_first_window(parent);
 	ASSERT(childWindow);
-	win = empthy_window();
+
+	win = window_create_empthy();
 	win.size.w = childWindow->size.w;
 	win.position.x = childWindow->position.x;
 	win.size.h = 0;
 	win.parent = parent;
 
 	i32 winCount = 0;
-	i32 focusedwinId = focusedWindow->id;
+	i32 focusedwinId = FocusedWindow->id;
 
 	for (sizet i = 0; i < ARRAY_LENGTH(parent->children); ++i) {
 
@@ -553,7 +566,7 @@ window_split_horizontal(NodeTree tree, Window* focusedWindow) {
 			if (ypos > parent->children[i].position.y) {
 				ypos = parent->children[i].position.y;
 			}
-			if (parent->children[i].id == focusedWindow->id) {
+			if (parent->children[i].id == FocusedWindow->id) {
 				parent->children = array_insert(parent->children, i + 1, &win);
 				i++;
 				winCount++;
@@ -570,50 +583,50 @@ window_split_horizontal(NodeTree tree, Window* focusedWindow) {
 		}
 	}
 
-	focusedWindow = window_find(parent, focusedwinId);
-	ASSERT_MSG(focusedWindow, "No window with that id in parent->children");
+	FocusedWindow = find_window(parent, focusedwinId);
+	ASSERT_MSG(FocusedWindow, "No window with that id in parent->children");
 
 	resize_windows_evenly_height(parent, ypos, height, winCount);
 
 	printf("\n\n TREE \n\n");
-	print_tree(tree);
-	return focusedWindow;
+	print_tree(WinTree);
 }
 
 
-Window*
-window_split_vertical(NodeTree tree, Window* focusedWindow) {
+void
+window_split_vertical() {
 	
-	if (focusedWindow->size.w / 2 <= MIN_WINDOW_WIDTH)
-		return focusedWindow;
+	if (FocusedWindow->size.w / 2 <= MIN_WINDOW_WIDTH) return;
 
-	Node* parent = focusedWindow->parent;
+	Node* parent = FocusedWindow->parent;
 
 	if (!parent->isVertical) {
 
 		Window* children = array_create(2, sizeof(Window));
-		children = array_push(children, focusedWindow);
+		children = array_push(children, FocusedWindow);
 
-		Node* container = focusedWindow;
+		Vec2i winSize = FocusedWindow->size;
+		Node* container = FocusedWindow;
 		container->nodeType = NODE_CONTAINER;
 		container->isVertical = 1;
 		container->children = children;
+		container->containerSize = winSize;
 
-		focusedWindow = children + 0;
-		focusedWindow->parent = container;
-		focusedWindow->size.w /= 2;
+		FocusedWindow = children + 0;
+		FocusedWindow->parent = container;
+		FocusedWindow->size.w /= 2;
 
-		Window newWindow = empthy_window();
-		newWindow.position.x = focusedWindow->size.w + focusedWindow->position.x;
-		newWindow.position.y = focusedWindow->position.y;
-		newWindow.size = focusedWindow->size;
+		Window newWindow = window_create_empthy();
+		newWindow.position.x = FocusedWindow->size.w + FocusedWindow->position.x;
+		newWindow.position.y = FocusedWindow->position.y;
+		newWindow.size = FocusedWindow->size;
 		newWindow.parent = container;
 
 		container->children = array_push(container->children, &newWindow);
 		printf("\n\n TREE \n\n");
-		print_tree(tree);
+		print_tree(WinTree);
 
-		return container->children + 0;
+		return;
 	}
 
 	Window win;
@@ -622,14 +635,15 @@ window_split_vertical(NodeTree tree, Window* focusedWindow) {
 
 	Window* childWindow = find_first_window(parent);
 	ASSERT(childWindow);
-	win = empthy_window();
+
+	win = window_create_empthy();
 	win.size.w = 0;
 	win.size.h = childWindow->size.h;
 	win.position.y = childWindow->position.y;
 	win.parent = parent;
 
 	i32 winCount = 0;
-	i32 focusedwinId = focusedWindow->id;
+	i32 focusedwinId = FocusedWindow->id;
 
 	for (sizet i = 0; i < ARRAY_LENGTH(parent->children); ++i) {
 
@@ -640,7 +654,7 @@ window_split_vertical(NodeTree tree, Window* focusedWindow) {
 			if (xpos > parent->children[i].position.x) {
 				xpos = parent->children[i].position.x;
 			}
-			if (parent->children[i].id == focusedWindow->id) {
+			if (parent->children[i].id == FocusedWindow->id) {
 				parent->children = array_insert(parent->children, i + 1, &win);
 				i++;
 				winCount++;
@@ -658,14 +672,13 @@ window_split_vertical(NodeTree tree, Window* focusedWindow) {
 		}
 	}
 
-	focusedWindow = window_find(parent, focusedwinId);
-	ASSERT_MSG(focusedWindow, "No window with that id in parent->children");
+	FocusedWindow = find_window(parent, focusedwinId);
+	ASSERT_MSG(FocusedWindow, "No window with that id in parent->children");
 
 	resize_windows_evenly_width(parent, xpos, width, winCount);
 
 	printf("\n\n TREE \n\n");
-	print_tree(tree);
-	return focusedWindow;
+	print_tree(WinTree);
 
 }
 
@@ -708,6 +721,8 @@ print_tree(Node* node) {
 	printf("Children : %p \n", node->children);
 	printf("Is Vertical : %i \n", node->isVertical);
 	printf("Children count : %zu \n", ARRAY_LENGTH(node->children));
+	printf("Size : ");
+	vec2i_print(node->containerSize);
 
 	for (sizet i = 0; i < ARRAY_LENGTH(node->children); ++i)  {
 

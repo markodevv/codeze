@@ -24,6 +24,7 @@ typedef struct Node {
 	union {
 		struct {
 			i32 id;
+			i32 buffId;
 			Vec2i renderView;
 			Vec2i position;
 			Vec2i size;
@@ -40,23 +41,20 @@ typedef struct Node {
 } Node;
 
 
-typedef Node* NodeTree;
+typedef Node WindowTree;
 typedef Node Window;
 typedef Node* WindowArray;
 
-struct Buffer;
+extern Window* FocusedWindow;
+extern WindowTree* WinTree;
 
-Window* window_split_vertical(NodeTree tree, Window* focusedWindow);
-Window* window_split_horizontal(NodeTree tree, Window* focusedWindow);
-Window* window_switch(NodeTree tree, struct Buffer* buf, Window* focusedWindow, WinDirection dir);
-Window* window_close(NodeTree tree, Window* focusedWindow);
-Window empthy_window();
-NodeTree window_tree_create(Window window);
-WindowArray tree_get_windows(Node* node, WindowArray windows);
+
+void window_split_vertical();
+void window_split_horizontal();
+void window_switch(WinDirection dir);
+void window_close();
+Window window_create_empthy();
+void window_tree_create(Window window);
+WindowArray tree_get_windows(Node* tree, WindowArray windows);
 void print_tree(Node* node);
 i32 new_window_id();
-/*
-WindowArray window_split_horizontaly(WindowArray windows, i32 winId);
-i32 window_switch(struct Buffer* buf, WindowArray windows, i32 winId, WinDirection dir);
-i32 window_close(struct Buffer* buf, WindowArray windows, i32 winId);
-*/

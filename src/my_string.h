@@ -25,6 +25,7 @@ void* str_concat(string s1, string s2);
 void str_pop(string str);
 char* str_as_cstr(string str);
 i8 cstr_equal(const char* s1, const char* s2);
+void str_skip(void* str, sizet count);
 
 sizet str_field_get(void* str, sizet field);
 void str_field_set(void* str, sizet field, sizet value);

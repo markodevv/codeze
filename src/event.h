@@ -49,23 +49,23 @@ typedef struct EventQueue {
 	struct Event* head;
 } EventQueue;
 
-void events_initialize(GLFWwindow* window);
-i32 event_queue_next(Event* event);
 
 typedef enum MouseButton {
-	LEFT = 0,
-    RIGHT = 1, 
-	MIDDLE = 2,
-	BUTTON01 = LEFT,
-	BUTTON02 = RIGHT,
-	BUTTON03 = MIDDLE,
-	BUTTON04 = 4,
-	BUTTON05 = 5,
-	BUTTON06 = 6,
-	BUTTON07 = 7,
-	BUTTON08 = 8,
+	MOUSE_LEFT = 0,
+    MOUSE_RIGHT = 1, 
+	MOUSE_MIDDLE = 2,
+	MOUSE_BUTTON01 = MOUSE_LEFT,
+	MOUSE_BUTTON02 = MOUSE_RIGHT,
+	MOUSE_BUTTON03 = MOUSE_MIDDLE,
+	MOUSE_BUTTON04 = 4,
+	MOUSE_BUTTON05 = 5,
+	MOUSE_BUTTON06 = 6,
+	MOUSE_BUTTON07 = 7,
+	MOUSE_BUTTON08 = 8,
 } MouseButton;
 
+void events_initialize(GLFWwindow* window);
+i32 event_queue_next(Event* event);
 
 #define MOD_SHIFT  0x0001
 #define MOD_CONTROL  0x0002
@@ -126,7 +126,7 @@ typedef enum KeyCode
 	KEY_LeftBracket         = 91,  /* [ */
 	KEY_Backslash           = 92,  /* \ */
 	KEY_RightBracket        = 93,  /* ] */
-	KEY_GraveAccent         = 96,  /* ` */
+	KEY_Tilde         = 96,  /* ` */
 
 	KEY_World1              = 161, /* non-US #1 */
 	KEY_World2              = 162, /* non-US #2 */

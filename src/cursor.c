@@ -5,12 +5,14 @@
 #include "config.h"
 
 Vec2
-cursor_render_pos(Buffer* buf, Window* win) {
+cursor_render_pos() {
   
-	string cursorString = buffer_string_before_cursor(buf);
+	string cursorString = buffer_string_before_cursor();
 	Vec2 pos;
-	pos.x = win->position.x;
-	pos.y = win->position.y + renderer_font_size() * (buf->currentLine - win->renderView.start);
+	pos.x = FocusedWindow->position.x;
+	pos.y = FocusedWindow->position.y +
+		renderer_font_size() *
+		(CurBuffer->currentLine - FocusedWindow->renderView.start);
 
 	GlyphData* glyphs = renderer_get_glyphs();
 
@@ -24,10 +26,11 @@ cursor_render_pos(Buffer* buf, Window* win) {
 }
 
 Vec2
-cursor_render_size(Buffer* buf) {
+cursor_render_size() {
+
 	GlyphData* glyphs = renderer_get_glyphs();
 	Vec2 size = {
-		glyphs[buffer_char_under_cursor(buf)].advanceX,
+		glyphs[buffer_char_under_cursor()].advanceX,
 		renderer_font_size()
 	};
 
@@ -35,64 +38,64 @@ cursor_render_size(Buffer* buf) {
 }
 
 void
-cursor_right(Buffer* b) {
+cursor_right() {
   
-	if (b->text[b->preLen + b->gapLen] == '\n'
-		|| b->postLen <= 0) {
+	if (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] == '\n'
+		|| CurBuffer->postLen <= 0) {
 		return;
 	}
 
-	if (b->text[b->preLen + b->gapLen] == '\t')
-		b->cursorXtabed += TAB_SIZE;
+	if (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] == '\t')
+		CurBuffer->cursorXtabed += TAB_SIZE;
 	else 
-		b->cursorXtabed++;
+		CurBuffer->cursorXtabed++;
 
-	b->curX++;
-	buffer_forward(b);
+	CurBuffer->curX++;
+	buffer_forward();
 }
 
 void
-cursor_left(Buffer* b) {
+cursor_left() {
 
-	if (b->preLen == 0) return;
+	if (CurBuffer->preLen == 0) return;
 
-	if (b->text[b->preLen - 1] == '\n')
+	if (CurBuffer->text[CurBuffer->preLen - 1] == '\n')
 		return;
-	else if (b->text[b->preLen - 1] == '\t')
-		b->cursorXtabed -= TAB_SIZE;
+	else if (CurBuffer->text[CurBuffer->preLen - 1] == '\t')
+		CurBuffer->cursorXtabed -= TAB_SIZE;
 	else 
-		b->cursorXtabed--;
+		CurBuffer->cursorXtabed--;
 
-	b->curX--;
-	buffer_backward(b);
+	CurBuffer->curX--;
+	buffer_backward();
 
 }
 
 void
-cursor_down(Buffer* b, Window* win) {
+cursor_down() {
 	
-	if (b->currentLine == ARRAY_LENGTH(b->cursorLines) - 1) return;
+	if (CurBuffer->currentLine == ARRAY_LENGTH(CurBuffer->cursorLines) - 1) return;
 
 
-	while (b->text[b->preLen + b->gapLen] != '\n') {
-		buffer_forward(b);
+	while (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] != '\n') {
+		buffer_forward();
 	}
-	buffer_forward(b);
-	b->currentLine++;
+	buffer_forward();
+	CurBuffer->currentLine++;
 
-	u32 currLineLen = b->cursorLines[b->currentLine] - 1;
+	u32 currLineLen = CurBuffer->cursorLines[CurBuffer->currentLine] - 1;
 
-	if (currLineLen >= b->cursorXtabed) {
+	if (currLineLen >= CurBuffer->cursorXtabed) {
 
-		sizet prevX = b->cursorXtabed;
+		sizet prevX = CurBuffer->cursorXtabed;
 		while (prevX > 0) {
 
-			if (b->text[b->preLen + b->gapLen] == '\t') {
-				buffer_forward(b);
+			if (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] == '\t') {
+				buffer_forward();
 				prevX -= TAB_SIZE;
 			}
 			else {
-				buffer_forward(b);
+				buffer_forward();
 				prevX--;
 			}
 				
@@ -100,43 +103,43 @@ cursor_down(Buffer* b, Window* win) {
 	}
 	else {
 
-		b->cursorXtabed = 0;
-		b->curX = 0;
-		while (b->text[b->preLen + b->gapLen] != '\n') {
+		CurBuffer->cursorXtabed = 0;
+		CurBuffer->curX = 0;
+		while (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] != '\n') {
 			
-			if (b->text[b->preLen + b->gapLen] == '\t') {
-				b->cursorXtabed += TAB_SIZE;
+			if (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] == '\t') {
+				CurBuffer->cursorXtabed += TAB_SIZE;
 			}
 			else {
-				b->cursorXtabed++;
+				CurBuffer->cursorXtabed++;
 			}
-			b->curX++;
-			buffer_forward(b);
+			CurBuffer->curX++;
+			buffer_forward();
 		}
 	}
 
 }
 
 void
-cursor_up(Buffer* b, Window* win) {
+cursor_up() {
 	
-	if (b->currentLine == 0) return;
+	if (CurBuffer->currentLine == 0) return;
 
-	while (b->text[b->preLen - 1] != '\n') {
+	while (CurBuffer->text[CurBuffer->preLen - 1] != '\n') {
 
-		buffer_backward(b);
+		buffer_backward();
 	}
-	buffer_backward(b);
-	b->currentLine--;
+	buffer_backward();
+	CurBuffer->currentLine--;
 
-	i32 backwardSteps = (b->cursorLines[b->currentLine] - 1) - b->cursorXtabed;
+	i32 backwardSteps = (CurBuffer->cursorLines[CurBuffer->currentLine] - 1) - CurBuffer->cursorXtabed;
 
 	if (backwardSteps > 0) {
 
 		while (backwardSteps > 0) {
 
-			buffer_backward(b);
-			if (b->text[b->preLen] == '\t')
+			buffer_backward();
+			if (CurBuffer->text[CurBuffer->preLen] == '\t')
 				backwardSteps -= TAB_SIZE;
 			else
 				backwardSteps--;
@@ -144,8 +147,8 @@ cursor_up(Buffer* b, Window* win) {
 	}
 	else {
 		
-		b->cursorXtabed = b->cursorLines[b->currentLine] - 1;
-		b->curX = b->lineLengths[b->currentLine] - 1;
+		CurBuffer->cursorXtabed = CurBuffer->cursorLines[CurBuffer->currentLine] - 1;
+		CurBuffer->curX = CurBuffer->lineLengths[CurBuffer->currentLine] - 1;
 	}
 
 }
