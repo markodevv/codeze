@@ -1,32 +1,21 @@
 #pragma once
 #include "types.h"
 
-#define STR_RESIZE_FACTOR 2
+typedef struct String {
 
-typedef char* string;
+	char* data;
+	sizet length;
+	sizet capacity;
 
-enum {
-	S_LENGTH,
-	S_CAPACITY,
-	S_FIELDS
-};
+} String;
 
-#define STR_LENGTH(str) str_field_get(str, S_LENGTH)
-#define STR_CAPACITY(str) str_field_get(str, S_CAPACITY)
-
-void* str_create_c(const char* text);
-void* str_create_s(sizet size);
-void str_release(void* str);
-sizet cstr_len(const char* str);
-void str_copy(string dest, string src);
-void* str_push(void *str, char c);
-void* str_resize(void* str);
-void* str_concat(string s1, string s2);
-void str_pop(string str);
-char* str_as_cstr(string str);
+String str_create_c(const char* text);
+String str_create_s(sizet size);
+void str_copy(String* dest, String* src);
+void str_push(String* str, char c);
+void str_concat(String* s1, char* s2);
 i8 cstr_equal(const char* s1, const char* s2);
-void str_skip(void* str, sizet count);
-
-sizet str_field_get(void* str, sizet field);
-void str_field_set(void* str, sizet field, sizet value);
+void str_skip(String* str, sizet count);
+void str_clear(String* str);
+void str_free(String* str);
 

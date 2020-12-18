@@ -6,12 +6,14 @@ configurations {"Debug", "Release"}
 include "third_party/glfw/"
 include "third_party/glad/"
 include "third_party/tinyregex"
+include "third_party/gc"
 
 IncludeDir = {}
 IncludeDir["glfw"] = "third_party/glfw/include"
 IncludeDir["glad"] = "third_party/glad/include"
 IncludeDir["freetype"] = "third_party/freetype/include"
 IncludeDir["tinyregex"] = "third_party/tinyregex"
+IncludeDir["gc"] = "third_party/gc/src"
 
 project "codeze"
 
@@ -25,6 +27,7 @@ project "codeze"
 	   "%{IncludeDir.glfw}",
 	   "%{IncludeDir.freetype}",
 	   "%{IncludeDir.tinyregex}",
+	   "%{IncludeDir.gc}",
 	   "%{IncludeDir.glad}"
 	}
 
@@ -37,7 +40,7 @@ project "codeze"
 
 	filter "system:windows"
 
-	    links {"glad", "glfw", "freetype", "tinyregex", "opengl32.lib"}
+	    links {"glad", "glfw", "freetype", "tinyregex", "gc", "opengl32.lib"}
 
 		defines {
 		   "WINDOWS_PLATFORM"
@@ -48,7 +51,7 @@ project "codeze"
 
 	    buildoptions {"-g", "-fPIC"}
 
-	    links {"glad", "glfw", "GL", "freetype", "dl", "tinyregex", "pthread", "m"}
+	    links {"glad", "glfw", "GL", "freetype", "gc", "dl", "tinyregex", "pthread", "m"}
 
 		defines {
 		   "LINUX_PLATFORM"

@@ -47,11 +47,15 @@ typedef Node* WindowArray;
 
 extern Window* FocusedWindow;
 extern WindowTree* WinTree;
+extern Window* CommandWindow;
 
 
 void window_split_vertical();
 void window_split_horizontal();
-void window_switch(WinDirection dir);
+void window_switch_up();
+void window_switch_down();
+void window_switch_left();
+void window_switch_right();
 void window_close();
 Window window_create_empthy();
 void window_tree_create(Window window);

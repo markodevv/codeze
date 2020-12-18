@@ -7,7 +7,7 @@
 Vec2
 cursor_render_pos() {
   
-	string cursorString = buffer_string_before_cursor();
+	String cursorString = buffer_string_before_cursor();
 	Vec2 pos;
 	pos.x = FocusedWindow->position.x;
 	pos.y = FocusedWindow->position.y +
@@ -16,12 +16,11 @@ cursor_render_pos() {
 
 	GlyphData* glyphs = renderer_get_glyphs();
 
-	for (sizet i = 0; i < STR_LENGTH(cursorString); ++i) {
+	for (sizet i = 0; i < cursorString.length; ++i) {
 
-		pos.x += glyphs[cursorString[i]].advanceX;
+		pos.x += glyphs[cursorString.data[i]].advanceX;
 	}
 
-	str_release(cursorString);
 	return pos;
 }
 
@@ -40,12 +39,12 @@ cursor_render_size() {
 void
 cursor_right() {
   
-	if (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] == '\n'
+	if (CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen] == '\n'
 		|| CurBuffer->postLen <= 0) {
 		return;
 	}
 
-	if (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] == '\t')
+	if (CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen] == '\t')
 		CurBuffer->cursorXtabed += TAB_SIZE;
 	else 
 		CurBuffer->cursorXtabed++;
@@ -59,9 +58,9 @@ cursor_left() {
 
 	if (CurBuffer->preLen == 0) return;
 
-	if (CurBuffer->text[CurBuffer->preLen - 1] == '\n')
+	if (CurBuffer->text.data[CurBuffer->preLen - 1] == '\n')
 		return;
-	else if (CurBuffer->text[CurBuffer->preLen - 1] == '\t')
+	else if (CurBuffer->text.data[CurBuffer->preLen - 1] == '\t')
 		CurBuffer->cursorXtabed -= TAB_SIZE;
 	else 
 		CurBuffer->cursorXtabed--;
@@ -77,7 +76,7 @@ cursor_down() {
 	if (CurBuffer->currentLine == ARRAY_LENGTH(CurBuffer->cursorLines) - 1) return;
 
 
-	while (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] != '\n') {
+	while (CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen] != '\n') {
 		buffer_forward();
 	}
 	buffer_forward();
@@ -90,7 +89,7 @@ cursor_down() {
 		sizet prevX = CurBuffer->cursorXtabed;
 		while (prevX > 0) {
 
-			if (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] == '\t') {
+			if (CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen] == '\t') {
 				buffer_forward();
 				prevX -= TAB_SIZE;
 			}
@@ -105,9 +104,9 @@ cursor_down() {
 
 		CurBuffer->cursorXtabed = 0;
 		CurBuffer->curX = 0;
-		while (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] != '\n') {
+		while (CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen] != '\n') {
 			
-			if (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] == '\t') {
+			if (CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen] == '\t') {
 				CurBuffer->cursorXtabed += TAB_SIZE;
 			}
 			else {
@@ -125,7 +124,7 @@ cursor_up() {
 	
 	if (CurBuffer->currentLine == 0) return;
 
-	while (CurBuffer->text[CurBuffer->preLen - 1] != '\n') {
+	while (CurBuffer->text.data[CurBuffer->preLen - 1] != '\n') {
 
 		buffer_backward();
 	}
@@ -139,7 +138,7 @@ cursor_up() {
 		while (backwardSteps > 0) {
 
 			buffer_backward();
-			if (CurBuffer->text[CurBuffer->preLen] == '\t')
+			if (CurBuffer->text.data[CurBuffer->preLen] == '\t')
 				backwardSteps -= TAB_SIZE;
 			else
 				backwardSteps--;

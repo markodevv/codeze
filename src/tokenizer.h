@@ -35,5 +35,5 @@ typedef struct Token {
 typedef Token* TokenArray;
 
 
-TokenArray tokens_make(string args);
+TokenArray tokens_make(String args);
 void print_tokens(Token* tokens);

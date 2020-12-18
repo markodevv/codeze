@@ -1,162 +1,87 @@
 #include "my_string.h"
 #include "debug.h"
+#include "memory.h"
 #include <string.h>
 
 #define STR_LEN_ADD_ONE(str) str_field_set(str, S_LENGTH, STR_LENGTH(str) + 1);
 #define STR_LEN_SUBTRACT_ONE(str) str_field_set(str, S_LENGTH, STR_LENGTH(str) - 1);
 
-void*
+String
 str_create_c(const char* text) {
 	
-	sizet strLen = cstr_len(text);
-	sizet headerSize = S_FIELDS * sizeof(sizet);
-	sizet strSize = strLen * sizeof(char);
+	sizet len = strlen(text);
 
-	sizet* str = (sizet*)malloc(strSize + headerSize);
-	ASSERT_MSG(str, "string malloc failed");
-
-	string out = (void*)(str + S_FIELDS);
-	memcpy(out, text, strLen * sizeof(char));
-
-	str[S_LENGTH] = strLen;
-	str[S_CAPACITY] = strLen;
+	String out;
+	out.capacity = len;
+	out.length = len;
+	//out.data = gc_malloc(&global_gc, len * sizeof(char));
+	out.data = malloc(len * sizeof(char));
+	memcpy(out.data, text, len * sizeof(char));
+	ASSERT_MSG(out.data, "string malloc failed");
 
 	return out;
 
 }
 
-void*
+String
 str_create_s(sizet size) {
 	
-	sizet headerSize = S_FIELDS * sizeof(sizet);
-	sizet strSize = size * sizeof(char);
+	String out;
+	out.capacity = size;
+	out.length = 0;
+	out.data = malloc(size * sizeof(char));
+	//out.data = gc_malloc(&global_gc, size * sizeof(char));
 
-	sizet* str = (sizet*)malloc(strSize + headerSize);
-	ASSERT_MSG(str, "string malloc failed");
+	ASSERT_MSG(out.data, "string malloc failed");
 
-	str[S_CAPACITY] = size;
-	str[S_LENGTH] = 0;
-
-	return (void*)(str + S_FIELDS);
+	return out;
 }
 
-sizet
-str_field_get(void* str, sizet field) {
-	
-	return ((sizet*)(str) - S_FIELDS)[field];
 
+// Only works if dest >= src
+void
+str_copy(String* dest, String* src) {
+
+	ASSERT(dest->capacity >= src->capacity);
+
+	for (sizet i = 0; i < src->length; ++i) {
+		
+		dest->data[i] = src->data[i];
+	}
+
+}
+
+
+
+void
+str_push(String* str, char c) {
+
+	if (str->length >= str->capacity) {
+		str->capacity *= 2;
+		str->data = realloc(str->data, str->capacity);
+	}
+
+	str->data[str->length] = c;
+	str->length++;
 }
 
 void
-str_field_set(void* str, sizet field, sizet value) {
-
-	((sizet*)(str) - S_FIELDS)[field] = value;
-
-}
-
-void
-str_release(void* str) {
+str_skip(String* str, sizet count) {
   
-	ASSERT(str);
-	free(str - S_FIELDS * sizeof(sizet));
-}
-
-
-
-sizet
-cstr_len(const char* str) {
-	
-	sizet len = 0;
-	while(str[len] != '\0') {
-		len++;
-	}
-	return len;
-
-}
-
-void
-str_copy(string dest, string src) {
-
-	ASSERT(STR_CAPACITY(dest) >= STR_LENGTH(src));
-
-	sizet i = 0;
-	for (i; i < STR_LENGTH(src); ++i) {
-		
-		dest[i] = src[i];
-	}
-	str_field_set(dest, S_LENGTH, STR_LENGTH(src));
-
-}
-
-
-void*
-str_resize(void* str) {
-	
-	void *temp = str_create_s(STR_RESIZE_FACTOR * STR_CAPACITY(str));
-
-	str_field_set(temp, S_LENGTH, STR_LENGTH(str));
-
-	memcpy(temp, str, STR_LENGTH(str) * sizeof(char));
-	str_release(str);
-
-	return temp;
-
-}
-
-void*
-str_push(void *str, char c) {
-
-	if (STR_LENGTH(str) >= STR_CAPACITY(str)) {
-		str = str_resize(str);
-	}
-
-	((string)str)[STR_LENGTH(str)] = c;
-	STR_LEN_ADD_ONE(str);
-    return str;
-}
-
-void
-str_skip(void* str, sizet count) {
-  
-	str_field_set(str, S_LENGTH, STR_LENGTH(str) + count);
-}
-
-char* str_as_cstr(string str) {
-	
-	str[STR_LENGTH(str) - 1] = '\0';
-	return str;
-
-}
-
-
-void*
-str_concat(string s1, string s2) {
-	
-	if ((STR_LENGTH(s1) + STR_LENGTH(s2)) >= STR_CAPACITY(s1)) {
-
-		s1 = str_resize(s1);
-	}
-
-	for (sizet i = 0; i < STR_LENGTH(s2); ++i) {
-		
-		s1[STR_LENGTH(s1) - 1] = s2[i];
-		STR_LEN_ADD_ONE(s1);
-		
-	}
-	return s1;
-
+	str->length += count;
 }
 
 
 void
-str_pop(string str) {
-
-	if (STR_LENGTH(str) == 0) return;
-
-	str[STR_LENGTH(str)] = '\0';
-	STR_LEN_SUBTRACT_ONE(str);
+str_concat(String* s1, char* s2) {
 	
+	i32 len = strlen(s2);
+	for (sizet i = 0; i < len; ++i) {
+		str_push(s1, s2[i]);
+	}
+
 }
+
 
 
 i8
@@ -164,7 +89,7 @@ cstr_equal(const char* s1, const char* s2) {
 	
 	sizet i = 0;
 
-	sizet len = cstr_len(s1);
+	sizet len = strlen(s1);
 	for (i; i < len; ++i) {
 
 		if (s1[i] != s2[i]) return 0;
@@ -176,4 +101,15 @@ cstr_equal(const char* s1, const char* s2) {
 		return 1;
 	}
 
+}
+
+void
+str_clear(String* str) {
+
+	str->length = 0;
+}
+
+void str_free(String* str) {
+
+	free(str->data);
 }

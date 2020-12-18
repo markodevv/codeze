@@ -7,6 +7,12 @@
 
 typedef void(*Command)();
 
-void dt_initialize();
-void dt_bind(Command command, KeyCode key, i32 mods);
-void dt_dispatch(KeyCode key, i32 mods);
+typedef struct DispatchTable {
+  
+	Command commands[KEYMAP_SIZE];
+
+} DispatchTable;
+
+void dt_init(DispatchTable* dt);
+void dt_bind(DispatchTable* dt, Command command, KeyCode key, i32 mods);
+void dt_dispatch(DispatchTable* dt, KeyCode key, i32 mods);

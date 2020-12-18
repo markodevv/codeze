@@ -147,14 +147,14 @@ in_quote(char c) {
 }
 
 TokenArray 
-tokens_make(string text) {
+tokens_make(String text) {
 
 	TokenArray tokens = array_create(INITIAL_TOKEN_CAPACITY, sizeof(Token));
 
 	sizet i = 0;
-	while (i < STR_LENGTH(text)) {
+	while (i < text.length) {
 		
-		switch(text[i]) {
+		switch(text.data[i]) {
 		default:
 			i++;
 			break;
@@ -212,9 +212,9 @@ tokens_make(string text) {
 		case 'Z': {
 			Token token = {TOK_UNKNOWN, 0, i};
 			static char word[256];
-			while (is_char_identifier(text[i])) {
+			while (is_char_identifier(text.data[i])) {
 
-				word[token.length] = text[i];
+				word[token.length] = text.data[i];
 				token.length++;
 				i++;
 			}
@@ -248,7 +248,7 @@ tokens_make(string text) {
 		case '8':
 		case '9': {
 			Token token = {TOK_NUMBER, 0, i};
-			while (is_number(text[i])) {
+			while (is_number(text.data[i])) {
 
 				token.length++;
 				i++;
@@ -293,7 +293,7 @@ tokens_make(string text) {
 		case '"': {
 			Token token = {TOK_STRING, 0, i};
 			i++;
-			while (in_quote(text[i])) {
+			while (in_quote(text.data[i])) {
 				i++;
 			}
 			i++;
@@ -304,7 +304,7 @@ tokens_make(string text) {
 		case '<': {
 			Token token = {TOK_STRING, 0, i};
 			i++;
-			while (text[i] != '>') {
+			while (text.data[i] != '>') {
 				i++;
 			}
 			i++;
@@ -320,16 +320,16 @@ tokens_make(string text) {
 		}
 		case '/': {
 			Token token = {TOK_COMMENT, 0, i};
-			if (text[i + 1] == '/') {
-				while (text[i] != '\n' && i < STR_LENGTH(text)) {
+			if (text.data[i + 1] == '/') {
+				while (text.data[i] != '\n' && i < text.length) {
 					token.length++;
 					i++;
 				}
 			}
-			else if (text[i + 1] == '*') {
+			else if (text.data[i + 1] == '*') {
 				i++;
-				while (i < STR_LENGTH(text) &&
-					   (text[i] != '*' && text[i + 1] != '/')) {
+				while (i < text.length &&
+					   (text.data[i] != '*' && text.data[i + 1] != '/')) {
 					token.length++;
 					i++;
 				}
@@ -346,7 +346,6 @@ tokens_make(string text) {
 		}
 	}
 
-	str_release(text);
 	return tokens;
 
 }

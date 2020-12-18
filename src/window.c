@@ -10,6 +10,7 @@
 
 Window* FocusedWindow;
 WindowTree* WinTree;
+Window* CommandWindow;
 
 static Window*
 find_window_at_point(Node* node, Vec2i point) {
@@ -51,45 +52,57 @@ window_create_empthy() {
 }
 
 void
-window_switch(WinDirection dir) {
-	
-	Vec2 cursorPos = cursor_render_pos();
-	Vec2i point;
-	point.x = (i32)cursorPos.x;
-	point.y = (i32)cursorPos.y;
+window_switch_up() {
 
-	switch (dir) {
-	case WIN_LEFT:
-		point.x = FocusedWindow->position.x;
-		point.y = FocusedWindow->position.y;
-		point.x -= 10.0f;
-		point.y += 10.0f;
-		break;
-	case WIN_RIGHT:
-		point.x = FocusedWindow->position.x + FocusedWindow->size.w;
-		point.y = FocusedWindow->position.y;
-		point.x += 10.0f;
-		point.y += 10.0f;
-		break;
-	case WIN_UP:
-		point.x = FocusedWindow->position.x;
-		point.y = FocusedWindow->position.y;
-		point.x += 10.0f;
-		point.y -= 10.0f;
-		break;
-	case WIN_DOWN:
-		point.x = FocusedWindow->position.x;
-		point.y = FocusedWindow->position.y + FocusedWindow->size.h;
-		point.x += 10.0f;
-		point.y += 10.0f;
-		break;
-	}
+	Vec2i point;
+	point.x = FocusedWindow->position.x + 10.0f;
+	point.y = FocusedWindow->position.y - 10.0f;
 
 	Window* out = find_window_at_point(WinTree, point);
 	if (out != NULL)  {
 		FocusedWindow = out;
 	}
 }
+
+void
+window_switch_down() {
+
+	Vec2i point;
+	point.x = FocusedWindow->position.x + 10.0f;
+	point.y = FocusedWindow->position.y + FocusedWindow->size.h + 10.0f;
+
+	Window* out = find_window_at_point(WinTree, point);
+	if (out != NULL)  {
+		FocusedWindow = out;
+	}
+}
+
+void
+window_switch_left() {
+
+	Vec2i point;
+	point.x = FocusedWindow->position.x - 10.0f;
+	point.y = FocusedWindow->position.y + 10.0f;
+
+	Window* out = find_window_at_point(WinTree, point);
+	if (out != NULL)  {
+		FocusedWindow = out;
+	}
+}
+
+void
+window_switch_right() {
+
+	Vec2i point;
+	point.x = FocusedWindow->position.x + FocusedWindow->size.w + 10.0f;
+	point.y = FocusedWindow->position.y + 10.0f;
+
+	Window* out = find_window_at_point(WinTree, point);
+	if (out != NULL)  {
+		FocusedWindow = out;
+	}
+}
+
 
 void
 window_tree_create(Window window) {
@@ -99,8 +112,21 @@ window_tree_create(Window window) {
 	WinTree->children = array_create(1, sizeof(Window));
 	WinTree->nodeType = NODE_CONTAINER;
 	WinTree->children = array_push(WinTree->children, &window);
+
 	FocusedWindow = WinTree->children + 0;
 	FocusedWindow->parent = WinTree;
+
+	CommandWindow = malloc(sizeof(Window));
+	CommandWindow->position.x = 0;
+	CommandWindow->position.y = FocusedWindow->size.h - 300.0f;
+	CommandWindow->size.w = FocusedWindow->size.w;
+	CommandWindow->size.h = 300.0f;
+	CommandWindow->nodeType = NODE_WINDOW;
+	CommandWindow->buffId = 1;
+
+	vec2i_print(CommandWindow->position);
+	vec2i_print(CommandWindow->size);
+
 	WinTree->containerSize.w = window.size.w;
 	WinTree->containerSize.h = window.size.h;
 	WinTree->parent = NULL;

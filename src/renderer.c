@@ -129,8 +129,10 @@ renderer_initialize(f32 width, f32 height) {
 
 	File* vertexFile = file_open("src/vertex_shader.txt", "r");
 	File* fragmentFile = file_open("src/fragment_shader.txt", "r");
+	str_push(&vertexFile->buffer, '\0');
+	str_push(&fragmentFile->buffer, '\0');
 
-	g_Renderer.program = shader_create(str_as_cstr(vertexFile->buffer), str_as_cstr(fragmentFile->buffer));
+	g_Renderer.program = shader_create(vertexFile->buffer.data, fragmentFile->buffer.data);
 	
 	glUseProgram(g_Renderer.program);
 
@@ -326,28 +328,28 @@ render_text(Buffer* buf, Vec2 position, Vec4 color) {
 	advanceY = position.y;
 	advanceX = position.x;
 
-	string text = buffer_get_text(buf);
+	String text = buffer_get_text(buf);
 
-	for (sizet i = 0; i < STR_LENGTH(text); ++i) {
+	for (sizet i = 0; i < text.length; ++i) {
 
-		if (text[i] == '\n') {
+		if (text.data[i] == '\n') {
 
 			advanceY += g_Renderer.fontSize;
 			advanceX = 0.0f;
 			continue;
 		}
-		else if (text[i] == '\t') {
+		else if (text.data[i] == '\t') {
 
-			advanceX += g_Renderer.glyphs[text[i]].advanceX;
+			advanceX += g_Renderer.glyphs[text.data[i]].advanceX;
 			continue;
 		}
 
-		xpos = advanceX + g_Renderer.glyphs[text[i]].bearingX;
+		xpos = advanceX + g_Renderer.glyphs[text.data[i]].bearingX;
 		// this is stupid, idk how else to make it work
-		ypos = advanceY - g_Renderer.glyphs[text[i]].bearingY + g_Renderer.fontSize;
-		w = g_Renderer.glyphs[text[i]].width;
-		h = g_Renderer.glyphs[text[i]].height;
-		offsetX = g_Renderer.glyphs[text[i]].offsetX;
+		ypos = advanceY - g_Renderer.glyphs[text.data[i]].bearingY + g_Renderer.fontSize;
+		w = g_Renderer.glyphs[text.data[i]].width;
+		h = g_Renderer.glyphs[text.data[i]].height;
+		offsetX = g_Renderer.glyphs[text.data[i]].offsetX;
 		texX = w / g_Renderer.bitmapW;
 		texY = h / g_Renderer.bitmapH;
 
@@ -374,9 +376,10 @@ render_text(Buffer* buf, Vec2 position, Vec4 color) {
 		}
 
 		g_Renderer.vertexCount += VERTICES_PER_QUAD;
-		advanceX += g_Renderer.glyphs[text[i]].advanceX;
+		advanceX += g_Renderer.glyphs[text.data[i]].advanceX;
 	}
-	str_release(text);
+
+	str_free(&text);
 }
 
 
@@ -386,7 +389,7 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens, b8 focused) {
 	static float xpos, ypos, w, h, offsetX,
 		texX, texY, advanceX, advanceY, tokLen;
 
-	string text = buffer_get_text(buf);
+	String text = buffer_get_text(buf);
 
 	advanceY = window->position.y;
 	advanceX = window->position.x;
@@ -431,15 +434,15 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens, b8 focused) {
 
 		// TODO: can remove this and make
 		// it renderable by setting the newline glyph as empthy image
-		if (text[i] == '\n') {
+		if (text.data[i] == '\n') {
 
 			advanceY += g_Renderer.fontSize;
 			advanceX = window->position.x;
 			continue;
 		}
-		else if (text[i] == '\t') {
+		else if (text.data[i] == '\t') {
 
-			advanceX += g_Renderer.glyphs[text[i]].advanceX;
+			advanceX += g_Renderer.glyphs[text.data[i]].advanceX;
 			continue;
 		}
 
@@ -458,12 +461,12 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens, b8 focused) {
 			continue;
 		}
 
-		xpos = advanceX + g_Renderer.glyphs[text[i]].bearingX;
+		xpos = advanceX + g_Renderer.glyphs[text.data[i]].bearingX;
 		// this is stupid, idk how else to make it work
-		ypos = advanceY - g_Renderer.glyphs[text[i]].bearingY + g_Renderer.fontSize;
-		w = g_Renderer.glyphs[text[i]].width;
-		h = g_Renderer.glyphs[text[i]].height;
-		offsetX = g_Renderer.glyphs[text[i]].offsetX;
+		ypos = advanceY - g_Renderer.glyphs[text.data[i]].bearingY + g_Renderer.fontSize;
+		w = g_Renderer.glyphs[text.data[i]].width;
+		h = g_Renderer.glyphs[text.data[i]].height;
+		offsetX = g_Renderer.glyphs[text.data[i]].offsetX;
 		texX = w / g_Renderer.bitmapW;
 		texY = h / g_Renderer.bitmapH;
 
@@ -500,8 +503,10 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens, b8 focused) {
 
 
 		g_Renderer.vertexCount += VERTICES_PER_QUAD;
-		advanceX += g_Renderer.glyphs[text[i]].advanceX;
+		advanceX += g_Renderer.glyphs[text.data[i]].advanceX;
 	}
+
+	str_free(&text);
 
 	#ifdef DEBUG
 
@@ -522,7 +527,6 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens, b8 focused) {
 
 	#endif
 
-	str_release(text);
 }
 
 void
@@ -559,6 +563,11 @@ void
 renderer_on_window_resize(f32 width, f32 height) {
   
 	mat_ortho(g_Renderer.projection, 0.0f, width, height, 0.0f);
+	// TODO:
+	FocusedWindow->position.x = 0.0f;
+	FocusedWindow->position.y = 0.0f;
+	FocusedWindow->size.w = width;
+	FocusedWindow->size.h = height;
 }
 
 GlyphData* renderer_get_glyphs() {

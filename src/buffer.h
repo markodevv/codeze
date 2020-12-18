@@ -8,7 +8,7 @@
 
 typedef struct Buffer {
   
-	string text;
+	String text;
 
 	sizet preLen;
 	sizet postLen;
@@ -24,18 +24,19 @@ typedef struct Buffer {
 } Buffer;
 
 extern Buffer* CurBuffer;
+extern Buffer* CommandBuffer;
 
 void buffer_forward();
 void buffer_backward();
 Buffer buffer_create(File* file);
 Buffer buffer_create_empthy();
 void buffer_insert_char(char c);
-string buffer_get_text();
+String buffer_get_text(Buffer* buf);
 void buffer_insert_tab();
 void buffer_insert_newline();
 void buffer_backspace_delete();
-string buffer_string_before_cursor();
+String buffer_string_before_cursor();
 char buffer_char_under_cursor();
 char buffer_char_before_cursor();
 sizet buffer_index_based_on_line(Buffer* buf, i32 line);
-void buffer_clear();
+void buffer_clear(Buffer* buf);

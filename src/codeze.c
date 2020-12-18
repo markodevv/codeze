@@ -53,76 +53,136 @@ typedef struct Editor {
 
 } Editor;
 
+static Editor App;
+static Window* LastWindow;
+static Buffer* LastBuffer;
+
 static void
-initialize_window(Window* window, f32 width, f32 height, f32 x, f32 y) {
-	
-	window->position.x = x;
-	window->position.y = y;
-	window->size.x = width;
-	window->size.y = height;
+editor_enter_command_state() {
+	buffer_clear(CommandBuffer);
+
+	App.state = STATE_COMMAND;
+	LastWindow = FocusedWindow;
+	FocusedWindow = CommandWindow;
+	LastBuffer = CurBuffer;
+	CurBuffer = CommandBuffer;
+
+	for (sizet i = 0; i < WorkingDirectory.length; ++i) {
+
+		buffer_insert_char(WorkingDirectory.data[i]);
+	}
+
+	// String s;
+	// while ((s = directory_filename_next()) != -1) {
+
+	// 	s = str_push(s, '\0');
+	// 	printf("%s \n", s);
+	// }
+}
+
+static void
+editor_enter_normal_state() {
+
+	App.state = STATE_NORMAL;
+	FocusedWindow = LastWindow;
+	CurBuffer = LastBuffer;
 }
 
 
+i32
+main(int argc, char* argv[]) {
+
 	
+	App.state = STATE_NORMAL;
+	App.width = 1916;
+	App.height = 1041;
+	App.window = renderer_create_window();
 
-int main() {
-	
-	Command commandmap[KEYMAP_SIZE];
-
-	Editor* editor = malloc(sizeof(Editor));
-	editor->width = 1916;
-	editor->height = 1041;
-	editor->state = STATE_NORMAL;
-
-	editor->window = renderer_create_window();
-	events_initialize(editor->window);
-	renderer_initialize(editor->width, editor->height);
+	events_initialize(App.window);
+	renderer_initialize(App.width, App.height);
 	renderer_load_font("assets/CONSOLA.TTF", 18);
 
+
+	fileio_init();
 	File* file = file_open("test.c", "r");
 
-	CurBuffer = malloc(sizeof(Buffer));
 	Buffer* buffers = array_create(1, sizeof(Buffer));
 	Buffer b = buffer_create(file);
 	buffers = array_push(buffers, &b);
+	b = buffer_create_empthy();
+	buffers = array_push(buffers, &b);
+
 	CurBuffer = &buffers[0];
+	CommandBuffer= &buffers[1];
 
 	file_close(file);
 
 	Window window = window_create_empthy();
 	window.buffId = 0;
-	window.size.w = editor->width;
-	window.size.h = editor->height;
+	window.size.w = App.width;
+	window.size.h = App.height;
 	window_tree_create(window);
 
-	dt_initialize();
-	dt_bind(cursor_down, KEY_Down, 0);
-	dt_bind(cursor_up, KEY_Up, 0);
-	dt_bind(cursor_left, KEY_Left, 0);
-	dt_bind(cursor_right, KEY_Right, 0);
-	dt_bind(buffer_insert_newline, KEY_Enter, 0);
-	dt_bind(buffer_insert_tab, KEY_Tab, 0);
-	dt_bind(buffer_backspace_delete, KEY_Backspace, 0);
-	dt_bind(window_split_horizontal, KEY_H, MOD_CONTROL);
-	dt_bind(window_split_vertical, KEY_V, MOD_CONTROL);
-	dt_bind(window_close, KEY_Q, MOD_CONTROL | MOD_ALT);
+	DispatchTable *dtNormalMode = malloc(sizeof(DispatchTable));
+	DispatchTable *dtCommandMode = malloc(sizeof(DispatchTable));
+	dt_init(dtNormalMode);
+	dt_init(dtCommandMode);
 
-	while (!glfwWindowShouldClose(editor->window)) {
+	dt_bind(dtNormalMode, cursor_down,             KEY_Down, 0);
+	dt_bind(dtNormalMode, cursor_up,               KEY_Up, 0);
+	dt_bind(dtNormalMode, cursor_left,             KEY_Left, 0);
+	dt_bind(dtNormalMode, cursor_right,            KEY_Right, 0);
+	dt_bind(dtNormalMode, buffer_insert_newline,   KEY_Enter, 0);
+	dt_bind(dtNormalMode, buffer_insert_tab,       KEY_Tab, 0);
+	dt_bind(dtNormalMode, buffer_backspace_delete, KEY_Backspace, 0);
+	dt_bind(dtNormalMode, window_split_horizontal, KEY_S, MOD_CONTROL);
+	dt_bind(dtNormalMode, window_split_vertical,   KEY_V, MOD_CONTROL);
+	dt_bind(dtNormalMode, window_close,            KEY_Q, MOD_CONTROL | MOD_ALT);
+	dt_bind(dtNormalMode, window_switch_up,        KEY_K, MOD_CONTROL);
+	dt_bind(dtNormalMode, window_switch_down,      KEY_J, MOD_CONTROL);
+	dt_bind(dtNormalMode, window_switch_left,      KEY_H, MOD_CONTROL);
+	dt_bind(dtNormalMode, window_switch_right,     KEY_L, MOD_CONTROL);
+	dt_bind(dtNormalMode, editor_enter_command_state, KEY_Enter, MOD_CONTROL);
+
+	dt_bind(dtCommandMode, cursor_left,             KEY_Left, 0);
+	dt_bind(dtCommandMode, cursor_right,            KEY_Right, 0);
+	dt_bind(dtCommandMode, buffer_insert_tab,       KEY_Tab, 0);
+	dt_bind(dtCommandMode, editor_enter_normal_state, KEY_Escape, 0);
+	dt_bind(dtCommandMode, buffer_backspace_delete, KEY_Backspace, 0);
+
+	while (!glfwWindowShouldClose(App.window)) {
 		
 		Event event;
 		while(event_queue_next(&event)) { 
-
-			if (event.type == KEY_PRESSED) {
-
-				dt_dispatch(event.key, event.mods);
-			}
-			else if (event.type == KEY_REPEAT) {
+			if (App.state == STATE_NORMAL) {
 				
-				dt_dispatch(event.key, event.mods);
-			}
-			else if (event.type == CHAR_INPUTED) {
+				if (event.type == KEY_PRESSED) {
 
-				buffer_insert_char(event.character);
+					dt_dispatch(dtNormalMode, event.key, event.mods);
+				}
+				else if (event.type == KEY_REPEAT) {
+
+					dt_dispatch(dtNormalMode, event.key, event.mods);
+				}
+				else if (event.type == CHAR_INPUTED) {
+
+					buffer_insert_char(event.character);
+				}
+			}
+			else if (App.state == STATE_COMMAND) {
+				
+				if (event.type == KEY_PRESSED) {
+
+					dt_dispatch(dtCommandMode, event.key, event.mods);
+				}
+				else if (event.type == KEY_REPEAT) {
+
+					dt_dispatch(dtCommandMode, event.key, event.mods);
+				}
+				else if (event.type == CHAR_INPUTED) {
+
+					buffer_insert_char(event.character);
+				}
 			}
 			//                    TODO:
 			else if (event.type == -5) {
@@ -130,7 +190,7 @@ int main() {
 
 				 // TODO: make it work for last line 
 				 f64 xpos, ypos;
-				 glfwGetCursorPos(editor->window, &xpos, &ypos);
+				 glfwGetCursorPos(Editor.window, &xpos, &ypos);
 
 				 i32 mouseY = (i32)ypos;
 				 i32 mouseX = (i32)xpos;
@@ -176,18 +236,13 @@ int main() {
 				
 				  } 
 
-				 str_release(lineStr);
 			*/
 			}
 			else if	(event.type == WINDOW_RESIZED) {
 
-				editor->width = event.width;
-				editor->height = event.height;
+				App.width = event.width;
+				App.height = event.height;
 				renderer_on_window_resize(event.width, event.height);
-				FocusedWindow->position.x = 0.0f;
-				FocusedWindow->position.y = 0.0f;
-				FocusedWindow->size.w = editor->width;
-				FocusedWindow->size.h = editor->height;
 			}
 		} 
 
@@ -195,11 +250,12 @@ int main() {
 		renderer_begin();
 
 
-		string bufferText = buffer_get_text(&buffers[0]);
+		String bufferText = buffer_get_text(&buffers[0]);
 		TokenArray tokens = tokens_make(bufferText);
 
 		WindowArray windows = array_create(26, sizeof(Window));
 		windows = tree_get_windows(WinTree, windows);
+
 
 		for (sizet i = 0; i < ARRAY_LENGTH(windows); ++i) {
 
@@ -210,12 +266,30 @@ int main() {
 			render_buffer(&buffers[windows[i].buffId], &windows[i], tokens, focused);
 			focused = 0;
 		}
+
+		if (App.state == STATE_COMMAND) {
+
+
+			Vec2 winPos = {
+				(f32)CommandWindow->position.x,
+				(f32)CommandWindow->position.y
+			};
+			Vec2 winSize = {
+				(f32)CommandWindow->size.w,
+				(f32)CommandWindow->size.h
+			};
+
+			Vec4 winColor = {0.1f, 0.1f, 0.1f, 0.8f};
+			Vec4 textColor = {1.0f, 1.0f, 1.0f, 1.0f};
+
+			render_quad(winPos, winSize, winColor);
+			render_text(CurBuffer, winPos, textColor);
+		}
 		render_cursor(CurBuffer, FocusedWindow);
 
-
 		Vec2 pos;
-		pos.x = editor->width - 200.0f;
-		pos.y = editor->height - 333.0f;
+		pos.x = App.width - 200.0f;
+		pos.y = App.height - 333.0f;
 		DEBUG_TEXT(pos, "- DEBUG TEXT -", NULL); pos.y += 20.0f;
 
 		DEBUG_TEXT(pos, "cursorX tabed %i", (i32)CurBuffer->cursorXtabed); pos.y += 20.0f;
@@ -227,17 +301,17 @@ int main() {
 		DEBUG_TEXT(pos, "pre length %i", (i32)CurBuffer->preLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "post length %i", (i32)CurBuffer->postLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "gap length %i", (i32)CurBuffer->gapLen); pos.y += 20.0f;
-		DEBUG_TEXT(pos, "char under cursor %c", (i32)CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen]); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "char under cursor %c", (i32)CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen]); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "Window count %zu", ARRAY_LENGTH(windows)); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "RenderView start %i", FocusedWindow->renderView.start); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "RenderView  end %i", FocusedWindow->renderView.end); pos.y += 20.0f;
 
 		renderer_end();
 
-		array_release(tokens);
 		array_release(windows);
+		str_free(&bufferText);
 
-		glfwSwapBuffers(editor->window);
+		glfwSwapBuffers(App.window);
 
 		glfwWaitEvents();
 

@@ -1,13 +1,12 @@
 #include "dispatch_table.h"
 #include "debug.h"
 
-static Command Commands[KEYMAP_SIZE];
-
-void dt_initialize() {
+void
+dt_init(DispatchTable* dt) {
 
 	for (sizet i = 0; i < KEYMAP_SIZE; ++i) {
 
-		Commands[i] = NULL;
+		dt->commands[i] = NULL;
 	}
 }
 
@@ -19,19 +18,20 @@ hash_function(KeyCode k, i32 m) {
 }
 
 void
-dt_bind(Command command, KeyCode key, i32 mods) {
+dt_bind(DispatchTable* dt, Command command, KeyCode key, i32 mods) {
   
 	i32 index = hash_function(key, mods);
-	ASSERT_MSG(Commands[index] == NULL, "collision detected");
-	Commands[index] = command;
+	ASSERT_MSG(dt->commands[index] == NULL, "collision detected");
+	dt->commands[index] = command;
 }
 
 void
-dt_dispatch(KeyCode key, i32 mods) {
+dt_dispatch(DispatchTable* dt, KeyCode key, i32 mods) {
 
 	i32 index = hash_function(key, mods);
-	if (Commands[index]) 
-		Commands[index]();
+	ASSERT(index < KEYMAP_SIZE);
+	if (dt->commands[index]) 
+		dt->commands[index]();
 	else 
-		printf("No command for key \n");
+		printf("No command for key %i \n", key);
 }
