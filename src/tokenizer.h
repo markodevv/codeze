@@ -1,6 +1,7 @@
 #pragma once
 #include "my_string.h"
 #include "types.h"
+#include "container.h"
 
 typedef enum TokenType {
 	
@@ -32,8 +33,7 @@ typedef struct Token {
 
 } Token;
 
-typedef Token* TokenArray;
 
 
-TokenArray tokens_make(String args);
+Array<Token> tokens_make(String args);
 void print_tokens(Token* tokens);

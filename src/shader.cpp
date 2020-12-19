@@ -25,7 +25,7 @@ compile_shader(unsigned int type, const char* source) {
 		i32 length = 0;
 		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
 
-		char* log = malloc(sizeof(char) * length);
+		char* log = (char*)malloc(sizeof(char) * length);
 		glGetShaderInfoLog(id, length, &length, log);
 		printf("Failed to compile shader error: %s \n", log);
 		printf("Shader: %s \n", source);
@@ -59,7 +59,7 @@ u32 shader_create(const char* vertex, const char* fragment) {
 		i32 length = 0;
 		glGetProgramiv(shader, GL_INFO_LOG_LENGTH, &length);
 
-		char* log = malloc(sizeof(char) * length);
+		char* log = (char*)malloc(sizeof(char) * length);
 		glGetProgramInfoLog(shader, length, &length, log);
 
 		printf("Shader linking failed: %s \n", log);

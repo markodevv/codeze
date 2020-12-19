@@ -15,8 +15,8 @@ typedef struct Buffer {
 	sizet gapLen;
 
 	i32 currentLine;
-	i32* cursorLines;
-	i32* lineLengths;
+	Array<i32> cursorLines;
+	Array<i32> lineLengths;
 
 	i32 curX;
 	i32 cursorXtabed;

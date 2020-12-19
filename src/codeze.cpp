@@ -88,10 +88,32 @@ editor_enter_normal_state() {
 	CurBuffer = LastBuffer;
 }
 
+void
+print_array(Array<int> arr) {
+	for (sizet i = 0; i < arr.length; ++i) {
+		printf("%i, ", arr[i]);
+	}
+	printf("\n");
+}
 
 i32
 main(int argc, char* argv[]) {
 
+	Array<int> arr;
+	arr.init(10);
+	for (sizet i = 0; i < arr.capacity; ++i) {
+		arr.push(i);
+	}
+	print_array(arr);
+
+	arr.erase(5);
+
+	print_array(arr);
+
+	arr.insert(17, 5);
+
+	print_array(arr);
+	
 	
 	App.state = STATE_NORMAL;
 	App.width = 1916;
@@ -106,11 +128,11 @@ main(int argc, char* argv[]) {
 	fileio_init();
 	File* file = file_open("test.c", "r");
 
-	Buffer* buffers = array_create(1, sizeof(Buffer));
+	Array<Buffer> buffers;
+	buffers.init(2);
 	Buffer b = buffer_create(file);
-	buffers = array_push(buffers, &b);
-	b = buffer_create_empthy();
-	buffers = array_push(buffers, &b);
+	buffers.push(buffer_create(file));
+	buffers.push(buffer_create_empthy());
 
 	CurBuffer = &buffers[0];
 	CommandBuffer= &buffers[1];
@@ -123,8 +145,8 @@ main(int argc, char* argv[]) {
 	window.size.h = App.height;
 	window_tree_create(window);
 
-	DispatchTable *dtNormalMode = malloc(sizeof(DispatchTable));
-	DispatchTable *dtCommandMode = malloc(sizeof(DispatchTable));
+	DispatchTable *dtNormalMode = new DispatchTable;
+	DispatchTable *dtCommandMode = new DispatchTable;
 	dt_init(dtNormalMode);
 	dt_init(dtCommandMode);
 
@@ -158,11 +180,11 @@ main(int argc, char* argv[]) {
 				
 				if (event.type == KEY_PRESSED) {
 
-					dt_dispatch(dtNormalMode, event.key, event.mods);
+					dt_dispatch(dtNormalMode, (KeyCode)event.key, event.mods);
 				}
 				else if (event.type == KEY_REPEAT) {
 
-					dt_dispatch(dtNormalMode, event.key, event.mods);
+					dt_dispatch(dtNormalMode, (KeyCode)event.key, event.mods);
 				}
 				else if (event.type == CHAR_INPUTED) {
 
@@ -173,11 +195,11 @@ main(int argc, char* argv[]) {
 				
 				if (event.type == KEY_PRESSED) {
 
-					dt_dispatch(dtCommandMode, event.key, event.mods);
+					dt_dispatch(dtCommandMode, (KeyCode)event.key, event.mods);
 				}
 				else if (event.type == KEY_REPEAT) {
 
-					dt_dispatch(dtCommandMode, event.key, event.mods);
+					dt_dispatch(dtCommandMode, (KeyCode)event.key, event.mods);
 				}
 				else if (event.type == CHAR_INPUTED) {
 
@@ -251,13 +273,14 @@ main(int argc, char* argv[]) {
 
 
 		String bufferText = buffer_get_text(&buffers[0]);
-		TokenArray tokens = tokens_make(bufferText);
+		Array<Token> tokens = tokens_make(bufferText);
 
-		WindowArray windows = array_create(26, sizeof(Window));
-		windows = tree_get_windows(WinTree, windows);
+		Array<Window> windows;
+		windows.init(26);
+		tree_get_windows(WinTree, &windows);
 
 
-		for (sizet i = 0; i < ARRAY_LENGTH(windows); ++i) {
+		for (sizet i = 0; i < windows.length; ++i) {
 
 			b8 focused = 0;
 			if (windows[i].id == FocusedWindow->id) {
@@ -296,19 +319,20 @@ main(int argc, char* argv[]) {
 		DEBUG_TEXT(pos, "cursorX %i", (i32)CurBuffer->curX); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "tabed line length %i", (i32)CurBuffer->cursorLines[CurBuffer->currentLine]); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "line length %i", (i32)CurBuffer->lineLengths[CurBuffer->currentLine]); pos.y += 20.0f;
-		DEBUG_TEXT(pos, "line count %i", (i32)ARRAY_LENGTH(CurBuffer->lineLengths)); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "line count %i", (i32)CurBuffer->lineLengths.length) pos.y += 20.0f;
 		DEBUG_TEXT(pos, "current line %i", (i32)CurBuffer->currentLine); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "pre length %i", (i32)CurBuffer->preLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "post length %i", (i32)CurBuffer->postLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "gap length %i", (i32)CurBuffer->gapLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "char under cursor %c", (i32)CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen]); pos.y += 20.0f;
-		DEBUG_TEXT(pos, "Window count %zu", ARRAY_LENGTH(windows)); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "Window count %zu", windows.length); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "RenderView start %i", FocusedWindow->renderView.start); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "RenderView  end %i", FocusedWindow->renderView.end); pos.y += 20.0f;
 
 		renderer_end();
 
-		array_release(windows);
+		windows.free_data();
+		tokens.free_data();
 		str_free(&bufferText);
 
 		glfwSwapBuffers(App.window);

@@ -38,19 +38,4 @@ renderer_create_window() {
 		printf("Failed to create window");
 		ASSERT(0);
 	}
-
-	glfwMakeContextCurrent(window);
-
-	// Glad initialization
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		printf("Failed to initialize glad");
-		ASSERT(0);
-	}
-	printf("Initialized glad\n");
-
-	// Enable Vsync
-	glfwSwapInterval(1);
-
-	return window;
-
 }

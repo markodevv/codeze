@@ -30,7 +30,7 @@ cursor_render_size() {
 	GlyphData* glyphs = renderer_get_glyphs();
 	Vec2 size = {
 		glyphs[buffer_char_under_cursor()].advanceX,
-		renderer_font_size()
+		(f32)renderer_font_size()
 	};
 
 	return size;
@@ -73,7 +73,7 @@ cursor_left() {
 void
 cursor_down() {
 	
-	if (CurBuffer->currentLine == ARRAY_LENGTH(CurBuffer->cursorLines) - 1) return;
+	if (CurBuffer->currentLine == CurBuffer->cursorLines.length - 1) return;
 
 
 	while (CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen] != '\n') {

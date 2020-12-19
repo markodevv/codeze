@@ -21,32 +21,31 @@ buffer_create(File* file) {
 	buf.curX = 0;
 	buf.currentLine = 0;
 	buf.postLen = file->buffer.length;
-	buf.cursorLines = array_create(file->lineCount, sizeof(i32));
-	buf.lineLengths = array_create(file->lineCount, sizeof(i32));
+	buf.cursorLines.init(file->lineCount);
+	buf.lineLengths.init(file->lineCount);
 
 	buf.text = str_create_s(file->buffer.length);
 	str_copy(&buf.text, &file->buffer);
 
 	sizet i = 0;
 	// foreach line
-	sizet zero = 0;
 	for (sizet line = 0; line < file->lineCount; ++line) {
 		
-		buf.lineLengths = array_push(buf.lineLengths, &zero);
-		buf.cursorLines = array_push(buf.cursorLines, &zero);
+		buf.lineLengths.push(0);
+		buf.cursorLines.push(0);
 		// foreach char in line
 		for (i; buf.text.data[i] != '\n'; ++i) {
 			// add to line length
 			if (buf.text.data[i] == '\t') 
 				buf.cursorLines[line] += TAB_SIZE;
 			else
-				buf.cursorLines[line]++;
+				buf.cursorLines[line] += 1;
 
-			buf.lineLengths[line]++;
+			buf.lineLengths[line] += 1;
 		}
 		i++;
-		buf.cursorLines[line]++;
-		buf.lineLengths[line]++;
+		buf.cursorLines[line] += 1;
+		buf.lineLengths[line] += 1;
 
 	}
 
@@ -64,13 +63,12 @@ buffer_create_empthy() {
 	buf.curX = 0;
 	buf.currentLine = 0;
 	buf.postLen = 0;
-	buf.cursorLines = array_create(1, sizeof(i32));
-	buf.lineLengths = array_create(1, sizeof(i32));
+	buf.cursorLines.init(1);
+	buf.lineLengths.init(1);
 
 
-	sizet zero = 0;
-	buf.lineLengths = array_push(buf.lineLengths, &zero);
-	buf.cursorLines = array_push(buf.cursorLines, &zero);
+	buf.lineLengths.push(0);
+	buf.cursorLines.push(0);
 
 	buf.text = str_create_s(BUFFER_EMPTHY_SIZE);
 
@@ -102,17 +100,17 @@ buffer_backward() {
 String
 buffer_get_text(Buffer* buf) {
 	
-	String newstr = str_create_s(buf->preLen + buf->postLen);
+	String out = str_create_s(buf->preLen + buf->postLen);
 
 	for (sizet i = 0; i < buf->preLen; ++i) {
-		str_push(&newstr, buf->text.data[i]);
+		str_push(&out, buf->text.data[i]);
 	}
 
 	for (sizet i = buf->preLen; i + buf->gapLen < buf->text.capacity; ++i) {
-		str_push(&newstr, buf->text.data[i + buf->gapLen]);
+		str_push(&out, buf->text.data[i + buf->gapLen]);
 	}
 
-	return newstr;
+	return out;
 
 }
 
@@ -164,13 +162,12 @@ void
 buffer_insert_newline() {
 	
 	buffer_insert_char('\n');
-	u32 zero = 0;
-	CurBuffer->cursorLines = array_insert(CurBuffer->cursorLines, CurBuffer->currentLine, &zero);
-	CurBuffer->lineLengths = array_insert(CurBuffer->lineLengths, CurBuffer->currentLine, &zero);
+	CurBuffer->cursorLines.insert(0, CurBuffer->currentLine);
+	CurBuffer->lineLengths.insert(0, CurBuffer->currentLine);
 
 	if (CurBuffer->cursorLines[CurBuffer->currentLine] != CurBuffer->cursorXtabed) {
 
-		u32 splitLineLen = CurBuffer->cursorLines[CurBuffer->currentLine] - CurBuffer->cursorXtabed;
+		i32 splitLineLen = CurBuffer->cursorLines[CurBuffer->currentLine] - CurBuffer->cursorXtabed;
 		CurBuffer->cursorLines[CurBuffer->currentLine] -= splitLineLen;
 		CurBuffer->cursorLines[CurBuffer->currentLine + 1] += splitLineLen;
 
@@ -178,6 +175,7 @@ buffer_insert_newline() {
 		CurBuffer->lineLengths[CurBuffer->currentLine] -= splitLineLen;
 		CurBuffer->lineLengths[CurBuffer->currentLine + 1] += splitLineLen;
 	}
+
 	CurBuffer->currentLine++;
 	CurBuffer->cursorXtabed = 0;
 	CurBuffer->curX = 0;
@@ -195,8 +193,8 @@ buffer_backspace_delete() {
 		i32 delCurosrLine = CurBuffer->cursorLines[CurBuffer->currentLine];
 		i32 delLine = CurBuffer->lineLengths[CurBuffer->currentLine];
 
-		array_erase(CurBuffer->cursorLines, CurBuffer->currentLine);
-		array_erase(CurBuffer->lineLengths, CurBuffer->currentLine);
+		CurBuffer->cursorLines.erase(CurBuffer->currentLine);
+		CurBuffer->lineLengths.erase(CurBuffer->currentLine);
 
 		CurBuffer->currentLine--;
 
@@ -269,11 +267,10 @@ void
 buffer_clear(Buffer* buf) {
 
 	str_clear(&buf->text);
-	array_reset(buf->lineLengths);
-	array_reset(buf->cursorLines);
-	i32 zero = 0;
-	buf->lineLengths = array_push(buf->lineLengths, &zero);
-	buf->cursorLines = array_push(buf->cursorLines, &zero);
+	buf->lineLengths.reset();
+	buf->cursorLines.reset();
+	buf->lineLengths.push(0);
+	buf->cursorLines.push(0);
 
 	buf->preLen = 0;
 	buf->postLen = 0;

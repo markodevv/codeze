@@ -14,8 +14,7 @@ str_create_c(const char* text) {
 	String out;
 	out.capacity = len;
 	out.length = len;
-	//out.data = gc_malloc(&global_gc, len * sizeof(char));
-	out.data = malloc(len * sizeof(char));
+	out.data = new char[len];
 	memcpy(out.data, text, len * sizeof(char));
 	ASSERT_MSG(out.data, "string malloc failed");
 
@@ -29,8 +28,7 @@ str_create_s(sizet size) {
 	String out;
 	out.capacity = size;
 	out.length = 0;
-	out.data = malloc(size * sizeof(char));
-	//out.data = gc_malloc(&global_gc, size * sizeof(char));
+	out.data = new char[size];
 
 	ASSERT_MSG(out.data, "string malloc failed");
 
@@ -58,7 +56,10 @@ str_push(String* str, char c) {
 
 	if (str->length >= str->capacity) {
 		str->capacity *= 2;
-		str->data = realloc(str->data, str->capacity);
+		char* old = str->data;
+		str->data = new char[str->capacity];
+		memcpy(str->data, old, str->length);
+		delete[] old;
 	}
 
 	str->data[str->length] = c;
@@ -111,5 +112,5 @@ str_clear(String* str) {
 
 void str_free(String* str) {
 
-	free(str->data);
+	delete[] str->data;
 }

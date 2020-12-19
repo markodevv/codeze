@@ -1,6 +1,7 @@
 #pragma once
 #include "math.h"
 #include "types.h"
+#include "container.h"
 
 typedef enum WinDirection {
 
@@ -32,7 +33,7 @@ typedef struct Node {
 		struct {
 			b8 isVertical;
 			Vec2i containerSize;
-			struct Node* children;
+			struct Array<Node> children;
 		};
 	};
 	NodeType nodeType;
@@ -59,6 +60,6 @@ void window_switch_right();
 void window_close();
 Window window_create_empthy();
 void window_tree_create(Window window);
-WindowArray tree_get_windows(Node* tree, WindowArray windows);
+void tree_get_windows(Node* tree, Array<Window>* windows);
 void print_tree(Node* node);
 i32 new_window_id();

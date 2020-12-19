@@ -1,29 +1,112 @@
 #pragma once
 #include "types.h"
 #include "event.h"
+#include "container.h"
+#include "debug.h"
+#include <stdlib.h>
+#include <string.h>
 
 #define ARRAY_RESIZE_FACTOR 2
 
-enum {
-	_CAPACITY,
-	_LENGTH,
-	_STRIDE,
-	_FIELDS
+template <typename T>
+struct Array {
+  
+	T* data;
+	sizet length;
+	sizet capacity;
+
+	void init(sizet capacity);
+	void reset();
+	void free_data();
+	void push(T item);
+	void expand();
+	T& pop();
+	void insert(T item, sizet pos);
+	void erase(sizet pos);
+
+	T& operator[](sizet index);
+
 };
 
-#define ARRAY_LENGTH(arr) array_field_get(arr, _LENGTH)
-#define ARRAY_STRIDE(arr) array_field_get(arr, _STRIDE)
-#define ARRAY_CAPACITY(arr) array_field_get(arr, _CAPACITY)
+  
+template <typename T>
+void Array<T>::init(sizet capacity) {
 
-void* array_create(sizet capacity, sizet stride);
-sizet array_field_get(void* arr, sizet field);
-void array_field_set(void* arr, sizet field, sizet value);
-void array_release(void *arr);
-void array_reset(void *arr);
-void* array_resize(void *arr);
-void* array_push(void *arr, void *xptr);
-void array_pop(void *arr, void *dest);
-void* array_insert(void *arr, sizet pos, void* item);
-void array_erase(void *arr, sizet pos);
-void* array_top(void* arr);
+	data = new T[capacity];
+	this->capacity = capacity;
+	this->length = 0;
+}
+
+template <typename T>
+void Array<T>::free_data() {
+
+	delete[] data;
+}
+
+template <typename T>
+void Array<T>::reset() {
+
+	length = 0;
+}
+
+template <typename T>
+T& Array<T>::operator[](sizet index) {
+	
+	ASSERT(index >= 0);
+	return data[index];
+}
+
+template <typename T>
+void Array<T>::expand() {
+
+	capacity *= 2;
+	T* old = data;
+	data = new T[capacity];
+	memcpy(data, old, length * sizeof(T));
+	delete[] old;
+}
+
+template <typename T>
+void Array<T>::push(T item) {
+
+	if (length >= capacity) {
+		expand();
+	}
+
+	data[length] = item;
+	length += 1;
+}
+
+template <typename T>
+T& Array<T>::pop() {
+
+	length -= 1;
+	return data[length + 1];
+}
+
+template <typename T>
+void Array<T>::insert(T item, sizet pos) {
+
+	ASSERT(pos <= length && pos >= 0);
+
+	if (length >= capacity) {
+		expand();
+	}
+
+	memcpy(data + (pos + 1), data + pos, (length - pos) * sizeof(T));
+	data[pos] = item;
+
+	length += 1;
+}
+
+template <typename T>
+void Array<T>::erase(sizet pos) {
+
+	ASSERT(length >= 1);
+
+	memcpy(data + pos, data + (pos + 1), (length - pos) * sizeof(T));
+	length -= 1;
+}
+
+
 

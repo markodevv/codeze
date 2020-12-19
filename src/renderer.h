@@ -79,7 +79,7 @@ void renderer_end();
 void render_quad(Vec2 position, Vec2 size, Vec4 color);
 void render_textured_quad(Vec2 position, Vec2 size, Vec4 color, u32 texID);
 void render_text(Buffer* buf, Vec2 position, Vec4 color);
-void render_buffer(Buffer* buf, Window* window, Token* tokens, b8 focused);
+void render_buffer(Buffer* buf, Window* window, Array<Token> tokens, b8 focused);
 void render_cursor(Buffer* buf, Window* window);
 void renderer_on_window_resize(f32 width, f32 height);
 GlyphData* renderer_get_glyphs();

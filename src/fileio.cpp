@@ -18,7 +18,7 @@ static struct dirent* entry;
 void
 fileio_init() {
   
-	char* cwd = malloc(sizeof(char) * 256);
+	char* cwd = new char[256];
 	cwd = getcwd(cwd, 256);
 	WorkingDirectory = str_create_c(cwd);
 	dir = opendir(cwd);
@@ -36,7 +36,7 @@ file_open(const char* path, const char* flags) {
 	sizet size = ftell(fp);
 	rewind(fp);
 
-	File* file = malloc(sizeof(File));
+	File* file = new File;
 	ASSERT(file);
 
 	file->buffer = str_create_s(size);

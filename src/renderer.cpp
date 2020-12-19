@@ -121,7 +121,7 @@ texture_load(const char* path, u32* texID, u8 slot) {
 void
 renderer_initialize(f32 width, f32 height) {
 
-	g_Renderer.vertexArray = malloc(sizeof(Vertex) * MAX_VERTICES);
+	g_Renderer.vertexArray = new Vertex[MAX_VERTICES];
 	g_Renderer.vertexArrayIndex = g_Renderer.vertexArray;
 
 	glEnable(GL_BLEND);
@@ -384,7 +384,7 @@ render_text(Buffer* buf, Vec2 position, Vec4 color) {
 
 
 void
-render_buffer(Buffer* buf, Window *window, TokenArray tokens, b8 focused) {
+render_buffer(Buffer* buf, Window *window, Array<Token> tokens, b8 focused) {
 
 	static float xpos, ypos, w, h, offsetX,
 		texX, texY, advanceX, advanceY, tokLen;
@@ -423,19 +423,23 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens, b8 focused) {
 						  (window->size.h % g_Renderer.fontSize) - 1) / g_Renderer.fontSize;
 
 	window->renderView.end = window->renderView.start + visibleLines - 1;
-	if (window->renderView.end > ARRAY_LENGTH(buf->lineLengths))
-		window->renderView.end = ARRAY_LENGTH(buf->lineLengths);
+	if (window->renderView.end > buf->lineLengths.length)
+		window->renderView.end = buf->lineLengths.length;
 
 	sizet start = buffer_index_based_on_line(buf, window->renderView.start);
 	sizet end = buffer_index_based_on_line(buf, window->renderView.end);
 
-	for (sizet i = start; i < end; ++i) {
+	//for (sizet i = start; i < end; ++i) {
+	for (sizet i = 0; i < text.length; ++i) {
 
 
+		if (tokLen <= 0) 
+			color = global_Colors[TOK_IDENTIFIER];
+
+		tokLen--;
 		// TODO: can remove this and make
 		// it renderable by setting the newline glyph as empthy image
 		if (text.data[i] == '\n') {
-
 			advanceY += g_Renderer.fontSize;
 			advanceX = window->position.x;
 			continue;
@@ -446,11 +450,6 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens, b8 focused) {
 			continue;
 		}
 
-		if (tokLen <= 0) {
-
-			color = global_Colors[TOK_IDENTIFIER];
-		}
-		tokLen--;
 
 		if (advanceY >= window->size.h + window->position.y - g_Renderer.fontSize) {
 			break;
@@ -511,7 +510,7 @@ render_buffer(Buffer* buf, Window *window, TokenArray tokens, b8 focused) {
 	#ifdef DEBUG
 
 	Vec2 quadSize = {200.0f, 140.0f};
-	Vec2 pos = {window->position.x + window->size.w - 200.0f, window->position.y};
+	Vec2 pos = {window->position.x + window->size.w - 200.0f, (f32)window->position.y};
 	Vec4 quadColor = {0.2f, 0.2f, 0.2f, 0.8f};
 	render_quad(pos, quadSize, quadColor);
 
@@ -534,8 +533,8 @@ render_cursor(Buffer* buf, Window* win) {
 
 	static Vec2 cursorPos, cursorSize;
 
-	cursorPos = cursor_render_pos(buf, win);
-	cursorSize = cursor_render_size(buf);
+	cursorPos = cursor_render_pos();
+	cursorSize = cursor_render_size();
 	// TODO: fix wierd offset
 	cursorPos.y += renderer_font_size() / 5;
 	render_quad(cursorPos, cursorSize, global_Colors[2]);

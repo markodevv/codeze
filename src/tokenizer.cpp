@@ -6,13 +6,13 @@
 #define INITIAL_TOKEN_CAPACITY 100
 
 #define NUM_KEYWORDS 14
-static char* gKeywords[] = {"case", "if", "else", "while", "switch", "continue",
+static const char* gKeywords[] = {"case", "if", "else", "while", "switch", "continue",
 	"break", "struct", "typedef", "return", "enum", "static",
 	"const", "constexpr"};
 
 
 #define NUM_TYPES 17
-static char* gTypes[] = {"void", "i64", "i32", "i16", "i8", "u64",
+static const char* gTypes[] = {"void", "i64", "i32", "i16", "i8", "u64",
 	"u32", "u16", "u8", "sizet", "f32", "int", "float", "char", 
 	"NULL", "double", "long"};
 
@@ -146,10 +146,11 @@ in_quote(char c) {
 
 }
 
-TokenArray 
+Array<Token> 
 tokens_make(String text) {
 
-	TokenArray tokens = array_create(INITIAL_TOKEN_CAPACITY, sizeof(Token));
+	Array<Token> tokens;
+	tokens.init(INITIAL_TOKEN_CAPACITY);
 
 	sizet i = 0;
 	while (i < text.length) {
@@ -233,7 +234,7 @@ tokens_make(String text) {
 				token.type = TOK_IDENTIFIER;
 			}
 
-			tokens = array_push(tokens, &token);
+			tokens.push(token);
 			break;
 		}
 
@@ -253,41 +254,41 @@ tokens_make(String text) {
 				token.length++;
 				i++;
 			}
-			tokens = array_push(tokens, &token);
+			tokens.push(token);
 			break;
 		}
 
 		case '(': {
 			Token token = {TOK_OPEN_PAREN, 1, i};
 			i++;
-			tokens = array_push(tokens, &token);
+			tokens.push(token);
 			continue;
 		}
 
 		case ')': {
 			Token token = {TOK_CLOSED_PAREN, 1, i};
 			i++;
-			tokens = array_push(tokens, &token);
+			tokens.push(token);
 			continue;
 		}
 
 		case '{': {
 			Token token = {TOK_OPEN_CURLY, 1, i};
 			i++;
-			tokens = array_push(tokens, &token);
+			tokens.push(token);
 			continue;
 		}
 
 		case '}': {
 			Token token = {TOK_CLOSED_CURLY, 1, i};
 			i++;
-			tokens = array_push(tokens, &token);
+			tokens.push(token);
 			continue;
 		}
 		case '#': {
 			Token token = {TOK_HASH, 1, i};
 			i++;
-			tokens = array_push(tokens, &token);
+			tokens.push(token);
 			continue;
 		}
 		case '"': {
@@ -298,7 +299,7 @@ tokens_make(String text) {
 			}
 			i++;
 			token.length = i - token.pos;
-			tokens = array_push(tokens, &token);
+			tokens.push(token);
 			continue;
 		}
 		case '<': {
@@ -309,13 +310,13 @@ tokens_make(String text) {
 			}
 			i++;
 			token.length = i - token.pos;
-			tokens = array_push(tokens, &token);
+			tokens.push(token);
 			continue;
 		}
 		case ';': {
 			Token token = {TOK_SEMICOLON, 1, i};
 			i++;
-			tokens = array_push(tokens, &token);
+			tokens.push(token);
 			continue;
 		}
 		case '/': {
@@ -339,7 +340,7 @@ tokens_make(String text) {
 			  token.type = TOK_IDENTIFIER;
 			}
 			i++;
-			tokens = array_push(tokens, &token);
+			tokens.push(token);
 			continue;
 		}
 
@@ -374,9 +375,9 @@ print_token(TokenType type) {
 }
 
 void
-print_tokens(Token* tokens) {
+print_tokens(Array<Token> tokens) {
 
-	for (sizet i = 0; i < ARRAY_LENGTH(tokens); ++i) {
+	for (sizet i = 0; i < tokens.length; ++i) {
 
 		print_token(tokens[i].type);
 		

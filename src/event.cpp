@@ -110,7 +110,7 @@ window_resize_callback(GLFWwindow* window, int width, int height) {
 void
 events_initialize(GLFWwindow* window) {
 
-	gEventQueue.events = malloc(sizeof(Event) * EVENT_QUEUE_CAPACITY);
+	gEventQueue.events = (Event*)malloc(sizeof(Event) * EVENT_QUEUE_CAPACITY);
 	gEventQueue.tail = gEventQueue.events;
 	gEventQueue.head = gEventQueue.events;
 
