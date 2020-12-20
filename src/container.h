@@ -15,39 +15,9 @@ struct Array {
 	sizet length;
 	sizet capacity;
 
-	void init(sizet capacity);
-	void reset();
-	void free_data();
-	void push(T item);
-	void expand();
-	T& pop();
-	void insert(T item, sizet pos);
-	void erase(sizet pos);
-
 	T& operator[](sizet index);
 
 };
-
-  
-template <typename T>
-void Array<T>::init(sizet capacity) {
-
-	data = new T[capacity];
-	this->capacity = capacity;
-	this->length = 0;
-}
-
-template <typename T>
-void Array<T>::free_data() {
-
-	delete[] data;
-}
-
-template <typename T>
-void Array<T>::reset() {
-
-	length = 0;
-}
 
 template <typename T>
 T& Array<T>::operator[](sizet index) {
@@ -56,57 +26,84 @@ T& Array<T>::operator[](sizet index) {
 	return data[index];
 }
 
-template <typename T>
-void Array<T>::expand() {
 
-	capacity *= 2;
-	T* old = data;
-	data = new T[capacity];
-	memcpy(data, old, length * sizeof(T));
+template <typename T> void
+array_init(Array<T>* arr, sizet capacity) {
+
+	arr->data = new T[capacity];
+	arr->capacity = capacity;
+	arr->length = 0;
+}
+
+template <typename T> void
+array_free(Array<T>* arr) {
+
+	delete[] arr->data;
+}
+
+template <typename T> void
+array_reset(Array<T>* arr) {
+
+	arr->length = 0;
+}
+
+template <typename T> void
+array_expand(Array<T>* arr) {
+
+	arr->capacity *= 2;
+	T* old = arr->data;
+	arr->data = new T[arr->capacity];
+	memcpy(arr->data, old, arr->length * sizeof(T));
 	delete[] old;
 }
 
-template <typename T>
-void Array<T>::push(T item) {
+template <typename T> void
+array_push(Array<T>* arr, const T& item) {
 
-	if (length >= capacity) {
-		expand();
+	if (arr->length >= arr->capacity) {
+		array_expand(arr);
 	}
 
-	data[length] = item;
-	length += 1;
+	arr->data[arr->length] = item;
+	arr->length += 1;
 }
 
-template <typename T>
-T& Array<T>::pop() {
+template <typename T> T&
+array_pop(Array<T>* arr) {
 
-	length -= 1;
-	return data[length + 1];
+	arr->length -= 1;
+	return arr->data[arr->length + 1];
 }
 
-template <typename T>
-void Array<T>::insert(T item, sizet pos) {
+template <typename T> void 
+array_insert(Array<T>* arr, const T& item, sizet pos) {
 
-	ASSERT(pos <= length && pos >= 0);
+	ASSERT(pos <= arr->length && pos >= 0);
 
-	if (length >= capacity) {
-		expand();
+	if (arr->length >= arr->capacity) {
+		array_expand(arr);
 	}
 
-	memcpy(data + (pos + 1), data + pos, (length - pos) * sizeof(T));
-	data[pos] = item;
+	memcpy(arr->data + (pos + 1), arr->data + pos, (arr->length - pos) * sizeof(T));
+	arr->data[pos] = item;
 
-	length += 1;
+	arr->length += 1;
 }
 
-template <typename T>
-void Array<T>::erase(sizet pos) {
+template <typename T> void 
+array_erase(Array<T>* arr, sizet pos) {
 
-	ASSERT(length >= 1);
 
-	memcpy(data + pos, data + (pos + 1), (length - pos) * sizeof(T));
-	length -= 1;
+	ASSERT(arr->length >= 1);
+
+	memcpy(arr->data + pos, arr->data + (pos + 1), (arr->length - pos) * sizeof(T));
+	arr->length -= 1;
 }
 
-
-
+// void
+// print_array(Array<int> arr) {
+// 	for (sizet i = 0; i < arr.length; ++i) {
+// 		printf("%i, ", arr[i]);
+// 	}
+// 	printf("\n");
+// }

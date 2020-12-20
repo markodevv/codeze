@@ -3,11 +3,8 @@
 #include "memory.h"
 #include <string.h>
 
-#define STR_LEN_ADD_ONE(str) str_field_set(str, S_LENGTH, STR_LENGTH(str) + 1);
-#define STR_LEN_SUBTRACT_ONE(str) str_field_set(str, S_LENGTH, STR_LENGTH(str) - 1);
-
 String
-str_create_c(const char* text) {
+str_create(const char* text) {
 	
 	sizet len = strlen(text);
 
@@ -23,7 +20,7 @@ str_create_c(const char* text) {
 }
 
 String
-str_create_s(sizet size) {
+str_create(sizet size) {
 	
 	String out;
 	out.capacity = size;
@@ -35,7 +32,26 @@ str_create_s(sizet size) {
 	return out;
 }
 
+char&
+String::operator[](sizet index) {
 
+	return data[index];
+}
+
+b8
+String::operator==(const String& str) {
+
+	if (str.length == length) {
+
+		for (sizet i = 0; i < length; ++i) {
+			if (str.data[i] != data[i])
+				return 0;
+		}
+		return 1;
+	}
+
+	return 0;
+}
 // Only works if dest >= src
 void
 str_copy(String* dest, String* src) {
@@ -83,6 +99,19 @@ str_concat(String* s1, char* s2) {
 
 }
 
+String
+str_substring(String* str, sizet start, sizet end) {
+	
+	sizet len = end - start;
+	String out = str_create(len);
+
+	for (sizet i = start; i < end; ++i) {
+		
+		str_push(&out, str->data[i]);
+	}
+
+	return out;
+}
 
 
 i8

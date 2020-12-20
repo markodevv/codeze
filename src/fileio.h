@@ -1,6 +1,7 @@
 #pragma once
 #include "types.h"
 #include "my_string.h"
+#include "container.h"
 
 typedef struct File {
   
@@ -17,4 +18,4 @@ void file_close(File* file);
 u8* image_load_png(const char* path, i32* x, i32* y, i32* bpp);
 void image_free(u8* data);
 void open_directory(const char* path);
-String directory_filename_next();
+void fileio_cwd_file_names(Array<String>* arr);

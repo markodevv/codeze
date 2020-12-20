@@ -1,7 +1,6 @@
 #include "fileio.h"
 #include "types.h"
 #include "debug.h"
-#include "container.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -20,10 +19,21 @@ fileio_init() {
   
 	char* cwd = new char[256];
 	cwd = getcwd(cwd, 256);
-	WorkingDirectory = str_create_c(cwd);
+	WorkingDirectory = str_create(cwd);
 	dir = opendir(cwd);
 
 	free(cwd);
+}
+
+void
+fileio_cwd_file_names(Array<String>* arr) {
+
+	array_init(arr, 10);
+
+	while ((entry = readdir(dir)) != NULL)
+		array_push(arr, str_create(entry->d_name));
+
+	rewinddir(dir);
 }
 
 File*
@@ -39,7 +49,7 @@ file_open(const char* path, const char* flags) {
 	File* file = new File;
 	ASSERT(file);
 
-	file->buffer = str_create_s(size);
+	file->buffer = str_create(size);
 	file->lineCount = 0;
 
 	char line[4096];
@@ -83,16 +93,5 @@ image_free(u8* data) {
 
 }
 
-String
-directory_filename_next() {
-
-	entry = readdir(dir);
-	String out;
-	if (entry) {
-		out = str_create_c(entry->d_name);
-		return out;
-	}
-	return out;
-}
 
 

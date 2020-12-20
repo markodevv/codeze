@@ -32,6 +32,4 @@ dt_dispatch(DispatchTable* dt, KeyCode key, i32 mods) {
 	ASSERT(index < KEYMAP_SIZE);
 	if (dt->commands[index]) 
 		dt->commands[index]();
-	else 
-		printf("No command for key %i \n", key);
 }

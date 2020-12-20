@@ -4,6 +4,7 @@
 #include "debug.h"
 #include "cursor.h"
 #include "config.h"
+#include "globals.h"
 
 #include <glad/glad.h>
 
@@ -322,34 +323,32 @@ render_textured_quad(Vec2 position, Vec2 size, Vec4 color, u32 texID) {
 }
 
 void
-render_text(Buffer* buf, Vec2 position, Vec4 color) {
+render_text(String& text, Vec2 position, Vec4 color) {
 
 	static float xpos, ypos, w, h, offsetX, texX, texY, advanceX, advanceY;
 	advanceY = position.y;
 	advanceX = position.x;
 
-	String text = buffer_get_text(buf);
-
 	for (sizet i = 0; i < text.length; ++i) {
 
-		if (text.data[i] == '\n') {
+		if (text[i] == '\n') {
 
 			advanceY += g_Renderer.fontSize;
 			advanceX = 0.0f;
 			continue;
 		}
-		else if (text.data[i] == '\t') {
+		else if (text[i] == '\t') {
 
-			advanceX += g_Renderer.glyphs[text.data[i]].advanceX;
+			advanceX += g_Renderer.glyphs[text[i]].advanceX;
 			continue;
 		}
 
-		xpos = advanceX + g_Renderer.glyphs[text.data[i]].bearingX;
+		xpos = advanceX + g_Renderer.glyphs[text[i]].bearingX;
 		// this is stupid, idk how else to make it work
-		ypos = advanceY - g_Renderer.glyphs[text.data[i]].bearingY + g_Renderer.fontSize;
-		w = g_Renderer.glyphs[text.data[i]].width;
-		h = g_Renderer.glyphs[text.data[i]].height;
-		offsetX = g_Renderer.glyphs[text.data[i]].offsetX;
+		ypos = advanceY - g_Renderer.glyphs[text[i]].bearingY + g_Renderer.fontSize;
+		w = g_Renderer.glyphs[text[i]].width;
+		h = g_Renderer.glyphs[text[i]].height;
+		offsetX = g_Renderer.glyphs[text[i]].offsetX;
 		texX = w / g_Renderer.bitmapW;
 		texY = h / g_Renderer.bitmapH;
 
@@ -376,10 +375,9 @@ render_text(Buffer* buf, Vec2 position, Vec4 color) {
 		}
 
 		g_Renderer.vertexCount += VERTICES_PER_QUAD;
-		advanceX += g_Renderer.glyphs[text.data[i]].advanceX;
+		advanceX += g_Renderer.glyphs[text[i]].advanceX;
 	}
 
-	str_free(&text);
 }
 
 
@@ -394,7 +392,7 @@ render_buffer(Buffer* buf, Window *window, Array<Token> tokens, b8 focused) {
 	advanceY = window->position.y;
 	advanceX = window->position.x;
 
-	u32 tokIndex = 0;
+	//u32 tokIndex = 0;
 	Vec4 color = global_Colors[0];
 
 	{
@@ -433,20 +431,20 @@ render_buffer(Buffer* buf, Window *window, Array<Token> tokens, b8 focused) {
 	for (sizet i = 0; i < text.length; ++i) {
 
 
-		if (tokLen <= 0) 
-			color = global_Colors[TOK_IDENTIFIER];
+		// if (tokLen <= 0) 
+		// 	color = global_Colors[TOK_IDENTIFIER];
 
-		tokLen--;
+		// tokLen--;
 		// TODO: can remove this and make
 		// it renderable by setting the newline glyph as empthy image
-		if (text.data[i] == '\n') {
+		if (text[i] == '\n') {
 			advanceY += g_Renderer.fontSize;
 			advanceX = window->position.x;
 			continue;
 		}
-		else if (text.data[i] == '\t') {
+		else if (text[i] == '\t') {
 
-			advanceX += g_Renderer.glyphs[text.data[i]].advanceX;
+			advanceX += g_Renderer.glyphs[text[i]].advanceX;
 			continue;
 		}
 
@@ -460,12 +458,12 @@ render_buffer(Buffer* buf, Window *window, Array<Token> tokens, b8 focused) {
 			continue;
 		}
 
-		xpos = advanceX + g_Renderer.glyphs[text.data[i]].bearingX;
+		xpos = advanceX + g_Renderer.glyphs[text[i]].bearingX;
 		// this is stupid, idk how else to make it work
-		ypos = advanceY - g_Renderer.glyphs[text.data[i]].bearingY + g_Renderer.fontSize;
-		w = g_Renderer.glyphs[text.data[i]].width;
-		h = g_Renderer.glyphs[text.data[i]].height;
-		offsetX = g_Renderer.glyphs[text.data[i]].offsetX;
+		ypos = advanceY - g_Renderer.glyphs[text[i]].bearingY + g_Renderer.fontSize;
+		w = g_Renderer.glyphs[text[i]].width;
+		h = g_Renderer.glyphs[text[i]].height;
+		offsetX = g_Renderer.glyphs[text[i]].offsetX;
 		texX = w / g_Renderer.bitmapW;
 		texY = h / g_Renderer.bitmapH;
 
@@ -484,12 +482,12 @@ render_buffer(Buffer* buf, Window *window, Array<Token> tokens, b8 focused) {
 		}
 
 
-		if (i == tokens[tokIndex].pos) {
+		// if (i == tokens[tokIndex].pos) {
 
-			color = global_Colors[tokens[tokIndex].type];
-			tokLen = tokens[tokIndex].length;
-			tokIndex++;
-		}
+		// 	color = global_Colors[tokens[tokIndex].type];
+		// 	tokLen = tokens[tokIndex].length;
+		// 	tokIndex++;
+		// }
 
 
 		for (i32 j = 0; j < VERTICES_PER_QUAD; ++j) {
@@ -502,7 +500,7 @@ render_buffer(Buffer* buf, Window *window, Array<Token> tokens, b8 focused) {
 
 
 		g_Renderer.vertexCount += VERTICES_PER_QUAD;
-		advanceX += g_Renderer.glyphs[text.data[i]].advanceX;
+		advanceX += g_Renderer.glyphs[text[i]].advanceX;
 	}
 
 	str_free(&text);
@@ -569,12 +567,14 @@ renderer_on_window_resize(f32 width, f32 height) {
 	FocusedWindow->size.h = height;
 }
 
-GlyphData* renderer_get_glyphs() {
+GlyphData*
+renderer_get_glyphs() {
 
 	return g_Renderer.glyphs;
 }
 
-i32 renderer_font_size() {
+i32
+renderer_font_size() {
 
 	return g_Renderer.fontSize;
 }

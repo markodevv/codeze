@@ -46,10 +46,6 @@ typedef Node WindowTree;
 typedef Node Window;
 typedef Node* WindowArray;
 
-extern Window* FocusedWindow;
-extern WindowTree* WinTree;
-extern Window* CommandWindow;
-
 
 void window_split_vertical();
 void window_split_horizontal();

@@ -2,13 +2,13 @@
 #include "debug.h"
 #include "math.h"
 #include "config.h"
+#include "globals.h"
+
 #include <string.h>
 
 #define BUFFER_RESIZE_FACTOR 2
 #define BUFFER_EMPTHY_SIZE 20
 
-Buffer* CurBuffer;
-Buffer* CommandBuffer;
 
 Buffer
 buffer_create(File* file) {
@@ -21,22 +21,22 @@ buffer_create(File* file) {
 	buf.curX = 0;
 	buf.currentLine = 0;
 	buf.postLen = file->buffer.length;
-	buf.cursorLines.init(file->lineCount);
-	buf.lineLengths.init(file->lineCount);
+	array_init(&buf.lineLengths, file->lineCount);
+	array_init(&buf.cursorLines, file->lineCount);
 
-	buf.text = str_create_s(file->buffer.length);
+	buf.text = str_create(file->buffer.length);
 	str_copy(&buf.text, &file->buffer);
 
 	sizet i = 0;
 	// foreach line
 	for (sizet line = 0; line < file->lineCount; ++line) {
 		
-		buf.lineLengths.push(0);
-		buf.cursorLines.push(0);
+		array_push(&buf.lineLengths, 0);
+		array_push(&buf.cursorLines, 0);
 		// foreach char in line
-		for (i; buf.text.data[i] != '\n'; ++i) {
+		for (i; buf.text[i] != '\n'; ++i) {
 			// add to line length
-			if (buf.text.data[i] == '\t') 
+			if (buf.text[i] == '\t') 
 				buf.cursorLines[line] += TAB_SIZE;
 			else
 				buf.cursorLines[line] += 1;
@@ -63,14 +63,14 @@ buffer_create_empthy() {
 	buf.curX = 0;
 	buf.currentLine = 0;
 	buf.postLen = 0;
-	buf.cursorLines.init(1);
-	buf.lineLengths.init(1);
+	array_init(&buf.cursorLines, 1);
+	array_init(&buf.lineLengths, 1);
 
 
-	buf.lineLengths.push(0);
-	buf.cursorLines.push(0);
+	array_push(&buf.lineLengths, 0);
+	array_push(&buf.cursorLines, 0);
 
-	buf.text = str_create_s(BUFFER_EMPTHY_SIZE);
+	buf.text = str_create(BUFFER_EMPTHY_SIZE);
 
 	//str_skip(buf.text, BUFFER_EMPTHY_SIZE);
 
@@ -81,8 +81,8 @@ buffer_create_empthy() {
 void
 buffer_forward() {
 	
-	CurBuffer->text.data[CurBuffer->preLen]
-		= CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen];
+	CurBuffer->text[CurBuffer->preLen]
+		= CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen];
 	CurBuffer->preLen++;
 	CurBuffer->postLen--;
 
@@ -91,7 +91,7 @@ buffer_forward() {
 void
 buffer_backward() {
 	
-	CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen - 1] = CurBuffer->text.data[CurBuffer->preLen - 1];
+	CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen - 1] = CurBuffer->text[CurBuffer->preLen - 1];
 	CurBuffer->preLen--;
 	CurBuffer->postLen++;
 
@@ -100,14 +100,14 @@ buffer_backward() {
 String
 buffer_get_text(Buffer* buf) {
 	
-	String out = str_create_s(buf->preLen + buf->postLen);
+	String out = str_create(buf->preLen + buf->postLen);
 
 	for (sizet i = 0; i < buf->preLen; ++i) {
-		str_push(&out, buf->text.data[i]);
+		str_push(&out, buf->text[i]);
 	}
 
 	for (sizet i = buf->preLen; i + buf->gapLen < buf->text.capacity; ++i) {
-		str_push(&out, buf->text.data[i + buf->gapLen]);
+		str_push(&out, buf->text[i + buf->gapLen]);
 	}
 
 	return out;
@@ -120,25 +120,25 @@ buffer_insert_char(char c) {
 	if (CurBuffer->gapLen == 0) {
 		
 		sizet gap = CurBuffer->text.capacity;
-		String newstr = str_create_s(gap * BUFFER_RESIZE_FACTOR);
+		String newstr = str_create(gap * BUFFER_RESIZE_FACTOR);
 
 		// copy first part of string
 		sizet i = 0;
 		for (i; i < CurBuffer->preLen; ++i) {
-			str_push(&newstr, CurBuffer->text.data[i]);
+			str_push(&newstr, CurBuffer->text[i]);
 		}
 
 		str_skip(&newstr, gap);
 		//copy second part of the string
 		for (i = CurBuffer->preLen; i < CurBuffer->text.capacity; ++i) {
-			str_push(&newstr, CurBuffer->text.data[i]);
+			str_push(&newstr, CurBuffer->text[i]);
 		}
 
 		str_free(&CurBuffer->text);
 		CurBuffer->text = newstr;
 	}
 
-	CurBuffer->text.data[CurBuffer->preLen] = c;
+	CurBuffer->text[CurBuffer->preLen] = c;
 	CurBuffer->preLen++;
 	CurBuffer->cursorLines[CurBuffer->currentLine]++;
 	CurBuffer->lineLengths[CurBuffer->currentLine]++;
@@ -162,8 +162,8 @@ void
 buffer_insert_newline() {
 	
 	buffer_insert_char('\n');
-	CurBuffer->cursorLines.insert(0, CurBuffer->currentLine);
-	CurBuffer->lineLengths.insert(0, CurBuffer->currentLine);
+	array_insert(&CurBuffer->cursorLines, 0, CurBuffer->currentLine);
+	array_insert(&CurBuffer->lineLengths, 0, CurBuffer->currentLine);
 
 	if (CurBuffer->cursorLines[CurBuffer->currentLine] != CurBuffer->cursorXtabed) {
 
@@ -188,13 +188,13 @@ buffer_backspace_delete() {
 	CurBuffer->preLen--;
 	CurBuffer->gapLen++;
 
-	if (CurBuffer->text.data[CurBuffer->preLen] == '\n') {
+	if (CurBuffer->text[CurBuffer->preLen] == '\n') {
 
 		i32 delCurosrLine = CurBuffer->cursorLines[CurBuffer->currentLine];
 		i32 delLine = CurBuffer->lineLengths[CurBuffer->currentLine];
 
-		CurBuffer->cursorLines.erase(CurBuffer->currentLine);
-		CurBuffer->lineLengths.erase(CurBuffer->currentLine);
+		array_erase(&CurBuffer->cursorLines, CurBuffer->currentLine);
+		array_erase(&CurBuffer->lineLengths, CurBuffer->currentLine);
 
 		CurBuffer->currentLine--;
 
@@ -205,7 +205,7 @@ buffer_backspace_delete() {
 
 
 	}
-	else if (CurBuffer->text.data[CurBuffer->preLen] == '\t') {
+	else if (CurBuffer->text[CurBuffer->preLen] == '\t') {
 		CurBuffer->cursorLines[CurBuffer->currentLine] -= TAB_SIZE - 1;
 		CurBuffer->cursorXtabed -= TAB_SIZE - 1;
 	}
@@ -220,18 +220,18 @@ buffer_backspace_delete() {
 String
 buffer_string_before_cursor() {
 	
-	String line = str_create_s(CurBuffer->lineLengths[CurBuffer->currentLine]);
+	String line = str_create(CurBuffer->lineLengths[CurBuffer->currentLine]);
 
 	i32 i = CurBuffer->preLen - 1;
 	if (CurBuffer->currentLine == 0) {
 		while (i >= 0) {
-			str_push(&line, CurBuffer->text.data[i]);
+			str_push(&line, CurBuffer->text[i]);
 			i--;
 		}
 	}
 	else {
-		while (CurBuffer->text.data[i] != '\n')  {
-			str_push(&line, CurBuffer->text.data[i]);
+		while (CurBuffer->text[i] != '\n')  {
+			str_push(&line, CurBuffer->text[i]);
 			i--;
 		}
 	}
@@ -242,13 +242,13 @@ buffer_string_before_cursor() {
 char
 buffer_char_under_cursor() {
 	
-	return CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen];
+	return CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen];
 }
 
 char
 buffer_char_before_cursor() {
 	
-	return CurBuffer->text.data[CurBuffer->preLen];
+	return CurBuffer->text[CurBuffer->preLen];
 }
 
 sizet
@@ -267,10 +267,10 @@ void
 buffer_clear(Buffer* buf) {
 
 	str_clear(&buf->text);
-	buf->lineLengths.reset();
-	buf->cursorLines.reset();
-	buf->lineLengths.push(0);
-	buf->cursorLines.push(0);
+	array_reset(&buf->lineLengths);
+	array_reset(&buf->cursorLines);
+	array_push(&buf->lineLengths, 0);
+	array_push(&buf->cursorLines, 0);
 
 	buf->preLen = 0;
 	buf->postLen = 0;
