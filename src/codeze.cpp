@@ -1,20 +1,3 @@
-#include "renderer.h"
-#include "my_string.h"
-#include "event.h"
-#include "debug.h"
-#include "fileio.h"
-#include "tokenizer.h"
-#include "container.h"
-#include "buffer.h"
-#include "cursor.h"
-#include "window.h"
-#include "dispatch_table.h"
-
-
-#define DO_INIT
-#include "globals.h"
-#undef DO_INIT
-
 /* TODO:
 
    - file opening/closing
@@ -39,80 +22,33 @@
 
 static GLFWwindow* GLFWwin;
 
-static void
-editor_enter_command_state() {
-
-	buffer_clear(CommandBuffer);
-	CurState = STATE_COMMAND;
-	LastWindow = FocusedWindow;
-	FocusedWindow = CommandWindow;
-	LastBuffer = CurBuffer;
-	CurBuffer = CommandBuffer;
-
-	for (sizet i = 0; i < WorkingDirectory.length; ++i) {
-
-		buffer_insert_char(WorkingDirectory.data[i]);
-	}
-
-}
 
 static void
 editor_enter_normal_state() {
 
+	on_command_state_exit();
 	CurState = STATE_NORMAL;
-	FocusedWindow = LastWindow;
-	CurBuffer = LastBuffer;
 }
 
-static i32
-find_last_slash_index(String& text) {
+static void
+editor_enter_command_state() {
 
-	for (sizet i = text.length - 1; i >= 0; --i) {
-
-		if (text[i] == '/') {
-			return i;
-		}
-	}
-	return 0;
+	on_command_state_enter();
+	CurState = STATE_COMMAND;
 }
+
 
 static Array<Buffer> buffers;
 
-static void
-check_open_file() {
-
-	Array<String> fileNames;
-	fileio_cwd_file_names(&fileNames);
-
-	String bufferstr = buffer_get_text(CurBuffer);
-	i32 slashIndex = find_last_slash_index(bufferstr);
-
-	String filestr = str_substring(&bufferstr, slashIndex + 1, bufferstr.length);
-
-	for (sizet i = 0; i < fileNames.length; ++i) {
-
-		if (fileNames[i] == filestr) {
-			str_push(&bufferstr, '\0');
-			editor_enter_normal_state();
-
-			File* file = file_open(bufferstr.data, "r");
-			array_push(&buffers, buffer_create(file));
-			CurBuffer = &buffers[buffers.length - 1];
-			CommandBuffer = &buffers[1];
-			FocusedWindow->buffId = buffers.length - 1;
-			file_close(file);
-			break;
-		}
-	}
-
-	str_free(&bufferstr);
-	str_free(&filestr);
-	array_free(&fileNames);
-}
-
-
 i32
 main(int argc, char* argv[]) {
+
+	List<Buffer> bufs;
+	list_init(&bufs, 1);
+
+	list_add(&bufs, buffer_create_empthy());
+	list_add(&bufs, buffer_create_empthy());
+
 
 	CurState = STATE_NORMAL;
 	Width = 1916;
@@ -125,7 +61,7 @@ main(int argc, char* argv[]) {
 
 
 	fileio_init();
-	File* file = file_open("test.c", "r");
+	File file = file_open("test.c", "r");
 
 	array_init(&buffers, 2);
 	Buffer b = buffer_create(file);
@@ -135,7 +71,6 @@ main(int argc, char* argv[]) {
 	CurBuffer = &buffers[0];
 	CommandBuffer = &buffers[1];
 
-	file_close(file);
 
 	Window window = window_create_empthy();
 	window.buffId = 0;
@@ -144,9 +79,9 @@ main(int argc, char* argv[]) {
 	window_tree_create(window);
 
 	DispatchTable *dtNormalMode = new DispatchTable;
-	DispatchTable *dtCommandMode = new DispatchTable;
+	DispatchTable *dtCmdState = new DispatchTable;
 	dt_init(dtNormalMode);
-	dt_init(dtCommandMode);
+	dt_init(dtCmdState);
 
 	dt_bind(dtNormalMode, cursor_down,             KEY_Down, 0);
 	dt_bind(dtNormalMode, cursor_up,               KEY_Up, 0);
@@ -164,46 +99,30 @@ main(int argc, char* argv[]) {
 	dt_bind(dtNormalMode, window_switch_right,     KEY_L, MOD_CONTROL);
 	dt_bind(dtNormalMode, editor_enter_command_state, KEY_Enter, MOD_CONTROL);
 
-	dt_bind(dtCommandMode, cursor_left,             KEY_Left, 0);
-	dt_bind(dtCommandMode, cursor_right,            KEY_Right, 0);
-	dt_bind(dtCommandMode, buffer_insert_tab,       KEY_Tab, 0);
-	dt_bind(dtCommandMode, editor_enter_normal_state, KEY_Escape, 0);
-	dt_bind(dtCommandMode, buffer_backspace_delete, KEY_Backspace, 0);
-	dt_bind(dtCommandMode, check_open_file, KEY_Enter, 0);
+	dt_bind(dtCmdState, cursor_left,             KEY_Left, 0);
+	dt_bind(dtCmdState, cursor_right,            KEY_Right, 0);
+	dt_bind(dtCmdState, buffer_insert_tab,       KEY_Tab, 0);
+	dt_bind(dtCmdState, editor_enter_normal_state, KEY_Escape, 0);
+	dt_bind(dtCmdState, buffer_backspace_delete, KEY_Backspace, 0);
+	dt_bind(dtCmdState, check_open_file, KEY_Enter, 0);
+
+	CurTable = dtNormalMode;
 
 	while (!glfwWindowShouldClose(GLFWwin)) {
 		
 		Event event;
 		while(event_queue_next(&event)) { 
-			if (CurState == STATE_NORMAL) {
-				
-				if (event.type == KEY_PRESSED) {
+			if (event.type == KEY_PRESSED) {
 
-					dt_dispatch(dtNormalMode, (KeyCode)event.key, event.mods);
-				}
-				else if (event.type == KEY_REPEAT) {
-
-					dt_dispatch(dtNormalMode, (KeyCode)event.key, event.mods);
-				}
-				else if (event.type == CHAR_INPUTED) {
-
-					buffer_insert_char(event.character);
-				}
+				dt_dispatch(CurTable, (KeyCode)event.key, event.mods);
 			}
-			else if (CurState == STATE_COMMAND) {
-				
-				if (event.type == KEY_PRESSED) {
+			else if (event.type == KEY_REPEAT) {
 
-					dt_dispatch(dtCommandMode, (KeyCode)event.key, event.mods);
-				}
-				else if (event.type == KEY_REPEAT) {
+				dt_dispatch(CurTable, (KeyCode)event.key, event.mods);
+			}
+			else if (event.type == CHAR_INPUTED) {
 
-					dt_dispatch(dtCommandMode, (KeyCode)event.key, event.mods);
-				}
-				else if (event.type == CHAR_INPUTED) {
-
-					buffer_insert_char(event.character);
-				}
+				buffer_insert_char(event.character);
 			}
 			//                    TODO:
 			else if (event.type == -5) {
@@ -305,9 +224,8 @@ main(int argc, char* argv[]) {
 			Vec4 textColor = {1.0f, 1.0f, 1.0f, 1.0f};
 
 			render_quad(winPos, winSize, winColor);
-			String text = buffer_get_text(CurBuffer);
+			String text = buffer_get_text_copy(CurBuffer);
 			render_text(text, winPos, textColor);
-			str_free(&text);
 
 			Array<String> fileNames;
 			fileio_cwd_file_names(&fileNames);
@@ -325,10 +243,8 @@ main(int argc, char* argv[]) {
 												
 				render_text(fileNames[i], winPos, {1.0f, 1.0f, 1.0f, 1.0f});
 				winPos.y += renderer_font_size();
-				str_free(&fileNames[i]);
 
 			}
-			array_free(&fileNames);
 		}
 		render_cursor(CurBuffer, FocusedWindow);
 
@@ -346,7 +262,7 @@ main(int argc, char* argv[]) {
 		DEBUG_TEXT(pos, "pre length %i", (i32)CurBuffer->preLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "post length %i", (i32)CurBuffer->postLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "gap length %i", (i32)CurBuffer->gapLen); pos.y += 20.0f;
-		DEBUG_TEXT(pos, "char under cursor %c", (i32)CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen]); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "char under cursor %c", (i32)CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen]); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "Window count %zu", windows.length); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "RenderView start %i", FocusedWindow->renderView.start); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "RenderView  end %i", FocusedWindow->renderView.end); pos.y += 20.0f;
@@ -355,7 +271,6 @@ main(int argc, char* argv[]) {
 
 		array_free(&windows);
 		array_free(&tokens);
-		//str_free(&bufferText);
 
 		glfwSwapBuffers(GLFWwin);
 

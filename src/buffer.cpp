@@ -11,7 +11,7 @@
 
 
 Buffer
-buffer_create(File* file) {
+buffer_create(File& file) {
   
 	Buffer buf;
 
@@ -20,21 +20,26 @@ buffer_create(File* file) {
 	buf.cursorXtabed = 0;
 	buf.curX = 0;
 	buf.currentLine = 0;
-	buf.postLen = file->buffer.length;
-	array_init(&buf.lineLengths, file->lineCount);
-	array_init(&buf.cursorLines, file->lineCount);
+	buf.postLen = file.buffer.length;
+	array_init(&buf.lineLengths, file.lineCount);
+	array_init(&buf.cursorLines, file.lineCount);
 
-	buf.text = str_create(file->buffer.length);
-	str_copy(&buf.text, &file->buffer);
+	buf.capacity = file.buffer.length;
+	buf.text = (char*)malloc(sizeof(char) * buf.capacity);
+
+	for (sizet i = 0; i < file.buffer.length; ++i) {
+
+		buf.text[i] = file.buffer[i];
+	}
 
 	sizet i = 0;
 	// foreach line
-	for (sizet line = 0; line < file->lineCount; ++line) {
+	for (sizet line = 0; line < file.lineCount; ++line) {
 		
 		array_push(&buf.lineLengths, 0);
 		array_push(&buf.cursorLines, 0);
 		// foreach char in line
-		for (i; buf.text[i] != '\n'; ++i) {
+		for (; buf.text[i] != '\n'; ++i) {
 			// add to line length
 			if (buf.text[i] == '\t') 
 				buf.cursorLines[line] += TAB_SIZE;
@@ -70,7 +75,9 @@ buffer_create_empthy() {
 	array_push(&buf.lineLengths, 0);
 	array_push(&buf.cursorLines, 0);
 
-	buf.text = str_create(BUFFER_EMPTHY_SIZE);
+	//buf.text = str_create(BUFFER_EMPTHY_SIZE);
+	buf.capacity = BUFFER_EMPTHY_SIZE;
+	buf.text = (char*)malloc(sizeof(char) * BUFFER_EMPTHY_SIZE);
 
 	//str_skip(buf.text, BUFFER_EMPTHY_SIZE);
 
@@ -98,7 +105,7 @@ buffer_backward() {
 }
 
 String
-buffer_get_text(Buffer* buf) {
+buffer_get_text_copy(Buffer* buf) {
 	
 	String out = str_create(buf->preLen + buf->postLen);
 
@@ -106,7 +113,7 @@ buffer_get_text(Buffer* buf) {
 		str_push(&out, buf->text[i]);
 	}
 
-	for (sizet i = buf->preLen; i + buf->gapLen < buf->text.capacity; ++i) {
+	for (sizet i = buf->preLen; i + buf->gapLen < buf->capacity; ++i) {
 		str_push(&out, buf->text[i + buf->gapLen]);
 	}
 
@@ -119,23 +126,24 @@ buffer_insert_char(char c) {
 	
 	if (CurBuffer->gapLen == 0) {
 		
-		sizet gap = CurBuffer->text.capacity;
-		String newstr = str_create(gap * BUFFER_RESIZE_FACTOR);
+		sizet gap = CurBuffer->preLen + CurBuffer->postLen;
+		CurBuffer->capacity += gap;
+		char* newbuf = (char*)malloc(sizeof(char) * CurBuffer->capacity);
 
 		// copy first part of string
 		sizet i = 0;
-		for (i; i < CurBuffer->preLen; ++i) {
-			str_push(&newstr, CurBuffer->text[i]);
+		for (; i < CurBuffer->preLen; ++i) {
+			newbuf[i] = CurBuffer->text[i];
 		}
 
-		str_skip(&newstr, gap);
 		//copy second part of the string
-		for (i = CurBuffer->preLen; i < CurBuffer->text.capacity; ++i) {
-			str_push(&newstr, CurBuffer->text[i]);
+		for (i = CurBuffer->preLen; i < gap; ++i) {
+			newbuf[i + gap] = CurBuffer->text[i];
 		}
 
-		str_free(&CurBuffer->text);
-		CurBuffer->text = newstr;
+		free(CurBuffer->text);
+		CurBuffer->text = newbuf;
+		CurBuffer->gapLen = gap;
 	}
 
 	CurBuffer->text[CurBuffer->preLen] = c;
@@ -146,7 +154,7 @@ buffer_insert_char(char c) {
 	CurBuffer->cursorXtabed++;
 	CurBuffer->curX++;
 
-	CurBuffer->gapLen = CurBuffer->text.capacity - (CurBuffer->preLen + CurBuffer->postLen);
+	CurBuffer->gapLen--;
 }
 
 void
@@ -266,15 +274,14 @@ buffer_index_based_on_line(Buffer* buf, i32 line) {
 void
 buffer_clear(Buffer* buf) {
 
-	str_clear(&buf->text);
 	array_reset(&buf->lineLengths);
 	array_reset(&buf->cursorLines);
 	array_push(&buf->lineLengths, 0);
 	array_push(&buf->cursorLines, 0);
 
+	buf->gapLen = buf->capacity;
 	buf->preLen = 0;
 	buf->postLen = 0;
-	buf->gapLen = buf->text.capacity;
 	buf->currentLine = 0;
 	buf->curX = 0;
 	buf->cursorXtabed = 0;

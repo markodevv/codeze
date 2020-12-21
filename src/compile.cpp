@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <threads.h>
 #include <time.h>
+#include <stdio.h>
+#include <dirent.h>
+#include <unistd.h>
 
 #include "types.h"
 
@@ -17,6 +20,7 @@
 #include "fileio.cpp"
 #include "tokenizer.cpp"
 #include "container.cpp"
+#include "cmdstate.cpp"
 #include "codeze.cpp"
 #include "my_string.cpp"
 #include "math.cpp"

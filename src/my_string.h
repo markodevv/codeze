@@ -1,14 +1,22 @@
 #pragma once
 #include "types.h"
 
+
 typedef struct String {
 
-	char* data;
-	sizet length;
-	sizet capacity;
+	char* data = NULL;
+	sizet length = 0;
+	sizet capacity = 0;
+	i16* refCount = NULL;
 
 	char& operator[](sizet index);
 	b8 operator==(const String& str);
+	b8 operator==(const char* str);
+
+	String() = default;
+	~String();
+	String(const String& other);
+	String& operator=(const String& other);
 
 } String;
 
@@ -20,5 +28,4 @@ void str_concat(String* s1, char* s2);
 i8 cstr_equal(const char* s1, const char* s2);
 void str_skip(String* str, sizet count);
 void str_clear(String* str);
-void str_free(String* str);
 String str_substring(String* str, sizet start, sizet end);

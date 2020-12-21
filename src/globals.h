@@ -1,6 +1,7 @@
 #pragma once
 #include "window.h"
 #include "buffer.h"
+#include "dispatch_table.h"
 
 typedef enum EditorState {
 
@@ -23,6 +24,11 @@ extern i32 Width;
 extern i32 Height;
 
 extern EditorState CurState;
+extern String WorkingDirectory;
+
+extern DispatchTable* CurTable;
+
+
 
 #ifdef DO_INIT
 
@@ -40,5 +46,7 @@ i32 Width;
 i32 Height;
 
 EditorState CurState;
+String WorkingDirectory;
 
+DispatchTable* CurTable;
 #endif

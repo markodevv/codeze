@@ -3,15 +3,25 @@
 #include "memory.h"
 #include <string.h>
 
+#define STRING_MIN_SIZE 10
+
 String
 str_create(const char* text) {
 	
 	sizet len = strlen(text);
 
 	String out;
-	out.capacity = len;
+	if (len < STRING_MIN_SIZE) {
+		out.data = (char*)malloc(sizeof(char) * STRING_MIN_SIZE);
+		out.capacity = STRING_MIN_SIZE;
+	}
+	else {
+		out.data = (char*)malloc(sizeof(char) * len);
+		out.capacity = len;
+	}
 	out.length = len;
-	out.data = new char[len];
+	out.refCount = (i16*)malloc(sizeof(i16));
+	(*out.refCount) = 1;
 	memcpy(out.data, text, len * sizeof(char));
 	ASSERT_MSG(out.data, "string malloc failed");
 
@@ -24,8 +34,18 @@ str_create(sizet size) {
 	
 	String out;
 	out.capacity = size;
+	if (size < STRING_MIN_SIZE) {
+		out.data = (char*)malloc(sizeof(char) * STRING_MIN_SIZE);
+		out.capacity = STRING_MIN_SIZE;
+	}
+	else {
+		out.data = (char*)malloc(sizeof(char) * size);
+		out.capacity = size;
+	}
 	out.length = 0;
-	out.data = new char[size];
+	out.data = (char*)malloc(sizeof(char) * size);
+	out.refCount = (i16*)malloc(sizeof(i16));
+	(*out.refCount) = 1;
 
 	ASSERT_MSG(out.data, "string malloc failed");
 
@@ -52,7 +72,72 @@ String::operator==(const String& str) {
 
 	return 0;
 }
-// Only works if dest >= src
+
+b8
+String::operator==(const char* str) {
+
+	sizet len = strlen(str);
+	if (len == length) {
+
+		for (sizet i = 0; i < length; ++i) {
+			if (str[i] != data[i])
+				return 0;
+		}
+		return 1;
+	}
+
+	return 0;
+}
+
+String&
+String::operator=(const String& other) {
+
+	if (this != &other) {
+		
+		if (refCount && (*refCount)-- == 0) {
+
+			free(refCount);
+			free(data);
+		}
+
+		data = other.data;
+		refCount = other.refCount;
+		capacity = other.capacity;
+		length = other.length;
+
+		(*refCount) += 1;
+	}
+
+	return *this;
+}
+
+
+String::~String() {
+
+	if (refCount) {
+		(*refCount)--;
+		if ((*refCount) == 0) {
+
+			free(refCount);
+			free(data);
+
+			refCount = NULL;
+			data = NULL;
+		}
+	}
+}
+
+String::String(const String& other) {
+
+	data = other.data;
+	refCount = other.refCount;
+	capacity = other.capacity;
+	length = other.length;
+
+	(*refCount) += 1;
+
+}
+
 void
 str_copy(String* dest, String* src) {
 
@@ -72,10 +157,7 @@ str_push(String* str, char c) {
 
 	if (str->length >= str->capacity) {
 		str->capacity *= 2;
-		char* old = str->data;
-		str->data = new char[str->capacity];
-		memcpy(str->data, old, str->length);
-		delete[] old;
+		str->data = (char*)realloc(str->data, sizeof(char) * str->capacity);
 	}
 
 	str->data[str->length] = c;
@@ -120,7 +202,7 @@ cstr_equal(const char* s1, const char* s2) {
 	sizet i = 0;
 
 	sizet len = strlen(s1);
-	for (i; i < len; ++i) {
+	for (; i < len; ++i) {
 
 		if (s1[i] != s2[i]) return 0;
 	}
@@ -139,7 +221,3 @@ str_clear(String* str) {
 	str->length = 0;
 }
 
-void str_free(String* str) {
-
-	delete[] str->data;
-}

@@ -5,11 +5,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#include <stdio.h>
-#include <dirent.h>
-#include <unistd.h>
 
-String WorkingDirectory;
 static DIR* dir;
 static struct dirent* entry;
 
@@ -17,7 +13,7 @@ static struct dirent* entry;
 void
 fileio_init() {
   
-	char* cwd = new char[256];
+	char* cwd = (char*)malloc(sizeof(char) * 256);
 	cwd = getcwd(cwd, 256);
 	WorkingDirectory = str_create(cwd);
 	dir = opendir(cwd);
@@ -28,15 +24,18 @@ fileio_init() {
 void
 fileio_cwd_file_names(Array<String>* arr) {
 
-	array_init(arr, 10);
+	array_init(arr, 2);
 
-	while ((entry = readdir(dir)) != NULL)
-		array_push(arr, str_create(entry->d_name));
+	while ((entry = readdir(dir)) != NULL) {
+		
+		String filename = str_create(entry->d_name);
+		array_push(arr, filename);
+	}
 
 	rewinddir(dir);
 }
 
-File*
+File
 file_open(const char* path, const char* flags) {
 
 	FILE* fp = fopen(path, flags);
@@ -46,11 +45,10 @@ file_open(const char* path, const char* flags) {
 	sizet size = ftell(fp);
 	rewind(fp);
 
-	File* file = new File;
-	ASSERT(file);
+	File file;
 
-	file->buffer = str_create(size);
-	file->lineCount = 0;
+	file.buffer = str_create(size);
+	file.lineCount = 0;
 
 	char line[4096];
 
@@ -59,10 +57,10 @@ file_open(const char* path, const char* flags) {
 		sizet i = 0;
 		while (line[i] != '\0') {
 
-			str_push(&file->buffer, line[i]);
+			str_push(&file.buffer, line[i]);
 			i++;
 		}
-		file->lineCount++;
+		file.lineCount++;
 	}
 
 	fclose(fp);
@@ -71,13 +69,6 @@ file_open(const char* path, const char* flags) {
   
 }
 
-void
-file_close(File* file) {
-
-	str_free(&file->buffer);
-	free(file);
-	
-}
 
 u8*
 image_load_png(const char* path, i32* x, i32* y, i32* bpp) {

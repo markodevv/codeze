@@ -128,12 +128,12 @@ renderer_initialize(f32 width, f32 height) {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	File* vertexFile = file_open("src/vertex_shader.txt", "r");
-	File* fragmentFile = file_open("src/fragment_shader.txt", "r");
-	str_push(&vertexFile->buffer, '\0');
-	str_push(&fragmentFile->buffer, '\0');
+	File vertexFile = file_open("src/vertex_shader.txt", "r");
+	File fragmentFile = file_open("src/fragment_shader.txt", "r");
+	str_push(&vertexFile.buffer, '\0');
+	str_push(&fragmentFile.buffer, '\0');
 
-	g_Renderer.program = shader_create(vertexFile->buffer.data, fragmentFile->buffer.data);
+	g_Renderer.program = shader_create(vertexFile.buffer.data, fragmentFile.buffer.data);
 	
 	glUseProgram(g_Renderer.program);
 
@@ -173,8 +173,6 @@ renderer_initialize(f32 width, f32 height) {
 
 	}
 
-	file_close(vertexFile);
-	file_close(fragmentFile);
 
 }
 
@@ -387,7 +385,7 @@ render_buffer(Buffer* buf, Window *window, Array<Token> tokens, b8 focused) {
 	static float xpos, ypos, w, h, offsetX,
 		texX, texY, advanceX, advanceY, tokLen;
 
-	String text = buffer_get_text(buf);
+	//String text = buffer_get_text(buf);
 
 	advanceY = window->position.y;
 	advanceX = window->position.x;
@@ -427,24 +425,24 @@ render_buffer(Buffer* buf, Window *window, Array<Token> tokens, b8 focused) {
 	sizet start = buffer_index_based_on_line(buf, window->renderView.start);
 	sizet end = buffer_index_based_on_line(buf, window->renderView.end);
 
-	//for (sizet i = start; i < end; ++i) {
-	for (sizet i = 0; i < text.length; ++i) {
+	for (sizet i = start; i < end + buf->gapLen; ++i) {
 
-
+		char c = buf->text[i];
+		//skip gap
+		if (i == buf->preLen)
+			i += buf->gapLen;
 		// if (tokLen <= 0) 
 		// 	color = global_Colors[TOK_IDENTIFIER];
 
 		// tokLen--;
-		// TODO: can remove this and make
-		// it renderable by setting the newline glyph as empthy image
-		if (text[i] == '\n') {
+		if (c == '\n') {
 			advanceY += g_Renderer.fontSize;
 			advanceX = window->position.x;
 			continue;
 		}
-		else if (text[i] == '\t') {
+		else if (c == '\t') {
 
-			advanceX += g_Renderer.glyphs[text[i]].advanceX;
+			advanceX += g_Renderer.glyphs[c].advanceX;
 			continue;
 		}
 
@@ -458,12 +456,12 @@ render_buffer(Buffer* buf, Window *window, Array<Token> tokens, b8 focused) {
 			continue;
 		}
 
-		xpos = advanceX + g_Renderer.glyphs[text[i]].bearingX;
+		xpos = advanceX + g_Renderer.glyphs[c].bearingX;
 		// this is stupid, idk how else to make it work
-		ypos = advanceY - g_Renderer.glyphs[text[i]].bearingY + g_Renderer.fontSize;
-		w = g_Renderer.glyphs[text[i]].width;
-		h = g_Renderer.glyphs[text[i]].height;
-		offsetX = g_Renderer.glyphs[text[i]].offsetX;
+		ypos = advanceY - g_Renderer.glyphs[c].bearingY + g_Renderer.fontSize;
+		w = g_Renderer.glyphs[c].width;
+		h = g_Renderer.glyphs[c].height;
+		offsetX = g_Renderer.glyphs[c].offsetX;
 		texX = w / g_Renderer.bitmapW;
 		texY = h / g_Renderer.bitmapH;
 
@@ -500,10 +498,8 @@ render_buffer(Buffer* buf, Window *window, Array<Token> tokens, b8 focused) {
 
 
 		g_Renderer.vertexCount += VERTICES_PER_QUAD;
-		advanceX += g_Renderer.glyphs[text[i]].advanceX;
+		advanceX += g_Renderer.glyphs[c].advanceX;
 	}
-
-	str_free(&text);
 
 	#ifdef DEBUG
 

@@ -1,7 +1,4 @@
 #include "cursor.h"
-#include "renderer.h"
-#include "buffer.h"
-#include "window.h"
 #include "config.h"
 
 Vec2
@@ -39,12 +36,12 @@ cursor_render_size() {
 void
 cursor_right() {
   
-	if (CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen] == '\n'
+	if (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] == '\n'
 		|| CurBuffer->postLen <= 0) {
 		return;
 	}
 
-	if (CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen] == '\t')
+	if (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] == '\t')
 		CurBuffer->cursorXtabed += TAB_SIZE;
 	else 
 		CurBuffer->cursorXtabed++;
@@ -58,9 +55,9 @@ cursor_left() {
 
 	if (CurBuffer->preLen == 0) return;
 
-	if (CurBuffer->text.data[CurBuffer->preLen - 1] == '\n')
+	if (CurBuffer->text[CurBuffer->preLen - 1] == '\n')
 		return;
-	else if (CurBuffer->text.data[CurBuffer->preLen - 1] == '\t')
+	else if (CurBuffer->text[CurBuffer->preLen - 1] == '\t')
 		CurBuffer->cursorXtabed -= TAB_SIZE;
 	else 
 		CurBuffer->cursorXtabed--;
@@ -76,7 +73,7 @@ cursor_down() {
 	if (CurBuffer->currentLine == CurBuffer->cursorLines.length - 1) return;
 
 
-	while (CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen] != '\n') {
+	while (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] != '\n') {
 		buffer_forward();
 	}
 	buffer_forward();
@@ -89,7 +86,7 @@ cursor_down() {
 		sizet prevX = CurBuffer->cursorXtabed;
 		while (prevX > 0) {
 
-			if (CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen] == '\t') {
+			if (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] == '\t') {
 				buffer_forward();
 				prevX -= TAB_SIZE;
 			}
@@ -104,9 +101,9 @@ cursor_down() {
 
 		CurBuffer->cursorXtabed = 0;
 		CurBuffer->curX = 0;
-		while (CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen] != '\n') {
+		while (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] != '\n') {
 			
-			if (CurBuffer->text.data[CurBuffer->preLen + CurBuffer->gapLen] == '\t') {
+			if (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] == '\t') {
 				CurBuffer->cursorXtabed += TAB_SIZE;
 			}
 			else {
@@ -124,7 +121,7 @@ cursor_up() {
 	
 	if (CurBuffer->currentLine == 0) return;
 
-	while (CurBuffer->text.data[CurBuffer->preLen - 1] != '\n') {
+	while (CurBuffer->text[CurBuffer->preLen - 1] != '\n') {
 
 		buffer_backward();
 	}
@@ -138,7 +135,7 @@ cursor_up() {
 		while (backwardSteps > 0) {
 
 			buffer_backward();
-			if (CurBuffer->text.data[CurBuffer->preLen] == '\t')
+			if (CurBuffer->text[CurBuffer->preLen] == '\t')
 				backwardSteps -= TAB_SIZE;
 			else
 				backwardSteps--;

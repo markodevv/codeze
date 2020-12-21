@@ -30,7 +30,7 @@ T& Array<T>::operator[](sizet index) {
 template <typename T> void
 array_init(Array<T>* arr, sizet capacity) {
 
-	arr->data = new T[capacity];
+	arr->data = (T*)calloc(capacity, sizeof(T));
 	arr->capacity = capacity;
 	arr->length = 0;
 }
@@ -38,7 +38,7 @@ array_init(Array<T>* arr, sizet capacity) {
 template <typename T> void
 array_free(Array<T>* arr) {
 
-	delete[] arr->data;
+	free(arr->data);
 }
 
 template <typename T> void
@@ -52,9 +52,10 @@ array_expand(Array<T>* arr) {
 
 	arr->capacity *= 2;
 	T* old = arr->data;
-	arr->data = new T[arr->capacity];
+	//arr->data = new T[arr->capacity];
+	arr->data = (T*)calloc(arr->capacity, sizeof(T));
 	memcpy(arr->data, old, arr->length * sizeof(T));
-	delete[] old;
+	free(old);
 }
 
 template <typename T> void
@@ -100,10 +101,44 @@ array_erase(Array<T>* arr, sizet pos) {
 	arr->length -= 1;
 }
 
-// void
-// print_array(Array<int> arr) {
-// 	for (sizet i = 0; i < arr.length; ++i) {
-// 		printf("%i, ", arr[i]);
-// 	}
-// 	printf("\n");
-// }
+template <typename T>
+struct Member {
+	
+	T data;
+	Member<T>* next;
+};
+
+template <typename T>
+struct List {
+	Member<T>* head;
+	Member<T>* tail;
+};
+
+template <typename T> void
+list_init(List<T>* list, sizet size) {
+
+	ASSERT(size > 0);
+	Member<T>* node = (Member<T>*)malloc(sizeof(Member<T>));
+	list->head = node;
+	list->tail = node;
+
+	for (sizet i = 0; i < size; ++i) {
+		node = (Member<T>*)malloc(sizeof(Member<T>));
+		list->tail->next = node;
+		list->tail = node;
+	}
+
+	list->tail->next = NULL;
+	list->tail = list->head;
+}
+
+
+template <typename T> void
+list_add(List<T>* list, const T& item) {
+
+	if (!list->tail)
+		list->tail = (Member<T>*)malloc(sizeof(Member<T>));
+		
+	list->tail->data = item;
+	list->tail = list->tail->next;
+}
