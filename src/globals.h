@@ -14,7 +14,6 @@ extern Buffer* CurBuffer;
 extern Buffer* CmdBuffer;
 
 extern Window* FocusedWindow;
-extern WindowTree* WinTree;
 extern Window* CommandWindow;
 
 extern Window* LastWindow;
@@ -24,10 +23,11 @@ extern i32 Width;
 extern i32 Height;
 
 extern EditorState CurState;
-extern String WorkingDirectory;
 
 extern DispatchTable* CurTable;
 
+extern DispatchTable dtNormalMode;
+extern DispatchTable dtCmdState;
 
 
 #ifdef DO_INIT
@@ -36,7 +36,6 @@ Buffer* CurBuffer;
 Buffer* CommandBuffer;
 
 Window* FocusedWindow;
-WindowTree* WinTree;
 Window* CommandWindow;
 
 Window* LastWindow;
@@ -46,7 +45,9 @@ i32 Width;
 i32 Height;
 
 EditorState CurState;
-String WorkingDirectory;
 
 DispatchTable* CurTable;
+DispatchTable NormalTable;
+DispatchTable CmdTable;
+
 #endif

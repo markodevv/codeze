@@ -21,12 +21,18 @@ cursor_render_pos() {
 	return pos;
 }
 
+inline static char
+char_under_cursor() {
+
+	return CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen];
+}
+
 Vec2
 cursor_render_size() {
 
 	GlyphData* glyphs = renderer_get_glyphs();
 	Vec2 size = {
-		glyphs[buffer_char_under_cursor()].advanceX,
+		glyphs[char_under_cursor()].advanceX,
 		(f32)renderer_font_size()
 	};
 
@@ -36,12 +42,12 @@ cursor_render_size() {
 void
 cursor_right() {
   
-	if (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] == '\n'
+	if (char_under_cursor() == '\n'
 		|| CurBuffer->postLen <= 0) {
 		return;
 	}
 
-	if (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] == '\t')
+	if (char_under_cursor() == '\t')
 		CurBuffer->cursorXtabed += TAB_SIZE;
 	else 
 		CurBuffer->cursorXtabed++;
@@ -73,7 +79,7 @@ cursor_down() {
 	if (CurBuffer->currentLine == CurBuffer->cursorLines.length - 1) return;
 
 
-	while (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] != '\n') {
+	while (char_under_cursor() != '\n') {
 		buffer_forward();
 	}
 	buffer_forward();
@@ -86,7 +92,7 @@ cursor_down() {
 		sizet prevX = CurBuffer->cursorXtabed;
 		while (prevX > 0) {
 
-			if (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] == '\t') {
+			if (char_under_cursor() == '\t') {
 				buffer_forward();
 				prevX -= TAB_SIZE;
 			}
@@ -101,9 +107,9 @@ cursor_down() {
 
 		CurBuffer->cursorXtabed = 0;
 		CurBuffer->curX = 0;
-		while (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] != '\n') {
+		while (char_under_cursor() != '\n') {
 			
-			if (CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen] == '\t') {
+			if (char_under_cursor() == '\t') {
 				CurBuffer->cursorXtabed += TAB_SIZE;
 			}
 			else {

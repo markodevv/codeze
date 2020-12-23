@@ -8,6 +8,8 @@
 #define MIN_WINDOW_HEIGHT 256
 #define BIG_NUMBER 69696969
 
+static Node* WinTree;
+
 static Window*
 find_window_at_point(Node* node, Vec2i point) {
 	
@@ -101,31 +103,34 @@ window_switch_right() {
 
 
 void
-window_tree_create(Window window) {
+windows_init(i32 focusedBuffId, i32 commandBuffId) {
   
-	WinTree = new Node;
-	WinTree->isVertical = 0;
+	WinTree = (Node*)malloc(sizeof(Node));
 	array_init(&WinTree->children, 1);
-	WinTree->nodeType = NODE_CONTAINER;
+
+	Window window = window_create_empthy();
+	window.size.w = Width;
+	window.size.h = Height;
+	window.parent = WinTree;
+	window.buffId = focusedBuffId;
+
 	array_push(&WinTree->children, window);
+	WinTree->isVertical = 0;
+	WinTree->nodeType = NODE_CONTAINER;
+	WinTree->containerSize.w = window.size.w;
+	WinTree->containerSize.h = window.size.h;
+	WinTree->parent = NULL;
 
 	FocusedWindow = &WinTree->children[0];
-	FocusedWindow->parent = WinTree;
+	//FocusedWindow->parent = WinTree;
 
-	CommandWindow = new Window;
+	CommandWindow = (Window*)malloc(sizeof(Window));
 	CommandWindow->position.x = 0;
 	CommandWindow->position.y = FocusedWindow->size.h - 200.0f;
 	CommandWindow->size.w = FocusedWindow->size.w;
 	CommandWindow->size.h = 200.0f;
 	CommandWindow->nodeType = NODE_WINDOW;
-	CommandWindow->buffId = 1;
-
-	vec2i_print(CommandWindow->position);
-	vec2i_print(CommandWindow->size);
-
-	WinTree->containerSize.w = window.size.w;
-	WinTree->containerSize.h = window.size.h;
-	WinTree->parent = NULL;
+	CommandWindow->buffId = commandBuffId;
 
 }
 
@@ -301,7 +306,7 @@ find_window(Node* parent, i32 id) {
 void
 window_close() {
 
-	// check is there is container or window at parent
+	// check if there is container or window at parent
 	if (FocusedWindow->parent->children.length == 1) return;
 
 
@@ -539,6 +544,7 @@ window_split_horizontal() {
 		newWindow.position.x = FocusedWindow->position.x;
 		newWindow.position.y = FocusedWindow->position.y + FocusedWindow->size.h;
 		newWindow.size = FocusedWindow->size;
+		newWindow.buffId = FocusedWindow->buffId;
 		newWindow.parent = container;
 
 		array_push(&container->children, newWindow);
@@ -561,6 +567,7 @@ window_split_horizontal() {
 	win.position.x = childWindow->position.x;
 	win.size.h = 0;
 	win.parent = parent;
+	win.buffId = FocusedWindow->buffId;
 
 	i32 winCount = 0;
 	i32 focusedwinId = FocusedWindow->id;
@@ -629,6 +636,7 @@ window_split_vertical() {
 		newWindow.position.x = FocusedWindow->size.w + FocusedWindow->position.x;
 		newWindow.position.y = FocusedWindow->position.y;
 		newWindow.size = FocusedWindow->size;
+		newWindow.buffId = FocusedWindow->buffId;
 		newWindow.parent = container;
 
 		array_push(&container->children, newWindow);
@@ -651,6 +659,7 @@ window_split_vertical() {
 	win.size.h = childWindow->size.h;
 	win.position.y = childWindow->position.y;
 	win.parent = parent;
+	win.buffId = FocusedWindow->buffId;
 
 	i32 winCount = 0;
 	i32 focusedwinId = FocusedWindow->id;
@@ -692,10 +701,8 @@ window_split_vertical() {
 
 }
 
-
-void
+static void
 tree_get_windows(Node* node, Array<Window>* windows) {
-
 
 	for (sizet i = 0; i < node->children.length; ++i) {
 		
@@ -706,6 +713,15 @@ tree_get_windows(Node* node, Array<Window>* windows) {
 	}
 
 }
+
+void
+windows_get_all(Array<Window>* windows) {
+
+	array_init(windows, 10);
+
+	tree_get_windows(WinTree, windows);
+}
+
 
 i32
 new_window_id() {
@@ -738,6 +754,7 @@ print_tree(Node* node) {
 			printf("---- Window ----\n");
 			printf("Adress : %p \n", &node->children[i]);
 			printf("Parent : %p \n", node->children[i].parent);
+			printf("Buffer id : %p \n", node->children[i].buffId);
 			printf("id : %i \n", node->children[i].id);
 			printf("Position :");
 			vec2i_print(node->children[i].position);

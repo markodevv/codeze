@@ -8,6 +8,7 @@
 
 static DIR* dir;
 static struct dirent* entry;
+static String WorkingDirectory;
 
 
 void

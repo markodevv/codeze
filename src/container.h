@@ -8,6 +8,8 @@
 
 #define ARRAY_RESIZE_FACTOR 2
 
+//Array
+
 template <typename T>
 struct Array {
   
@@ -19,8 +21,8 @@ struct Array {
 
 };
 
-template <typename T>
-T& Array<T>::operator[](sizet index) {
+template <typename T> T&
+Array<T>::operator[](sizet index) {
 	
 	ASSERT(index >= 0);
 	return data[index];
@@ -108,6 +110,7 @@ struct Member {
 	Member<T>* next;
 };
 
+
 template <typename T>
 struct List {
 	Member<T>* head;
@@ -115,30 +118,140 @@ struct List {
 };
 
 template <typename T> void
-list_init(List<T>* list, sizet size) {
+list_init(List<T>* list) {
 
-	ASSERT(size > 0);
-	Member<T>* node = (Member<T>*)malloc(sizeof(Member<T>));
-	list->head = node;
-	list->tail = node;
+	list->head = NULL;
+	list->tail = NULL;
 
-	for (sizet i = 0; i < size; ++i) {
-		node = (Member<T>*)malloc(sizeof(Member<T>));
-		list->tail->next = node;
-		list->tail = node;
-	}
-
-	list->tail->next = NULL;
-	list->tail = list->head;
 }
-
 
 template <typename T> void
 list_add(List<T>* list, const T& item) {
 
-	if (!list->tail)
-		list->tail = (Member<T>*)malloc(sizeof(Member<T>));
+	Member<T>* node = (Member<T>*)malloc(sizeof(Member<T>));
+	node->data = item;
+	node->next = NULL;
+
+	if (!list->head) {
+		list->head = node;
+		list->tail = node;
+	}
+	else {
+		list->tail->next = node;
+		list->tail = node;
+	}
+}
+
+// Linked list
+template <typename T> void
+list_insert(List<T>* list, const T& item, sizet pos) {
+
+	Member<T>* node = list->head;
+	for (sizet i = 1; i < pos; ++i) {
+
+		node = node->next;
+	}
+
+	
+	Member<T>* newnode = (Member<T>*)malloc(sizeof(Member<T>));
+	newnode->data = item;
+	newnode->next = node->next;
+	node->next = newnode;
+
+}
+
+template <typename T> void
+list_free(List<T>* list) {
+
+	Member<T>* node = list->head;
+	Member<T>* toFree;
+	while (node) {
 		
-	list->tail->data = item;
-	list->tail = list->tail->next;
+		toFree = node;
+		node = node->next;
+		free(toFree);
+	}
+	list->head = NULL;
+	list->tail = NULL;
+}
+
+
+template <typename T> T&
+list_at(List<T>* list, sizet pos) {
+
+	Member<T>* node = list->head;
+	for (sizet i = 0; i < pos; ++i) {
+
+		node = node->next;
+	}
+
+	return node->data;
+}
+
+// Hashtable
+
+// needs to be power of 2
+#define HASH_TABLE_SIZE 1024
+
+template <typename T>
+struct HashTable {
+
+	T* data;
+	T& operator[](sizet index);
+};
+
+
+template <typename T> T&
+HashTable<T>::operator[](sizet index) {
+
+	return data[index];
+}
+
+static long
+hash_function(const char *str)
+{
+    long hash = 5381;
+    int c;
+
+    while (c = *str++)
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+    return hash;
+}
+
+template <typename T> void
+hash_table_init(HashTable<T>* table) {
+
+	table->data = (T*)calloc(HASH_TABLE_SIZE, sizeof(T));
+}
+
+template <typename T> void
+hash_table_put(HashTable<T>* table, const char* key, const T& value) {
+
+	i32 hashValue = hash_function(key);
+	i32 hashIndex = hashValue & (HASH_TABLE_SIZE - 1);
+
+	ASSERT_MSG(table->data[hashIndex] == NULL, "Hash collision detected");
+
+	table->data[hashIndex] = value;
+}
+
+template <typename T> i32
+hash_table_index_from_key(HashTable<T>* table, const char* key) {
+
+	i32 hashValue = hash_function(key);
+	i32 hashIndex = hashValue & (HASH_TABLE_SIZE - 1);
+
+	return hashIndex;
+}
+
+template <typename T> T&
+hash_table_get(HashTable<T>* table, const char* key) {
+
+	i32 hashValue = hash_function(key);
+	i32 hashIndex = hashValue & (HASH_TABLE_SIZE - 1);
+
+	ASSERT_MSG(table->data[hashIndex], "invalid key for hastable");
+
+	return table->data[hashIndex];
 }

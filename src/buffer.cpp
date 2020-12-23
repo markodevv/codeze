@@ -9,6 +9,72 @@
 #define BUFFER_RESIZE_FACTOR 2
 #define BUFFER_EMPTHY_SIZE 20
 
+static List<Buffer> Buffers;
+static HashTable<Buffer*> BufferTable;
+
+void
+buffers_init() {
+	
+	list_init(&Buffers);
+	hash_table_init(&BufferTable);
+}
+
+void
+buffer_add(const char* path) {
+
+	File file = file_open(path, "r");
+	list_add(&Buffers, buffer_create(file));
+
+	String key = get_filestr_from_path(path);
+	str_push(&key, '\0');
+	printf("%s \n\n", key.data);
+
+	hash_table_put(&BufferTable, key.data, &Buffers.tail->data);
+}
+
+void
+buffer_add_empthy() {
+
+	static i32 index = 0;
+	static i8 numberIndex = 8;
+	static char bufferName[] = "<empthy 0>";
+
+	bufferName[numberIndex] = '0' + index;
+	list_add(&Buffers, buffer_create_empthy());
+
+	hash_table_put(&BufferTable, bufferName, &Buffers.tail->data);
+
+	index++;
+}
+
+void
+buffer_add_empthy(const char* bufferName) {
+
+	list_add(&Buffers, buffer_create_empthy());
+	hash_table_put(&BufferTable, bufferName, &Buffers.tail->data);
+}
+
+i32
+buffer_hash_index_from_key(const char* key) {
+
+	return hash_table_index_from_key(&BufferTable, key);
+}
+
+Buffer*
+buffer_get(const char* key) {
+
+	return hash_table_get(&BufferTable, key);
+}
+
+Buffer*
+buffer_get(i32 index) {
+
+	Buffer* out = BufferTable[index];
+	printf("INDEX %i \n", index);
+	ASSERT_MSG(out, "invalid index for hash table");
+	return out;
+}
+
 
 Buffer
 buffer_create(File& file) {
@@ -121,6 +187,7 @@ buffer_get_text_copy(Buffer* buf) {
 
 }
 
+
 void
 buffer_insert_char(char c) {
 	
@@ -131,13 +198,18 @@ buffer_insert_char(char c) {
 		char* newbuf = (char*)malloc(sizeof(char) * CurBuffer->capacity);
 
 		// copy first part of string
-		sizet i = 0;
-		for (; i < CurBuffer->preLen; ++i) {
+		for (sizet i = 0; i < CurBuffer->preLen; ++i) {
 			newbuf[i] = CurBuffer->text[i];
 		}
 
+#ifdef DEBUG
+		for (sizet i = CurBuffer->preLen; i < CurBuffer->preLen + gap; ++i) {
+			newbuf[i] = '%';
+		}
+#endif
+
 		//copy second part of the string
-		for (i = CurBuffer->preLen; i < gap; ++i) {
+		for (sizet i = CurBuffer->preLen; i < gap; ++i) {
 			newbuf[i + gap] = CurBuffer->text[i];
 		}
 
@@ -153,7 +225,6 @@ buffer_insert_char(char c) {
 
 	CurBuffer->cursorXtabed++;
 	CurBuffer->curX++;
-
 	CurBuffer->gapLen--;
 }
 
@@ -193,6 +264,11 @@ void
 buffer_backspace_delete() {
 	
 	if (CurBuffer->preLen == 0) return;
+
+#ifdef DEBUG
+	//	CurBuffer->text[CurBuffer->preLen] = '%';
+#endif
+
 	CurBuffer->preLen--;
 	CurBuffer->gapLen++;
 
@@ -247,17 +323,6 @@ buffer_string_before_cursor() {
 	return line;
 }
 
-char
-buffer_char_under_cursor() {
-	
-	return CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen];
-}
-
-char
-buffer_char_before_cursor() {
-	
-	return CurBuffer->text[CurBuffer->preLen];
-}
 
 sizet
 buffer_index_based_on_line(Buffer* buf, i32 line) {

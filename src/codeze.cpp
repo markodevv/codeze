@@ -1,3 +1,4 @@
+#include "window.h"
 /* TODO:
 
    - file opening/closing
@@ -28,6 +29,7 @@ editor_enter_normal_state() {
 
 	on_command_state_exit();
 	CurState = STATE_NORMAL;
+	CurTable = &NormalTable;
 }
 
 static void
@@ -35,20 +37,13 @@ editor_enter_command_state() {
 
 	on_command_state_enter();
 	CurState = STATE_COMMAND;
+	CurTable = &CmdTable;
 }
 
 
-static Array<Buffer> buffers;
 
 i32
 main(int argc, char* argv[]) {
-
-	List<Buffer> bufs;
-	list_init(&bufs, 1);
-
-	list_add(&bufs, buffer_create_empthy());
-	list_add(&bufs, buffer_create_empthy());
-
 
 	CurState = STATE_NORMAL;
 	Width = 1916;
@@ -59,54 +54,62 @@ main(int argc, char* argv[]) {
 	renderer_initialize(Width, Height);
 	renderer_load_font("assets/CONSOLA.TTF", 18);
 
-
 	fileio_init();
-	File file = file_open("test.c", "r");
 
-	array_init(&buffers, 2);
-	Buffer b = buffer_create(file);
-	array_push(&buffers, buffer_create(file));
-	array_push(&buffers, buffer_create_empthy());
+	const char* testFileName = "/test.c";
+	String filepath = str_create(10);
 
-	CurBuffer = &buffers[0];
-	CommandBuffer = &buffers[1];
+	for (sizet i = 0; i < WorkingDirectory.length; ++i) {
+		str_push(&filepath, WorkingDirectory[i]);
+	}
+	for (sizet i = 0; i < strlen(testFileName); ++i) {
+
+		str_push(&filepath, testFileName[i]);
+	}
+	str_push(&filepath, '\0');
+
+	buffers_init();
+	buffer_add(filepath.data);
+	buffer_add_empthy("command_buffer");
+
+	CurBuffer = buffer_get("test.c");
+	CommandBuffer = buffer_get("command_buffer");
 
 
 	Window window = window_create_empthy();
-	window.buffId = 0;
+	window.buffId = 
 	window.size.w = Width;
 	window.size.h = Height;
-	window_tree_create(window);
+	windows_init(buffer_hash_index_from_key("test.c"),
+				 buffer_hash_index_from_key("command_buffer"));
 
-	DispatchTable *dtNormalMode = new DispatchTable;
-	DispatchTable *dtCmdState = new DispatchTable;
-	dt_init(dtNormalMode);
-	dt_init(dtCmdState);
+	dt_init(&NormalTable);
+	dt_init(&CmdTable);
 
-	dt_bind(dtNormalMode, cursor_down,             KEY_Down, 0);
-	dt_bind(dtNormalMode, cursor_up,               KEY_Up, 0);
-	dt_bind(dtNormalMode, cursor_left,             KEY_Left, 0);
-	dt_bind(dtNormalMode, cursor_right,            KEY_Right, 0);
-	dt_bind(dtNormalMode, buffer_insert_newline,   KEY_Enter, 0);
-	dt_bind(dtNormalMode, buffer_insert_tab,       KEY_Tab, 0);
-	dt_bind(dtNormalMode, buffer_backspace_delete, KEY_Backspace, 0);
-	dt_bind(dtNormalMode, window_split_horizontal, KEY_S, MOD_CONTROL);
-	dt_bind(dtNormalMode, window_split_vertical,   KEY_V, MOD_CONTROL);
-	dt_bind(dtNormalMode, window_close,            KEY_Q, MOD_CONTROL | MOD_ALT);
-	dt_bind(dtNormalMode, window_switch_up,        KEY_K, MOD_CONTROL);
-	dt_bind(dtNormalMode, window_switch_down,      KEY_J, MOD_CONTROL);
-	dt_bind(dtNormalMode, window_switch_left,      KEY_H, MOD_CONTROL);
-	dt_bind(dtNormalMode, window_switch_right,     KEY_L, MOD_CONTROL);
-	dt_bind(dtNormalMode, editor_enter_command_state, KEY_Enter, MOD_CONTROL);
+	dt_bind(&NormalTable, cursor_down,             KEY_Down, 0);
+	dt_bind(&NormalTable, cursor_up,               KEY_Up, 0);
+	dt_bind(&NormalTable, cursor_left,             KEY_Left, 0);
+	dt_bind(&NormalTable, cursor_right,            KEY_Right, 0);
+	dt_bind(&NormalTable, buffer_insert_newline,   KEY_Enter, 0);
+	dt_bind(&NormalTable, buffer_insert_tab,       KEY_Tab, 0);
+	dt_bind(&NormalTable, buffer_backspace_delete, KEY_Backspace, 0);
+	dt_bind(&NormalTable, window_split_horizontal, KEY_S, MOD_CONTROL);
+	dt_bind(&NormalTable, window_split_vertical,   KEY_V, MOD_CONTROL);
+	dt_bind(&NormalTable, window_close,            KEY_Q, MOD_CONTROL | MOD_ALT);
+	dt_bind(&NormalTable, window_switch_up,        KEY_K, MOD_CONTROL);
+	dt_bind(&NormalTable, window_switch_down,      KEY_J, MOD_CONTROL);
+	dt_bind(&NormalTable, window_switch_left,      KEY_H, MOD_CONTROL);
+	dt_bind(&NormalTable, window_switch_right,     KEY_L, MOD_CONTROL);
+	dt_bind(&NormalTable, editor_enter_command_state, KEY_Enter, MOD_CONTROL);
 
-	dt_bind(dtCmdState, cursor_left,             KEY_Left, 0);
-	dt_bind(dtCmdState, cursor_right,            KEY_Right, 0);
-	dt_bind(dtCmdState, buffer_insert_tab,       KEY_Tab, 0);
-	dt_bind(dtCmdState, editor_enter_normal_state, KEY_Escape, 0);
-	dt_bind(dtCmdState, buffer_backspace_delete, KEY_Backspace, 0);
-	dt_bind(dtCmdState, check_open_file, KEY_Enter, 0);
+	dt_bind(&CmdTable, cursor_left,             KEY_Left, 0);
+	dt_bind(&CmdTable, cursor_right,            KEY_Right, 0);
+	dt_bind(&CmdTable, buffer_insert_tab,       KEY_Tab, 0);
+	dt_bind(&CmdTable, editor_enter_normal_state, KEY_Escape, 0);
+	dt_bind(&CmdTable, buffer_backspace_delete, KEY_Backspace, 0);
+	dt_bind(&CmdTable, command_execute, KEY_Enter, 0);
 
-	CurTable = dtNormalMode;
+	CurTable = &NormalTable;
 
 	while (!glfwWindowShouldClose(GLFWwin)) {
 		
@@ -189,13 +192,8 @@ main(int argc, char* argv[]) {
 
 		renderer_begin();
 
-
-		//String bufferText = buffer_get_text(&buffers[0]);
-		Array<Token> tokens;// = tokens_make(bufferText);
-
 		Array<Window> windows;
-		array_init(&windows, 32);
-		tree_get_windows(WinTree, &windows);
+		windows_get_all(&windows);
 
 
 		for (sizet i = 0; i < windows.length; ++i) {
@@ -204,47 +202,12 @@ main(int argc, char* argv[]) {
 			if (windows[i].id == FocusedWindow->id) {
 				focused = 1;
 			}
-			render_buffer(&buffers[windows[i].buffId], &windows[i], tokens, focused);
+			render_buffer(buffer_get(windows[i].buffId), &windows[i], NULL, focused);
 			focused = 0;
 		}
 
 		if (CurState == STATE_COMMAND) {
-
-
-			Vec2 winPos = {
-				(f32)CommandWindow->position.x,
-				(f32)CommandWindow->position.y
-			};
-			Vec2 winSize = {
-				(f32)CommandWindow->size.w,
-				(f32)CommandWindow->size.h
-			};
-
-			Vec4 winColor = {0.1f, 0.1f, 0.1f, 0.8f};
-			Vec4 textColor = {1.0f, 1.0f, 1.0f, 1.0f};
-
-			render_quad(winPos, winSize, winColor);
-			String text = buffer_get_text_copy(CurBuffer);
-			render_text(text, winPos, textColor);
-
-			Array<String> fileNames;
-			fileio_cwd_file_names(&fileNames);
-
-			winPos.y += renderer_font_size();
-			f32 startPos = winPos.y;
-
-			for (sizet i = 0; i < fileNames.length; ++i) {
-
-				if (winPos.y >= Height - 2 * renderer_font_size()) {
-
-					winPos.y = startPos;
-					winPos.x += 300.0f;
-				}
-												
-				render_text(fileNames[i], winPos, {1.0f, 1.0f, 1.0f, 1.0f});
-				winPos.y += renderer_font_size();
-
-			}
+			cmd_state_update();
 		}
 		render_cursor(CurBuffer, FocusedWindow);
 
@@ -262,6 +225,10 @@ main(int argc, char* argv[]) {
 		DEBUG_TEXT(pos, "pre length %i", (i32)CurBuffer->preLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "post length %i", (i32)CurBuffer->postLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "gap length %i", (i32)CurBuffer->gapLen); pos.y += 20.0f;
+		if (CurBuffer->preLen != 0) {
+			
+			DEBUG_TEXT(pos, "char before cursor %c", (i32)CurBuffer->text[CurBuffer->preLen - 1]); pos.y += 20.0f;
+		}
 		DEBUG_TEXT(pos, "char under cursor %c", (i32)CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen]); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "Window count %zu", windows.length); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "RenderView start %i", FocusedWindow->renderView.start); pos.y += 20.0f;
@@ -270,7 +237,6 @@ main(int argc, char* argv[]) {
 		renderer_end();
 
 		array_free(&windows);
-		array_free(&tokens);
 
 		glfwSwapBuffers(GLFWwin);
 

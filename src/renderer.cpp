@@ -380,7 +380,7 @@ render_text(String& text, Vec2 position, Vec4 color) {
 
 
 void
-render_buffer(Buffer* buf, Window *window, Array<Token> tokens, b8 focused) {
+render_buffer(Buffer* buf, Window *window, Array<Token>* tokens, b8 focused) {
 
 	static float xpos, ypos, w, h, offsetX,
 		texX, texY, advanceX, advanceY, tokLen;
@@ -425,11 +425,16 @@ render_buffer(Buffer* buf, Window *window, Array<Token> tokens, b8 focused) {
 	sizet start = buffer_index_based_on_line(buf, window->renderView.start);
 	sizet end = buffer_index_based_on_line(buf, window->renderView.end);
 
-	for (sizet i = start; i < end + buf->gapLen; ++i) {
+
+	sizet len = buf->gapLen + buf->preLen + buf->postLen;
+	sizet startIndex = buf->preLen == 0 ? buf->gapLen : 0;
+
+	for (sizet i = startIndex; i < len; ++i) {
+	//for (sizet i = start; i < end + buf->gapLen; ++i) {
 
 		char c = buf->text[i];
 		//skip gap
-		if (i == buf->preLen)
+		if (i == buf->preLen - 1)
 			i += buf->gapLen;
 		// if (tokLen <= 0) 
 		// 	color = global_Colors[TOK_IDENTIFIER];

@@ -150,6 +150,17 @@ str_copy(String* dest, String* src) {
 
 }
 
+void
+str_reverse(String* str) {
+
+	sizet index = str->length - 1;
+	for (sizet i = 0; i < str->length / 2; ++i) {
+
+		char c = str->data[i];
+		str->data[i] = str->data[index - i];
+		str->data[index - i] = c;
+	}
+}
 
 
 void
@@ -221,3 +232,52 @@ str_clear(String* str) {
 	str->length = 0;
 }
 
+void
+str_free(String* str) {
+	
+	free(str->data);
+}
+
+String
+get_filestr_from_path(const char* filepath) {
+
+	String out = str_create(10);
+	sizet len = strlen(filepath);
+
+	if (filepath[len - 1] == '/')
+		len -= 1;
+
+
+	for (sizet i = len - 1; i >= 0; --i) {
+
+		if (filepath[i] == '/')
+			break;
+
+		str_push(&out, filepath[i]);
+	}
+
+	str_reverse(&out);
+
+	return out;
+}
+
+String
+get_filestr_from_path(String& filepath) {
+
+	String out = str_create(10);
+
+	sizet len = filepath.length;
+
+	if (filepath[filepath.length - 1] == '/')
+		len -= 1;
+
+	for (sizet i = len; i >= 0; --i) {
+
+		if (filepath[i] == '/')
+			break;
+
+		str_push(&out, filepath[i]);
+	}
+
+	return out;
+}
