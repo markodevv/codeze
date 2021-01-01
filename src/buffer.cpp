@@ -23,11 +23,11 @@ void
 buffer_add(const char* path) {
 
 	File file = file_open(path, "r");
-	list_add(&Buffers, buffer_create(file));
-
 	String key = get_filestr_from_path(path);
 	str_push(&key, '\0');
-	printf("%s \n\n", key.data);
+
+	list_add(&Buffers, buffer_create(file));
+	Buffers.tail->data.name = str_create(key.data);
 
 	hash_table_put(&BufferTable, key.data, &Buffers.tail->data);
 }
@@ -40,8 +40,9 @@ buffer_add_empthy() {
 	static char bufferName[] = "<empthy 0>";
 
 	bufferName[numberIndex] = '0' + index;
-	list_add(&Buffers, buffer_create_empthy());
 
+	list_add(&Buffers, buffer_create_empthy());
+	Buffers.tail->data.name = str_create(bufferName);
 	hash_table_put(&BufferTable, bufferName, &Buffers.tail->data);
 
 	index++;
@@ -51,6 +52,7 @@ void
 buffer_add_empthy(const char* bufferName) {
 
 	list_add(&Buffers, buffer_create_empthy());
+	Buffers.tail->data.name = str_create(bufferName);
 	hash_table_put(&BufferTable, bufferName, &Buffers.tail->data);
 }
 
@@ -70,7 +72,6 @@ Buffer*
 buffer_get(i32 index) {
 
 	Buffer* out = BufferTable[index];
-	printf("INDEX %i \n", index);
 	ASSERT_MSG(out, "invalid index for hash table");
 	return out;
 }

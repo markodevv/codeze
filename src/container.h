@@ -54,7 +54,6 @@ array_expand(Array<T>* arr) {
 
 	arr->capacity *= 2;
 	T* old = arr->data;
-	//arr->data = new T[arr->capacity];
 	arr->data = (T*)calloc(arr->capacity, sizeof(T));
 	memcpy(arr->data, old, arr->length * sizeof(T));
 	free(old);
@@ -128,7 +127,7 @@ list_init(List<T>* list) {
 template <typename T> void
 list_add(List<T>* list, const T& item) {
 
-	Member<T>* node = (Member<T>*)malloc(sizeof(Member<T>));
+	Member<T>* node = (Member<T>*)calloc(1, sizeof(Member<T>));
 	node->data = item;
 	node->next = NULL;
 
@@ -153,7 +152,7 @@ list_insert(List<T>* list, const T& item, sizet pos) {
 	}
 
 	
-	Member<T>* newnode = (Member<T>*)malloc(sizeof(Member<T>));
+	Member<T>* newnode = (Member<T>*)calloc(1, sizeof(Member<T>));
 	newnode->data = item;
 	newnode->next = node->next;
 	node->next = newnode;
@@ -231,7 +230,7 @@ hash_table_put(HashTable<T>* table, const char* key, const T& value) {
 	i32 hashValue = hash_function(key);
 	i32 hashIndex = hashValue & (HASH_TABLE_SIZE - 1);
 
-	ASSERT_MSG(table->data[hashIndex] == NULL, "Hash collision detected");
+	ASSERT_MSG(&table->data[hashIndex], "Hash collision detected");
 
 	table->data[hashIndex] = value;
 }
@@ -251,7 +250,19 @@ hash_table_get(HashTable<T>* table, const char* key) {
 	i32 hashValue = hash_function(key);
 	i32 hashIndex = hashValue & (HASH_TABLE_SIZE - 1);
 
-	ASSERT_MSG(table->data[hashIndex], "invalid key for hastable");
+	ASSERT_MSG(&table->data[hashIndex], "invalid key for hastable");
 
 	return table->data[hashIndex];
+}
+
+template <typename T> b8
+hash_table_value_exists(HashTable<T>* table, const char* key) {
+
+	i32 hashValue = hash_function(key);
+	i32 hashIndex = hashValue & (HASH_TABLE_SIZE - 1);
+
+	if (&table->data[hashIndex]) {
+		return true;
+	}
+	return false;
 }

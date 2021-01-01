@@ -2,6 +2,7 @@
 #include "debug.h"
 
 #include <glad/glad.h>
+#include <stdlib.h>
 
 
 static u32

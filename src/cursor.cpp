@@ -1,5 +1,10 @@
 #include "cursor.h"
 #include "config.h"
+#include "my_string.h"
+#include "renderer.h"
+#include "buffer.h"
+#include "globals.h"
+
 
 Vec2
 cursor_render_pos() {

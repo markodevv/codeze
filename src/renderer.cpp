@@ -380,7 +380,7 @@ render_text(String& text, Vec2 position, Vec4 color) {
 
 
 void
-render_buffer(Buffer* buf, Window *window, Array<Token>* tokens, b8 focused) {
+render_buffer(Buffer* buf, Window *window, Array<Token>* tokens) {
 
 	static float xpos, ypos, w, h, offsetX,
 		texX, texY, advanceX, advanceY, tokLen;
@@ -392,28 +392,6 @@ render_buffer(Buffer* buf, Window *window, Array<Token>* tokens, b8 focused) {
 
 	//u32 tokIndex = 0;
 	Vec4 color = global_Colors[0];
-
-	{
-		Vec2 borderPos, borderSize;
-		borderPos.x = window->position.x;
-		borderPos.y = window->position.y;
-		borderSize.x = 0.8f;
-		borderSize.y = window->size.h;
-
-		Vec4 borderColor = global_Colors[0];
-
-		if (focused) 
-			borderColor = global_Colors[5];
-
-		render_quad(borderPos, borderSize, borderColor);
-
-		borderPos.x = window->position.x;
-		borderPos.y = window->position.y + window->size.h - 1.0f;
-		borderSize.x = window->size.w;
-		borderSize.y = 0.8f;
-
-		render_quad(borderPos, borderSize, borderColor);
-	}
 
 	sizet visibleLines = (window->size.h -
 						  (window->size.h % g_Renderer.fontSize) - 1) / g_Renderer.fontSize;
@@ -506,6 +484,7 @@ render_buffer(Buffer* buf, Window *window, Array<Token>* tokens, b8 focused) {
 		advanceX += g_Renderer.glyphs[c].advanceX;
 	}
 
+
 	#ifdef DEBUG
 
 	Vec2 quadSize = {200.0f, 140.0f};
@@ -525,6 +504,20 @@ render_buffer(Buffer* buf, Window *window, Array<Token>* tokens, b8 focused) {
 
 	#endif
 
+}
+
+void
+render_status_line(String& bufferName, Window* window) {
+
+	Vec2 size = {(f32)window->size.w, (f32)g_Renderer.fontSize};
+	Vec2 pos = {
+		(f32)window->position.x,
+		(f32)window->position.y + (f32)window->size.h - size.y
+	};
+
+	render_quad(pos, size, {0.8f, 0.8f, 0.8f, 1.0f});
+	pos.x += 100.0f;
+	render_text(bufferName, pos, {0.1f, 0.1f, 0.1f, 1.0f});
 }
 
 void

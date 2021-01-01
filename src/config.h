@@ -1,1 +1,3 @@
-#define TAB_SIZE 4
+#pragma once
+
+void config_read(const char* config);

@@ -5,10 +5,12 @@
 #include "fileio.h"
 #include "container.h"
 
+#define TAB_SIZE 4
 
 typedef struct Buffer {
   
 	char* text;
+	String name;
 
 	sizet preLen;
 	sizet postLen;
@@ -27,6 +29,7 @@ typedef struct Buffer {
 
 void buffers_init();
 void buffer_add_empthy();
+void buffer_add_empthy(const char* bufferName);
 void buffer_add(const char* path);
 Buffer* buffer_get(const char* key);
 Buffer* buffer_get(i32 index);

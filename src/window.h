@@ -59,3 +59,5 @@ void windows_init(i32 focusedBuffId, i32 commandBuffId);
 void windows_get_all(Array<Window>* windows);
 void print_tree(Node* node);
 i32 new_window_id();
+
+void render_all_windows();

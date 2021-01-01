@@ -1,7 +1,9 @@
 #include "my_string.h"
 #include "debug.h"
 #include "memory.h"
+
 #include <string.h>
+#include <stdlib.h>
 
 #define STRING_MIN_SIZE 10
 
@@ -105,7 +107,8 @@ String::operator=(const String& other) {
 		capacity = other.capacity;
 		length = other.length;
 
-		(*refCount) += 1;
+		if (data) 
+			(*refCount) += 1;
 	}
 
 	return *this;

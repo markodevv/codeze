@@ -1,0 +1,4 @@
+bind cursor-left h
+bind cursor-right l
+bind cursor-up k
+bind cursor-down j

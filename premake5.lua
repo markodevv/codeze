@@ -17,7 +17,10 @@ project "codeze"
 	language "C++"
 	staticruntime "on"
 
-	files {"src/compile.cpp"}
+	files {
+	   "src/*.cpp",
+	   "src/*.h"
+	}
 
 	includedirs {
 	   "%{IncludeDir.glfw}",

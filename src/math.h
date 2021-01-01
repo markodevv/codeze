@@ -47,6 +47,10 @@ typedef struct Vec2i {
 		};
 	};
 
+	operator Vec2() const {
+		return {(f32)x, (f32)y};
+	}
+
 } Vec2i;
 
 typedef struct Vec3i {

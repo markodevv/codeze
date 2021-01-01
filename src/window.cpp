@@ -3,6 +3,8 @@
 #include "container.h"
 #include "debug.h"
 #include "cursor.h"
+#include "globals.h"
+#include "renderer.h"
 
 #define MIN_WINDOW_WIDTH 256
 #define MIN_WINDOW_HEIGHT 256
@@ -109,8 +111,8 @@ windows_init(i32 focusedBuffId, i32 commandBuffId) {
 	array_init(&WinTree->children, 1);
 
 	Window window = window_create_empthy();
-	window.size.w = Width;
-	window.size.h = Height;
+	window.size.w = TheWidth;
+	window.size.h = TheHeight;
 	window.parent = WinTree;
 	window.buffId = focusedBuffId;
 
@@ -732,6 +734,28 @@ new_window_id() {
 
 }
 
+static void
+render_windows(Node* parent) {
+	
+	for (sizet i = 0; i < parent->children.length; ++i) {
+		
+		if (parent->children[i].nodeType == NODE_WINDOW) {
+
+			Window* window = &parent->children[i];
+			render_buffer(buffer_get(window->buffId), window, NULL);
+			render_status_line(buffer_get(window->buffId)->name, window);
+		}
+		else 
+			render_windows(&parent->children[i]);
+	}
+}
+
+void
+render_all_windows() {
+
+	render_windows(WinTree);
+}
+
 
 void
 print_tree(Node* node) {
@@ -754,7 +778,7 @@ print_tree(Node* node) {
 			printf("---- Window ----\n");
 			printf("Adress : %p \n", &node->children[i]);
 			printf("Parent : %p \n", node->children[i].parent);
-			printf("Buffer id : %p \n", node->children[i].buffId);
+			printf("Buffer id : %i \n", node->children[i].buffId);
 			printf("id : %i \n", node->children[i].id);
 			printf("Position :");
 			vec2i_print(node->children[i].position);

@@ -2,11 +2,14 @@
 #include "types.h"
 #include "debug.h"
 
+#include <dirent.h>
+#include <unistd.h>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 
-static DIR* dir;
+static DIR* Dir;
 static struct dirent* entry;
 static String WorkingDirectory;
 
@@ -14,12 +17,29 @@ static String WorkingDirectory;
 void
 fileio_init() {
   
-	char* cwd = (char*)malloc(sizeof(char) * 256);
-	cwd = getcwd(cwd, 256);
+	char* cwd = (char*)malloc(sizeof(char) * 512);
+	cwd = getcwd(cwd, 512);
 	WorkingDirectory = str_create(cwd);
-	dir = opendir(cwd);
+	Dir = opendir(cwd);
 
 	free(cwd);
+}
+
+b8
+fileio_try_change_cwd(String& newcwd) {
+
+	str_push(&newcwd, '\0');
+	DIR* dir = opendir(newcwd.data);
+
+	if (dir) {
+
+		closedir(Dir);
+		Dir = dir;
+		WorkingDirectory = newcwd;
+
+		return true;
+	}
+	return false;
 }
 
 void
@@ -27,13 +47,13 @@ fileio_cwd_file_names(Array<String>* arr) {
 
 	array_init(arr, 2);
 
-	while ((entry = readdir(dir)) != NULL) {
+	while ((entry = readdir(Dir)) != NULL) {
 		
 		String filename = str_create(entry->d_name);
 		array_push(arr, filename);
 	}
 
-	rewinddir(dir);
+	rewinddir(Dir);
 }
 
 File
@@ -68,6 +88,11 @@ file_open(const char* path, const char* flags) {
 
 	return file;
   
+}
+
+String
+fileio_get_cwd() {
+	return WorkingDirectory;
 }
 
 
