@@ -9,7 +9,7 @@ typedef enum KeyCode
 {
 	// From glfw3.h
 	KEY_Space               = 32,
-	KEY_Apostrophe          = 39, /* ' */
+	KEY_Apostrophe          = 38, /* ' */
 	KEY_Comma               = 44, /* , */
 	KEY_Minus               = 45, /* - */
 	KEY_Period              = 46, /* . */
@@ -142,4 +142,4 @@ typedef enum KeyCode
 } KeyCode;
 
 struct String;
-KeyCode keycode_from_string(String& keystr);
+KeyCode keycode_from_string(String key);

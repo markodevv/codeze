@@ -1,7 +1,7 @@
 workspace "codeze"
 
-toolset "clang"
 configurations {"Debug", "Release"}
+architecture "x86_64"
 
 include "third_party/glfw/"
 include "third_party/glad/"
@@ -10,6 +10,8 @@ IncludeDir = {}
 IncludeDir["glfw"] = "third_party/glfw/include"
 IncludeDir["glad"] = "third_party/glad/include"
 IncludeDir["freetype"] = "third_party/freetype/include"
+IncludeDir["dirent"] = "third_party/dirent"
+
 
 project "codeze"
 
@@ -25,6 +27,7 @@ project "codeze"
 	includedirs {
 	   "%{IncludeDir.glfw}",
 	   "%{IncludeDir.freetype}",
+	    "%{IncludeDir.dirent}",
 	   "%{IncludeDir.glad}"
 	}
 
@@ -37,7 +40,7 @@ project "codeze"
 
 	filter "system:windows"
 
-	    links {"glad", "glfw", "freetype", "opengl32.lib"}
+	    links {"glad", "glfw", "freetype.lib", "opengl32.lib"}
 
 		defines {
 		   "WINDOWS_PLATFORM"

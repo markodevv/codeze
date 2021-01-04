@@ -14,6 +14,9 @@ extern Buffer* LastBuffer;
 extern i32 TheWidth;
 extern i32 TheHeight;
 
+enum InputMode;
+extern InputMode InputMod;
+
 #ifdef DO_INIT
 
 Buffer* CurBuffer;
@@ -27,5 +30,7 @@ Buffer* LastBuffer;
 
 i32 TheWidth;
 i32 TheHeight;
+
+InputMode InputMod;
 
 #endif

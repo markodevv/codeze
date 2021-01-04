@@ -2,64 +2,40 @@
 #include "my_string.h"
 
 KeyCode
-keycode_from_string(String& keystr) {
+keycode_from_string(String key) {
 
-	if (keystr ==  "a")
-			return KEY_A;
-	if (keystr ==  "b")
-			return KEY_B;
-	if (keystr ==  "c")
-			return KEY_C;
-	if (keystr ==  "d")
-			return KEY_D;
-	if (keystr ==  "e")
-			return KEY_E;
-	if (keystr ==  "f")
-			return KEY_F;
-	if (keystr ==  "g")
-			return KEY_G;
-	if (keystr ==  "h")
-			return KEY_H;
-	if (keystr ==  "i")
-			return KEY_I;
-	if (keystr ==  "j")
-			return KEY_J;
-	if (keystr ==  "k")
-			return KEY_K;
-	if (keystr ==  "l")
-			return KEY_L;
-	if (keystr ==  "m")
-			return KEY_M;
-	if (keystr ==  "n")
-			return KEY_N;
-	if (keystr ==  "o")
-			return KEY_O;
-	if (keystr ==  "p")
-			return KEY_P;
-	if (keystr ==  "q")
-			return KEY_Q;
-	if (keystr ==  "r")
-			return KEY_R;
-	if (keystr ==  "s")
-			return KEY_S;
-	if (keystr ==  "t")
-			return KEY_T;
-	if (keystr ==  "u")
-			return KEY_U;
-	if (keystr ==  "v")
-			return KEY_V;
-	if (keystr ==  "w")
-			return KEY_W;
-	if (keystr ==  "x")
-			return KEY_X;
-	if (keystr ==  "y")
-			return KEY_Y;
-	if (keystr ==  "z")
-			return KEY_Z;
-	if (keystr ==  ";")
-			return KEY_Semicolon;
-	if (keystr ==  "=")
-			return KEY_Equal;
+	if (key ==  "a") return KEY_A;
+	if (key ==  "b") return KEY_B;
+	if (key ==  "c") return KEY_C;
+	if (key ==  "d") return KEY_D;
+	if (key ==  "e") return KEY_E;
+	if (key ==  "f") return KEY_F;
+	if (key ==  "g") return KEY_G;
+	if (key ==  "h") return KEY_H;
+	if (key ==  "i") return KEY_I;
+	if (key ==  "j") return KEY_J;
+	if (key ==  "k") return KEY_K;
+	if (key ==  "l") return KEY_L;
+	if (key ==  "m") return KEY_M;
+	if (key ==  "n") return KEY_N;
+	if (key ==  "o") return KEY_O;
+	if (key ==  "p") return KEY_P;
+	if (key ==  "q") return KEY_Q;
+	if (key ==  "r") return KEY_R;
+	if (key ==  "s") return KEY_S;
+	if (key ==  "t") return KEY_T;
+	if (key ==  "u") return KEY_U;
+	if (key ==  "v") return KEY_V;
+	if (key ==  "w") return KEY_W;
+	if (key ==  "x") return KEY_X;
+	if (key ==  "y") return KEY_Y;
+	if (key ==  "z") return KEY_Z;
+	if (key ==  ";") return KEY_Semicolon;
+	if (key ==  "=") return KEY_Equal;
+	if (key ==  "left") return KEY_Left;
+	if (key ==  "right") return KEY_Right;
+	if (key ==  "up") return KEY_Up;
+	if (key ==  "down") return KEY_Down;
 
 	return KEY_Unknown;
 }

@@ -751,7 +751,7 @@ render_windows(Node* parent) {
 }
 
 void
-render_all_windows() {
+window_render_all() {
 
 	render_windows(WinTree);
 }

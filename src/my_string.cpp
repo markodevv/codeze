@@ -26,6 +26,7 @@ str_create(const char* text) {
 	(*out.refCount) = 1;
 	memcpy(out.data, text, len * sizeof(char));
 	ASSERT_MSG(out.data, "string malloc failed");
+	ASSERT_MSG(out.refCount, "string malloc failed");
 
 	return out;
 
@@ -50,6 +51,7 @@ str_create(sizet size) {
 	(*out.refCount) = 1;
 
 	ASSERT_MSG(out.data, "string malloc failed");
+	ASSERT_MSG(out.refCount, "string malloc failed");
 
 	return out;
 }
@@ -96,10 +98,13 @@ String::operator=(const String& other) {
 
 	if (this != &other) {
 		
-		if (refCount && (*refCount)-- == 0) {
+		if (refCount) {
+			(*refCount)--;
+			if (*refCount == 0) {
 
-			free(refCount);
-			free(data);
+				free(refCount);
+				free(data);
+			}
 		}
 
 		data = other.data;
@@ -107,7 +112,7 @@ String::operator=(const String& other) {
 		capacity = other.capacity;
 		length = other.length;
 
-		if (data) 
+		if (refCount) 
 			(*refCount) += 1;
 	}
 
@@ -136,6 +141,19 @@ String::String(const String& other) {
 	refCount = other.refCount;
 	capacity = other.capacity;
 	length = other.length;
+
+	if (refCount)
+		(*refCount) += 1;
+
+}
+
+String::String(const char* cstr) {
+
+	String str = str_create(cstr);
+	data = str.data;
+	refCount = str.refCount;
+	capacity = str.capacity;
+	length = str.length;
 
 	(*refCount) += 1;
 

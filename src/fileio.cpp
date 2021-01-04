@@ -3,7 +3,13 @@
 #include "debug.h"
 
 #include <dirent.h>
+
+#ifdef LINUX_PLATFORM
 #include <unistd.h>
+#elif WINDOWS_PLATFORM
+#include <direct.h>
+#include <io.h>
+#endif
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -18,7 +24,13 @@ void
 fileio_init() {
   
 	char* cwd = (char*)malloc(sizeof(char) * 512);
+
+#ifdef LINUX_PLATFORM
 	cwd = getcwd(cwd, 512);
+#elif WINDOWS_PLATFORM
+	cwd = _getcwd(cwd, 512);
+#endif
+
 	WorkingDirectory = str_create(cwd);
 	Dir = opendir(cwd);
 

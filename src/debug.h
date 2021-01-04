@@ -10,10 +10,16 @@
 	if (!(condition)) { \
 		*(int *)0 = 0; \
 	} 
+#define ASSERT_MSG(condition, message) \
+	if (!(condition)) { \
+		printf("%s", message); \
+		*(int *)0 = 0; \
+	} 
 
 #else
 
 #define ASSERT(condition) 
+#define ASSERT_MSG(condition, message) 
 
 #endif
 

@@ -5,6 +5,7 @@
 #include "debug.h"
 #include <stdlib.h>
 #include <string.h>
+#include "my_string.h"
 
 #define ARRAY_RESIZE_FACTOR 2
 
@@ -206,17 +207,17 @@ HashTable<T>::operator[](sizet index) {
 	return data[index];
 }
 
-static long
-hash_function(const char *str)
-{
+static i32
+hash_function(const String& str) {
     long hash = 5381;
-    int c;
+    i32 c;
 
-    while (c = *str++)
-        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+	for (sizet i = 0; i < str.length; ++i) 
+        hash = ((hash << 5) + hash) + (i32)str.data[i];
 
     return hash;
 }
+
 
 template <typename T> void
 hash_table_init(HashTable<T>* table) {
@@ -225,7 +226,7 @@ hash_table_init(HashTable<T>* table) {
 }
 
 template <typename T> void
-hash_table_put(HashTable<T>* table, const char* key, const T& value) {
+hash_table_put(HashTable<T>* table, const String& key, const T& value) {
 
 	i32 hashValue = hash_function(key);
 	i32 hashIndex = hashValue & (HASH_TABLE_SIZE - 1);
@@ -245,7 +246,7 @@ hash_table_index_from_key(HashTable<T>* table, const char* key) {
 }
 
 template <typename T> T&
-hash_table_get(HashTable<T>* table, const char* key) {
+hash_table_get(HashTable<T>* table, const String& key) {
 
 	i32 hashValue = hash_function(key);
 	i32 hashIndex = hashValue & (HASH_TABLE_SIZE - 1);

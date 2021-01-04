@@ -22,7 +22,7 @@ cmdmode_insert_char(char c) {
 static void
 cmdmode_exit() {
 
-	editor_set_input_mode(INPUT_NORMAL);
+	editor_change_mode(INPUT_NORMAL);
 }
 
 static void

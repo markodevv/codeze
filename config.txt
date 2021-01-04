@@ -1,4 +1,11 @@
-bind cursor-left h
-bind cursor-right l
-bind cursor-up k
-bind cursor-down j
+bind cursor-left 		left
+bind cursor-right 		right
+bind cursor-up 			up
+bind cursor-down 		down
+bind window-split-vertical	C-v
+bind window-split-horizontal 	C-s
+bind window-switch-up 		C-k
+bind window-switch-down 	C-j
+bind window-switch-left 	C-h
+bind window-switch-right 	C-l
+bind window-close	 	C-q

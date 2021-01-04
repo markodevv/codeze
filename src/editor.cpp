@@ -14,35 +14,21 @@
 #undef DO_INIT
 
 /* TODO:
-   - read dex editor source code
+   - config file parser
+   - red black trees
    - file opening/closing
    - undo redo
    - switching buffers
  */
 
-/* DONE:
 
-   - closing windows
-   - window scrolling
-   - split window feature
-   - mouse input basics
-   - gap buffer basics
-   - syntax highliting basics
-   - tidy up code
-   - Font rendering
-   - string struct
-   - fix offscreen rendering
- */
-
-static InputMode InputMod;
 static GLFWwindow* GLFWwin;
 
-void
-editor_set_input_mode(InputMode mode) {
+void 
+editor_change_mode(InputMode mode) {
 
 	InputMod = mode;
 }
-
 
 
 i32
@@ -104,7 +90,7 @@ main(int argc, char* argv[]) {
 
 		renderer_begin();
 
-		render_all_windows();
+		window_render_all();
 		Modes[InputMod]->update();
 		render_cursor(CurBuffer, FocusedWindow);
 
@@ -130,6 +116,8 @@ main(int argc, char* argv[]) {
 		DEBUG_TEXT(pos, "char under cursor %c", (i32)CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen]); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "RenderView start %i", FocusedWindow->renderView.start); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "RenderView  end %i", FocusedWindow->renderView.end); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "Width %i", TheWidth); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "Height %i", TheHeight); pos.y += 20.0f;
 #endif
 
 		renderer_end();

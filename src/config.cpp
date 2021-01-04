@@ -1,67 +1,118 @@
 #include "config.h"
 #include "command.h"
+#include "editor.h"
 #include "bind.h"
 
-#include <unistd.h>
+#ifdef LINUX_PLATFORM
+	#include <unistd.h>
+#elif WINDOWS_PLATFORM
+	#include <io.h>
+#endif
 
-const char* BindIdentifier = "bind";
 
-static void
-config_parse_bind(String& line) {
-	
-	i32 cursor = 0;
-	for (sizet i = 0; i < line.length; ++i) {
-		if (line[i] == BindIdentifier[i]) {
-			
-			cursor++;
-			continue;
-		}
-		else
+static b8
+empthy_space(char c) {
+
+	return c == ' ' || c == '\t';
+}
+
+static b8
+valid_cmd(String cmdname) {
+
+	Command* cmd = command_get(cmdname);
+	if (cmd) 
+		return true;
+
+	return false;
+}
+
+static String
+get_word_at(String str, i32 index) {
+
+	String word = str_create(10);
+
+	for (sizet i = index; i < str.length; ++i) {
+
+		char c = str[i];
+		if (c == '\n' || c == ' ')
 			break;
+
+		str_push(&word, c);
 	}
 
-	while(line[cursor] == ' ')
+	return word;
+}
+
+static void
+config_handle_bind(String line, i32 cursor) {
+	
+
+	while(empthy_space(line[cursor]))
 		cursor++;
 
 	String cmdName = str_create("");
 
-	while(line[cursor] != ' ') {
+	while(!empthy_space(line[cursor])) {
+
 		str_push(&cmdName, line[cursor]);
 		cursor++;
 	}
 
-	Command* cmd = command_get(cmdName);
 
-	if (cmd) {
+	if (valid_cmd(cmdName)) {
 		
-		while(line[cursor] == ' ')
+		while(empthy_space(line[cursor]))
 			cursor++;
 
 		String keySequence = str_create("");
 		while(line[cursor] != ' ' &&
-			  line[cursor] != '\n' &&
-			  line[cursor] != '\0') {
+			line[cursor] != '\n' &&
+			cursor < line.length) {
+
 			str_push(&keySequence, line[cursor]);
 			cursor++;
 		}
 
-		binding_add(cmd, keySequence);
+		binding_add(cmdName, keySequence, INPUT_NORMAL);
+	}
+	else {
+
+		str_push(&cmdName, '\0');
+		printf("invalid command: %s \n", cmdName.data);
 	}
 	
+}
+
+static i32
+index_of_first_char(const char* str) {
+
+	i32 out = 0;
+	while (str[out] == ' ' || str[out] == '\t') {
+		out++;
+	}
+
+	return out;
 }
 
 void 
 config_read(const char* path) {
 	
 	FILE* fp = fopen(path, "r");
-
+	ASSERT(fp);
 	char line[4096];
 
 	while (fgets(line, sizeof(line), fp) != NULL) {
 
-		if (line[0] == 'b') {
+		i32 i = index_of_first_char(line);
+		if (line[i] == 'b') {
+
 			String strline = str_create(line);
-			config_parse_bind(strline);
+			String word = get_word_at(strline, i);
+
+			if (word == "bind") {
+				config_handle_bind(strline, i + 4);
+			}
 		}
 	}
 }
+

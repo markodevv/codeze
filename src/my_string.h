@@ -14,6 +14,7 @@ typedef struct String {
 	b8 operator==(const char* str);
 
 	String() = default;
+	String(const char* cstr);
 	~String();
 	String(const String& other);
 	String& operator=(const String& other);

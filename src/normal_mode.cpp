@@ -9,13 +9,13 @@ void
 normal_mode_on_event(Event& event) {
 
 	if (event.type == KEY_PRESSED ||
-			 event.type == KEY_REPEAT) {
+		event.type == KEY_REPEAT) {
 		handle_key((KeyCode)event.key, event.mods);
 	}
-	// else if (event.type == CHAR_INPUTED) {
+	else if (event.type == CHAR_INPUTED) {
 		
-	// 	buffer_insert_char(event.character);
-	// }
+		buffer_insert_char(event.character);
+	}
 }
 
 void

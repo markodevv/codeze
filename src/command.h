@@ -12,4 +12,5 @@ struct Command {
 };
 
 void commands_init();
-Command* command_get(String& name);
+void command_handle(String& cmdname);
+Command* command_get(String& cmdname);

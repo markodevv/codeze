@@ -1,10 +1,12 @@
 #pragma once
 
-typedef enum InputMode {
+enum InputMode {
 
 	INPUT_NORMAL,
 	INPUT_COMMAND,
+	INPUT_NAVIGATION,
+	MODES_TOTAL
 	
-} InputMode;
+};
 
-void editor_set_input_mode(InputMode im);
+void editor_change_mode(InputMode mode);

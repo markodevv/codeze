@@ -60,4 +60,4 @@ void windows_get_all(Array<Window>* windows);
 void print_tree(Node* node);
 i32 new_window_id();
 
-void render_all_windows();
+void window_render_all();
