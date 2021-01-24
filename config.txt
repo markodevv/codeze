@@ -14,6 +14,7 @@ mode navigation
 	bind window-close	 			C-q
 
 	bind enter-edit-mode 	i
+	bind enter-command-mode	S-;
 
 mode edit 
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "types.h"
 #include "event.h"
+#include "editor.h"
 
 struct EditorModeOps {
 
@@ -8,6 +9,8 @@ struct EditorModeOps {
 	void (*update)();
 };
 
+struct String;
+String ModeToString(InputMode mode);
 
 extern const EditorModeOps NormalModeOps;
 extern const EditorModeOps CommandModeOps;

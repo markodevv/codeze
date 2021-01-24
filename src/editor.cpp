@@ -97,7 +97,7 @@ main(int argc, char* argv[]) {
 #ifdef DEBUG
 		Vec2 pos;
 		pos.x = TheWidth - 200.0f;
-		pos.y = TheHeight - 333.0f;
+		pos.y = TheHeight - 400.0f;
 		DEBUG_TEXT(pos, "- DEBUG TEXT -", NULL); pos.y += 20.0f;
 
 		DEBUG_TEXT(pos, "cursorX tabed %i", (i32)CurBuffer->cursorXtabed); pos.y += 20.0f;
@@ -118,6 +118,9 @@ main(int argc, char* argv[]) {
 		DEBUG_TEXT(pos, "RenderView  end %i", FocusedWindow->renderView.end); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "Width %i", TheWidth); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "Height %i", TheHeight); pos.y += 20.0f;
+		String mode = ModeToString(InputMod);
+		str_push(&mode, '\0');
+		DEBUG_TEXT(pos, "Current Mode %s", mode.data); pos.y += 20.0f;
 #endif
 
 		renderer_end();

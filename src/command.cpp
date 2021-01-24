@@ -85,6 +85,12 @@ cmd_exit_edit_mode(List<char>* args) {
 	editor_change_mode(MODE_NAVIGATION);
 }
 
+static void
+cmd_enter_cmd_mode(List<char>* args) {
+
+	editor_change_mode(MODE_COMMAND);
+}
+
 void
 commands_init() {
 
@@ -102,6 +108,7 @@ commands_init() {
 	hash_table_put(&Commands, "window-close", {cmd_window_close, 0, 0});
 	hash_table_put(&Commands, "enter-edit-mode", {cmd_enter_edit_mode, 0, 0});
 	hash_table_put(&Commands, "exit-edit-mode", {cmd_exit_edit_mode, 0, 0});
+	hash_table_put(&Commands, "enter-command-mode", {cmd_enter_cmd_mode, 0, 0});
 }
 
 Command* 
