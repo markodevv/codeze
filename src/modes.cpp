@@ -2,5 +2,6 @@
 
 const EditorModeOps* const Modes[] = {
 	&NormalModeOps,
-	&CommandModeOps
+	&CommandModeOps,
+	&NavigationModeOps
 };

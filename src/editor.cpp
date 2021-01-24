@@ -34,7 +34,7 @@ editor_change_mode(InputMode mode) {
 i32
 main(int argc, char* argv[]) {
 
-	InputMod = INPUT_NORMAL;
+	InputMod = MODE_NORMAL;
 	TheWidth = 1916;
 	TheHeight = 1041;
 	GLFWwin = renderer_create_window();

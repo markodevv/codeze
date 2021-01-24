@@ -36,6 +36,7 @@ keycode_from_string(String key) {
 	if (key ==  "right") return KEY_Right;
 	if (key ==  "up") return KEY_Up;
 	if (key ==  "down") return KEY_Down;
+	if (key ==  "escape") return KEY_Escape;
 
 	return KEY_Unknown;
 }

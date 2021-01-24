@@ -1,9 +1,9 @@
 #pragma once
 #include "key.h"
 #include "types.h"
+#include "editor.h"
 
 struct String;
-enum InputMode;
 
 void bindings_init();
 void binding_add(String cmdName, String keySequence, InputMode mode);

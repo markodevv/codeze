@@ -1,6 +1,7 @@
 #pragma once
 #include "window.h"
 #include "buffer.h"
+#include "editor.h"
 
 extern Buffer* CurBuffer;
 extern Buffer* CmdBuffer;

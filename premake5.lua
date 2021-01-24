@@ -2,6 +2,7 @@ workspace "codeze"
 
 configurations {"Debug", "Release"}
 architecture "x86_64"
+toolset "clang"
 
 include "third_party/glfw/"
 include "third_party/glad/"
@@ -10,11 +11,11 @@ IncludeDir = {}
 IncludeDir["glfw"] = "third_party/glfw/include"
 IncludeDir["glad"] = "third_party/glad/include"
 IncludeDir["freetype"] = "third_party/freetype/include"
-IncludeDir["dirent"] = "third_party/dirent"
 
 
 project "codeze"
 
+toolset "clang"
     kind "ConsoleApp"
 	language "C++"
 	staticruntime "on"
@@ -27,7 +28,6 @@ project "codeze"
 	includedirs {
 	   "%{IncludeDir.glfw}",
 	   "%{IncludeDir.freetype}",
-	    "%{IncludeDir.dirent}",
 	   "%{IncludeDir.glad}"
 	}
 

@@ -2,13 +2,17 @@
 #include "types.h"
 #include "debug.h"
 
-#include <dirent.h>
 
 #ifdef LINUX_PLATFORM
+
+#include <dirent.h>
 #include <unistd.h>
+
 #elif WINDOWS_PLATFORM
-#include <direct.h>
+
 #include <io.h>
+#include <../third_party/dirent/dirent.h>
+
 #endif
 
 #define STB_IMAGE_IMPLEMENTATION

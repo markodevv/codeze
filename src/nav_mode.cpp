@@ -12,10 +12,6 @@ on_event(Event& event) {
 		event.type == KEY_REPEAT) {
 		handle_key((KeyCode)event.key, event.mods);
 	}
-	else if (event.type == CHAR_INPUTED) {
-		
-		buffer_insert_char(event.character);
-	}
 }
 
 static void
@@ -23,7 +19,7 @@ update() {
 	
 }
 
-const EditorModeOps NormalModeOps = {
+const EditorModeOps NavigationModeOps = {
 	on_event,
 	update
 };

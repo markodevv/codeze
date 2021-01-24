@@ -22,7 +22,7 @@ cmdmode_insert_char(char c) {
 static void
 cmdmode_exit() {
 
-	editor_change_mode(INPUT_NORMAL);
+	editor_change_mode(MODE_NORMAL);
 }
 
 static void
@@ -55,8 +55,8 @@ cmdmode_handle_key(i32 key, i32 mods) {
 	}
 }
 
-void
-cmdmode_on_event(Event& event) {
+static void
+on_event(Event& event) {
 
 	if (event.type == KEY_PRESSED || event.type == KEY_REPEAT) {
 
@@ -67,12 +67,12 @@ cmdmode_on_event(Event& event) {
 	}
 }
 
-void
-cmdmode_update() {
+static void
+update() {
 	
 }
 
 const EditorModeOps CommandModeOps = {
-	cmdmode_on_event,
-	cmdmode_update
+	on_event,
+	update
 };

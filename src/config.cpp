@@ -13,7 +13,7 @@
 static b8
 empthy_space(char c) {
 
-	return c == ' ' || c == '\t';
+	return c == ' ' || c == '\t' || c == '\n';
 }
 
 static b8
@@ -34,7 +34,32 @@ get_word_at(String str, i32 index) {
 	for (sizet i = index; i < str.length; ++i) {
 
 		char c = str[i];
-		if (c == '\n' || c == ' ')
+		if (empthy_space(c))
+			break;
+
+		str_push(&word, c);
+	}
+
+	return word;
+}
+
+static String
+next_word(String str, i32 &index) {
+
+	while(!empthy_space(str[index]) && index < str.length) {
+
+		index += 1;
+	}
+	while(empthy_space(str[index]) && index < str.length) {
+
+		index += 1;
+	}
+
+	String word = str_create(10);
+	for (sizet i = index; i < str.length; ++i) {
+
+		char c = str[i];
+		if (empthy_space(c))
 			break;
 
 		str_push(&word, c);
@@ -44,9 +69,8 @@ get_word_at(String str, i32 index) {
 }
 
 static void
-config_handle_bind(String line, i32 cursor) {
+config_handle_bind(String line, i32 &cursor, InputMode mode) {
 	
-
 	while(empthy_space(line[cursor]))
 		cursor++;
 
@@ -73,7 +97,7 @@ config_handle_bind(String line, i32 cursor) {
 			cursor++;
 		}
 
-		binding_add(cmdName, keySequence, INPUT_NORMAL);
+		binding_add(cmdName, keySequence, mode);
 	}
 	else {
 
@@ -100,19 +124,28 @@ config_read(const char* path) {
 	FILE* fp = fopen(path, "r");
 	ASSERT(fp);
 	char line[4096];
+	i32 lineNum = 0;
+	InputMode currentMode = MODE_NORMAL;
 
 	while (fgets(line, sizeof(line), fp) != NULL) {
 
 		i32 i = index_of_first_char(line);
-		if (line[i] == 'b') {
+		String strline = str_create(line);
+		String word = get_word_at(strline, i);
 
-			String strline = str_create(line);
-			String word = get_word_at(strline, i);
-
-			if (word == "bind") {
-				config_handle_bind(strline, i + 4);
-			}
+		if (word == "bind") {
+			i += 4;
+			config_handle_bind(strline, i, currentMode);
 		}
+		else if (word == "mode") {
+
+			String mode = next_word(strline, i);
+			if (mode == "edit") 
+				currentMode = MODE_NORMAL;
+			else if (mode == "navigation") 
+				currentMode = MODE_NAVIGATION;
+		}
+		lineNum++;
 	}
 }
 

@@ -11,5 +11,6 @@ struct EditorModeOps {
 
 extern const EditorModeOps NormalModeOps;
 extern const EditorModeOps CommandModeOps;
+extern const EditorModeOps NavigationModeOps;
 
 extern const EditorModeOps* const Modes[];
