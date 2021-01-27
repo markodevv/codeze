@@ -516,7 +516,8 @@ render_status_line(String& bufferName, Window* window) {
 	};
 
 	render_quad(pos, size, {0.8f, 0.8f, 0.8f, 1.0f});
-	pos.x += 100.0f;
+	pos.x += 20.0f;
+	pos.y -= 4.0f;
 	render_text(bufferName, pos, {0.1f, 0.1f, 0.1f, 1.0f});
 }
 

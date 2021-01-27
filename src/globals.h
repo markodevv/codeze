@@ -9,8 +9,8 @@ extern Buffer* CmdBuffer;
 extern Window* FocusedWindow;
 extern Window* CommandWindow;
 
-extern Window* LastWindow;
-extern Buffer* LastBuffer;
+extern Window* PrevWindow;
+extern Buffer* PrevBuffer;
 
 extern i32 TheWidth;
 extern i32 TheHeight;
@@ -26,8 +26,8 @@ Buffer* CmdBuffer;
 Window* FocusedWindow;
 Window* CommandWindow;
 
-Window* LastWindow;
-Buffer* LastBuffer;
+Window* PrevWindow;
+Buffer* PrevBuffer;
 
 i32 TheWidth;
 i32 TheHeight;

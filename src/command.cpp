@@ -3,6 +3,8 @@
 #include "buffer.h"
 #include "window.h"
 #include "editor.h"
+#include "globals.h"
+#include "container.h"
 
 static HashTable<Command> Commands;
 
@@ -88,11 +90,59 @@ cmd_exit_edit_mode(List<char>* args) {
 static void
 cmd_enter_cmd_mode(List<char>* args) {
 
+	PrevBuffer = CurBuffer;
+	CurBuffer = CmdBuffer;
 	editor_change_mode(MODE_COMMAND);
+	buffer_clear(CurBuffer);
+}
+
+static void
+cmd_open_file(List<char>* args) {
+
+	PrevBuffer = CurBuffer;
+	CurBuffer = CmdBuffer;
+	editor_change_mode(MODE_COMMAND);
+	buffer_clear(CurBuffer);
+}
+
+static Array<String> CommandNames;
+
+
+Array<String>
+get_command_names() {
+	return CommandNames;
 }
 
 void
 commands_init() {
+
+	array_init(&CommandNames, 10);
+	String temp = str_create("cursor-left");
+	array_push(&CommandNames, temp);
+	temp = "cursor-right";
+	array_push(&CommandNames, temp);
+	temp = "cursor-up";
+	array_push(&CommandNames, temp);
+	temp = "cursor-down";
+	array_push(&CommandNames, temp);
+	temp = "window-split-vertical";
+	array_push(&CommandNames, temp);
+	temp = "window-split-horizontal";
+	array_push(&CommandNames, temp);
+	temp = "window-witch-up";
+	array_push(&CommandNames, temp);
+	temp = "window-witch-down";
+	array_push(&CommandNames, temp);
+	temp = "window-witch-left";
+	array_push(&CommandNames, temp);
+	temp = "window-witch-right";
+	array_push(&CommandNames, temp);
+	temp = "enter-edit-mode";
+	array_push(&CommandNames, temp);
+	temp = "exit-edit-mode";
+	array_push(&CommandNames, temp);
+	temp = "enter-command-mode";
+	array_push(&CommandNames, temp);
 
 	hash_table_init(&Commands);
 	hash_table_put(&Commands, "cursor-left", {cmd_cursor_left, 0, 0});

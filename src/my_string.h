@@ -32,6 +32,7 @@ void str_skip(String* str, sizet count);
 void str_clear(String* str);
 String str_substring(String* str, sizet start, sizet end);
 void str_reverse(String* str);
+void str_print(String& str);
 
 String get_filestr_from_path(const char* filepath);
 String get_filestr_from_path(String& filepath);

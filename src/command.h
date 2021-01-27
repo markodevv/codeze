@@ -14,3 +14,4 @@ struct Command {
 void commands_init();
 void command_handle(String& cmdname);
 Command* command_get(String& cmdname);
+Array<String> get_command_names();

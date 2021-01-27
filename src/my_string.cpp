@@ -259,6 +259,24 @@ str_free(String* str) {
 	free(str->data);
 }
 
+void
+str_add(String* to, String* from) {
+
+	for (sizet i = 0; i < from->length; ++i) {
+
+		str_push(to, (*from)[i]);
+	}
+}
+
+void
+str_print(String& str) {
+	
+	for (sizet i = 0; i < str.length; ++i) {
+		printf("%c", str[i]);
+	}
+	printf("\n");
+}
+
 String
 get_filestr_from_path(const char* filepath) {
 
@@ -302,3 +320,4 @@ get_filestr_from_path(String& filepath) {
 
 	return out;
 }
+

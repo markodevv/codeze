@@ -11,9 +11,9 @@ String
 ModeToString(InputMode mode) {
 	
 	if (mode == MODE_COMMAND) 
-		return "Command mode";
+		return "Command";
 	if (mode == MODE_NAVIGATION) 
-		return "Navigation mode";
+		return "Navigation";
 	if (mode == MODE_NORMAL) 
-		return "Normal mode";
+		return "Normal";
 }

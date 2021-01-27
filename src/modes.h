@@ -7,6 +7,7 @@ struct EditorModeOps {
 
 	void (*on_event)(Event& event);
 	void (*update)();
+	void (*on_init)();
 };
 
 struct String;

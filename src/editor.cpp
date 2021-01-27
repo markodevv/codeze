@@ -8,6 +8,7 @@
 #include "command.h"
 #include "bind.h"
 #include "config.h"
+#include "autocomplete.h"
 
 #define DO_INIT
 #include "globals.h"
@@ -72,6 +73,9 @@ main(int argc, char* argv[]) {
 	windows_init(buffer_hash_index_from_key("test.c"),
 				 buffer_hash_index_from_key("command_buffer"));
 
+	for (sizet i = 0; i < MODES_TOTAL; ++i) {
+		Modes[i]->on_init();
+	}
 
 	while (!glfwWindowShouldClose(GLFWwin)) {
 		
@@ -109,10 +113,8 @@ main(int argc, char* argv[]) {
 		DEBUG_TEXT(pos, "pre length %i", (i32)CurBuffer->preLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "post length %i", (i32)CurBuffer->postLen); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "gap length %i", (i32)CurBuffer->gapLen); pos.y += 20.0f;
-		if (CurBuffer->preLen != 0) {
-			
+		if (CurBuffer->preLen != 0) 
 			DEBUG_TEXT(pos, "char before cursor %c", (i32)CurBuffer->text[CurBuffer->preLen - 1]); pos.y += 20.0f;
-		}
 		DEBUG_TEXT(pos, "char under cursor %c", (i32)CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen]); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "RenderView start %i", FocusedWindow->renderView.start); pos.y += 20.0f;
 		DEBUG_TEXT(pos, "RenderView  end %i", FocusedWindow->renderView.end); pos.y += 20.0f;
@@ -120,7 +122,7 @@ main(int argc, char* argv[]) {
 		DEBUG_TEXT(pos, "Height %i", TheHeight); pos.y += 20.0f;
 		String mode = ModeToString(InputMod);
 		str_push(&mode, '\0');
-		DEBUG_TEXT(pos, "Current Mode %s", mode.data); pos.y += 20.0f;
+		DEBUG_TEXT(pos, "Mode %s", mode.data); pos.y += 20.0f;
 #endif
 
 		renderer_end();

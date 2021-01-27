@@ -15,11 +15,17 @@ on_event(Event& event) {
 }
 
 static void
+on_init() {
+	
+}
+
+static void
 update() {
 	
 }
 
 const EditorModeOps NavigationModeOps = {
 	on_event,
-	update
+	update,
+	on_init
 };
