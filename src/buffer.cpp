@@ -261,6 +261,12 @@ buffer_insert_newline() {
 	CurBuffer->curX = 0;
 }
 
+sizet
+buffer_length(Buffer* buf) {
+
+	return buf->preLen + buf->postLen;
+}
+
 void
 buffer_backspace_delete() {
 	

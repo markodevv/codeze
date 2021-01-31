@@ -251,8 +251,6 @@ hash_table_get(HashTable<T>* table, const String& key) {
 	i32 hashValue = hash_function(key);
 	i32 hashIndex = hashValue & (HASH_TABLE_SIZE - 1);
 
-	ASSERT_MSG(&table->data[hashIndex], "invalid key for hastable");
-
 	return table->data[hashIndex];
 }
 

@@ -4,7 +4,6 @@
 #include "editor.h"
 
 extern Buffer* CurBuffer;
-extern Buffer* CmdBuffer;
 
 extern Window* FocusedWindow;
 extern Window* CommandWindow;
@@ -21,7 +20,6 @@ extern InputMode InputMod;
 #ifdef DO_INIT
 
 Buffer* CurBuffer;
-Buffer* CmdBuffer;
 
 Window* FocusedWindow;
 Window* CommandWindow;

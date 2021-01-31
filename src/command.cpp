@@ -91,19 +91,14 @@ static void
 cmd_enter_cmd_mode(List<char>* args) {
 
 	PrevBuffer = CurBuffer;
-	CurBuffer = CmdBuffer;
 	editor_change_mode(MODE_COMMAND);
-	buffer_clear(CurBuffer);
 }
 
 static void
-cmd_open_file(List<char>* args) {
-
-	PrevBuffer = CurBuffer;
-	CurBuffer = CmdBuffer;
-	editor_change_mode(MODE_COMMAND);
-	buffer_clear(CurBuffer);
+cmd_find_file(List<char>* args) {
+	
 }
+
 
 static Array<String> CommandNames;
 
@@ -137,11 +132,7 @@ commands_init() {
 	array_push(&CommandNames, temp);
 	temp = "window-witch-right";
 	array_push(&CommandNames, temp);
-	temp = "enter-edit-mode";
-	array_push(&CommandNames, temp);
-	temp = "exit-edit-mode";
-	array_push(&CommandNames, temp);
-	temp = "enter-command-mode";
+	temp = "find-file";
 	array_push(&CommandNames, temp);
 
 	hash_table_init(&Commands);
@@ -159,13 +150,13 @@ commands_init() {
 	hash_table_put(&Commands, "enter-edit-mode", {cmd_enter_edit_mode, 0, 0});
 	hash_table_put(&Commands, "exit-edit-mode", {cmd_exit_edit_mode, 0, 0});
 	hash_table_put(&Commands, "enter-command-mode", {cmd_enter_cmd_mode, 0, 0});
+	hash_table_put(&Commands, "find-file", {cmd_find_file, 0, 0});
 }
 
 Command* 
 command_get(String& cmdname) {
 
-	str_push(&cmdname, '\0');
-	return &hash_table_get(&Commands, cmdname.data);
+	return &hash_table_get(&Commands, cmdname.as_cstr());
 }
 
 void

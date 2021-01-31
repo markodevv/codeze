@@ -47,3 +47,4 @@ void buffer_backspace_delete();
 String buffer_string_before_cursor();
 sizet buffer_index_based_on_line(Buffer* buf, i32 line);
 void buffer_clear(Buffer* buf);
+sizet buffer_length(Buffer* buf);

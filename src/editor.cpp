@@ -8,7 +8,6 @@
 #include "command.h"
 #include "bind.h"
 #include "config.h"
-#include "autocomplete.h"
 
 #define DO_INIT
 #include "globals.h"
@@ -28,6 +27,8 @@ static GLFWwindow* GLFWwin;
 void 
 editor_change_mode(InputMode mode) {
 
+	Modes[InputMod]->on_end();
+	Modes[mode]->on_start();
 	InputMod = mode;
 }
 
@@ -44,7 +45,7 @@ main(int argc, char* argv[]) {
 	renderer_initialize(TheWidth, TheHeight);
 	renderer_load_font("assets/CONSOLA.TTF", 18);
 
-	fileio_init();
+	fileio_update_cwd();
 	commands_init();
 	bindings_init();
 
@@ -68,7 +69,6 @@ main(int argc, char* argv[]) {
 	buffer_add_empthy("command_buffer");
 
 	CurBuffer = buffer_get("test.c");
-	CmdBuffer = buffer_get("command_buffer");
 
 	windows_init(buffer_hash_index_from_key("test.c"),
 				 buffer_hash_index_from_key("command_buffer"));

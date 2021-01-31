@@ -12,6 +12,7 @@ typedef struct String {
 	char& operator[](sizet index);
 	b8 operator==(const String& str);
 	b8 operator==(const char* str);
+	String operator+(String& str);
 
 	String() = default;
 	String(const char* cstr);
@@ -19,10 +20,13 @@ typedef struct String {
 	String(const String& other);
 	String& operator=(const String& other);
 
+	char* as_cstr();
+
 } String;
 
 String str_create(const char* text);
 String str_create(sizet size);
+String str_create(String& other);
 void str_free(String* str);
 void str_copy(String* dest, String* src);
 void str_push(String* str, char c);

@@ -1,11 +1,18 @@
-#include "autocomplete.h"
+#include "complete.h"
 #include "types.h"
 #include "my_string.h"
 #include "container.h"
 
 #define NUM_SUPPORTED_CHARS 95
 
-void
+struct TrieNode {
+	
+	TrieNode* children;
+	b8 endOfWord;
+};
+static TrieNode Root;
+
+static void
 trie_init(TrieNode* trie) {
 	
 	trie->endOfWord = false;
@@ -74,25 +81,19 @@ get_names_from_trie(TrieNode* node, Array<String>* arr, i32 level, char word[128
 }
 
 Array<String>
-get_matching_names(TrieNode* root, String& word) {
+completion_get_matching(String& word) {
 
 	Array<String> names;
+	array_init(&names, 10);
 
-	if (word.length == 0) {
-		
-		array_init(&names, 10);
-		char buffer[128];
-		get_names_from_trie(root, &names, 0, buffer, word);
-	}
-	else if (is_match(word, root, 0, false)) {
+	if (is_match(word, &Root, 0, false)) {
 
-		TrieNode* node = root;
+		TrieNode* node = &Root;
 		for (sizet i = 0; i < word.length; ++i) {
 
 			node = &node->children[word[i] - ' '];
 		}
 
-		array_init(&names, 10);
 		char buffer[128];
 		get_names_from_trie(node, &names, 0, buffer, word);
 	}
@@ -100,3 +101,37 @@ get_matching_names(TrieNode* root, String& word) {
 	return names;
 }
 
+
+void
+completion_init() {
+	trie_init(&Root);
+}
+
+void
+completion_add(String& word) {
+	
+	trie_insert(&Root, word);
+}
+
+static void
+trie_free(TrieNode* node) {
+	
+	for (i32 i = 0; i < NUM_SUPPORTED_CHARS; ++i) {
+
+		if (node->children[i].children) {
+			trie_free(&node->children[i]); 
+		}
+	}
+
+	free(node->children);
+}
+
+void
+completion_reset() {
+	
+	if (Root.children) {
+		
+		trie_free(&Root);
+	}
+	trie_init(&Root);
+}

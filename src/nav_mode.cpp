@@ -24,8 +24,21 @@ update() {
 	
 }
 
+static void
+on_start() {
+	
+}
+
+static void
+on_end() {
+	
+}
+
+
 const EditorModeOps NavigationModeOps = {
 	on_event,
 	update,
-	on_init
+	on_init,
+	on_start,
+	on_end
 };

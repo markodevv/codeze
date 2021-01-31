@@ -18,21 +18,21 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#define LONGEST_PATH_LENGTH 512
 
 static DIR* Dir;
-static struct dirent* entry;
 static String WorkingDirectory;
 
 
 void
-fileio_init() {
+fileio_update_cwd() {
   
-	char* cwd = (char*)malloc(sizeof(char) * 512);
+	char* cwd = (char*)malloc(sizeof(char) * LONGEST_PATH_LENGTH);
 
 #ifdef LINUX_PLATFORM
-	cwd = getcwd(cwd, 512);
+	cwd = getcwd(cwd, LONGEST_PATH_LENGTH);
 #elif WINDOWS_PLATFORM
-	cwd = _getcwd(cwd, 512);
+	cwd = _getcwd(cwd, LONGEST_PATH_LENGTH);
 #endif
 
 	WorkingDirectory = str_create(cwd);
@@ -42,35 +42,70 @@ fileio_init() {
 }
 
 b8
-fileio_try_change_cwd(String& newcwd) {
+fileio_change_dir(String& cd) {
 
-	str_push(&newcwd, '\0');
-	DIR* dir = opendir(newcwd.data);
+	
+	str_push(&cd, '\0');
+	i32 err = chdir(cd.data);
 
-	if (dir) {
+	if (err == -1) {
 
-		closedir(Dir);
-		Dir = dir;
-		WorkingDirectory = newcwd;
-
-		return true;
+		printf("Can't change dir with: %s \n", cd.data);
+		return false;
 	}
-	return false;
+	char* cwd = (char*)malloc(sizeof(char) * LONGEST_PATH_LENGTH);
+	cwd = getcwd(cwd, LONGEST_PATH_LENGTH);
+	printf("new cwd: %s \n", cwd);
+	fileio_update_cwd();
+	free(cwd);
+
+	return true;
 }
 
-void
-fileio_cwd_file_names(Array<String>* arr) {
+Array<String>
+fileio_cwd_file_names() {
 
-	array_init(arr, 2);
+	static struct dirent* entry;
+	Array<String> arr;
+	array_init(&arr, 10);
 
 	while ((entry = readdir(Dir)) != NULL) {
 		
 		String filename = str_create(entry->d_name);
-		array_push(arr, filename);
+		array_push(&arr, filename);
 	}
 
 	rewinddir(Dir);
+
+	return arr;
 }
+
+Array<String>
+fileio_path_file_names(String& path) {
+
+	static DIR* dir;
+	dirent* entry;
+	Array<String> arr;
+	array_init(&arr, 10);
+
+	dir = opendir(path.as_cstr());
+
+	if (dir) {
+		
+
+		while ((entry = readdir(dir)) != NULL) {
+
+			String filename = str_create(entry->d_name);
+			array_push(&arr, filename);
+		}
+
+		closedir(dir);
+		return arr;
+	}
+
+	return arr;
+}
+
 
 File
 file_open(const char* path, const char* flags) {
@@ -106,8 +141,9 @@ file_open(const char* path, const char* flags) {
   
 }
 
-String
+String&
 fileio_get_cwd() {
+
 	return WorkingDirectory;
 }
 

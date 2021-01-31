@@ -3,11 +3,16 @@
 #include "types.h"
 #include "container.h"
 
+enum ArgumentType {
+				   ARG_FILE,
+};
+
 struct Command {
 
 	void (*cmd)(List<char>* args);
 	i8 minArgs;
 	i8 maxArgs;
+
 
 };
 

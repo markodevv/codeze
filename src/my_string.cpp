@@ -56,6 +56,17 @@ str_create(sizet size) {
 	return out;
 }
 
+String
+str_create(String& other) {
+	
+	String out = str_create(other.length);
+
+	out.data = (char*)memcpy(out.data, other.data, other.length * sizeof(char));
+	out.length = other.length;
+
+	return out;
+}
+
 char&
 String::operator[](sizet index) {
 
@@ -91,6 +102,29 @@ String::operator==(const char* str) {
 	}
 
 	return 0;
+}
+
+String
+String::operator+(String& str) {
+	
+	for (sizet i = 0; i < str.length; ++i) {
+
+		str_push(this, str[i]);
+	}
+
+	return *this;
+}
+
+char*
+String::as_cstr() {
+
+	if (length >= capacity) {
+		capacity *= 2;
+		data = (char*)realloc(data, sizeof(char) * capacity);
+	}
+	data[length] = '\0';
+
+	return data;
 }
 
 String&

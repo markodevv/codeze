@@ -18,6 +18,15 @@ on_event(Event& event) {
 	}
 }
 
+static void
+on_start() {
+	
+}
+
+static void
+on_end() {
+	
+}
 
 static void
 update() {
@@ -32,5 +41,7 @@ on_init() {
 const EditorModeOps NormalModeOps = {
 	on_event,
 	update,
-	on_init
+	on_init,
+	on_start,
+	on_end
 };
