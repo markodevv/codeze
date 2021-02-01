@@ -36,6 +36,7 @@ editor_change_mode(InputMode mode) {
 i32
 main(int argc, char* argv[]) {
 
+
 	InputMod = MODE_NORMAL;
 	TheWidth = 1916;
 	TheHeight = 1041;

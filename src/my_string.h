@@ -24,6 +24,7 @@ typedef struct String {
 
 } String;
 
+
 String str_create(const char* text);
 String str_create(sizet size);
 String str_create(String& other);
@@ -37,6 +38,10 @@ void str_clear(String* str);
 String str_substring(String* str, sizet start, sizet end);
 void str_reverse(String* str);
 void str_print(String& str);
+
+template <typename T> class Array;
+
+void str_array_free(Array<String>& arr);
 
 String get_filestr_from_path(const char* filepath);
 String get_filestr_from_path(String& filepath);

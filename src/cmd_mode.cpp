@@ -8,30 +8,47 @@
 #include "container.h"
 #include "fileio.h"
 
+enum CmdMode {
+					   
+					   MODE_CMD,
+					   MODE_FIND_FILE,
+					   MODE_MAX
+};
+
+struct MinorModeOps {
+	
+	void (*on_start)();
+	void (*handle_key)(i32 key, i32 mods);
+}; 
+
 static Array<String> FieldNames;
 static String Text;
 static i32 SelectedFieldId;
 static Buffer* CmdBuffer;
+static CmdMode CmdCurMode;
 
-static enum CMD_STATE {
-					   
-					   NORMAL_STATE,
-					   FIND_FILE_STATE,
-}CmdState;
+
+static MinorModeOps MinorModes[MODE_MAX];
+
+
+static void
+empthy() {
+	
+}
 
 static inline void
-update_fields() {
+update_fields(String& word) {
 
-	Text = buffer_get_text_copy(CurBuffer);
-	array_free(&FieldNames);
-	FieldNames = completion_get_matching(Text);
+	str_array_free(FieldNames);
+	FieldNames = completion_get_matching(word);
 }
 
 static void
 backspace_delete() {
 
 	buffer_backspace_delete();
-	update_fields();
+	Text = buffer_get_text_copy(CurBuffer);
+	update_fields(Text);
 }
 
 static void
@@ -47,13 +64,38 @@ static void
 normal_state_insert(char c) {
 	
 	insert_char(c);
-	update_fields();
+	Text = buffer_get_text_copy(CurBuffer);
+	update_fields(Text);
 }
+
+static String
+last_word_from_path() {
+
+	String Text = buffer_get_text_copy(CurBuffer);
+	String out = str_create("");
+
+	i32 index = Text.length - 1;
+
+	while (index >= 0 && Text[index - 1] != '/') {
+		index--;
+	}
+
+	for (sizet i = index; i < Text.length; ++i) {
+		
+		str_push(&out, Text[i]);
+	}
+
+	return out;
+}
+
 
 static void
 find_file_state_insert(char c) {
 	
 	insert_char(c);
+	String word = last_word_from_path();
+	printf("word id :%s \n", word.as_cstr());
+	update_fields(word);
 }
 
 static void
@@ -63,6 +105,12 @@ exit() {
 	CurBuffer = PrevBuffer;
 }
 
+static inline void
+change_minor_mode_to(CmdMode mode) {
+
+	MinorModes[mode].on_start();
+	CmdCurMode = mode;
+}
 
 static void
 handle_command() {
@@ -70,18 +118,9 @@ handle_command() {
 	Text = buffer_get_text_copy(CurBuffer);
 	Command* cmd = command_get(Text);
 	if (cmd->cmd) {
-		printf(" %i test \n", Text.length);
 		if (Text == "find-file") {
 
-			CmdState = FIND_FILE_STATE;
-			String cwd = fileio_get_cwd();
-			buffer_clear(CurBuffer);
-
-			for (sizet i = 0; i < cwd.length; ++i) {
-
-				insert_char(cwd[i]);
-			}
-			Text = buffer_get_text_copy(CurBuffer);
+			change_minor_mode_to(MODE_FIND_FILE);
 
 		}
 		else{
@@ -97,7 +136,7 @@ handle_command() {
 
 
 static void 
-handle_key(i32 key, i32 mods) {
+cmdmode_handle_key(i32 key, i32 mods) {
 	
 	switch(key) {
 	case KEY_Backspace:
@@ -107,43 +146,67 @@ handle_key(i32 key, i32 mods) {
 		exit();
 		break;
 	case KEY_Enter:
-			handle_command();
+		handle_command();
 		break;
 	case KEY_Tab:
-		if (CmdState == NORMAL_STATE) {
-			
-		}
-		else if (CmdState == FIND_FILE_STATE) {
-
-			Text = buffer_get_text_copy(CurBuffer);
-			Array<String> filenames = fileio_path_file_names(Text);
-			if (filenames.length) {
-				
-				array_reset(&FieldNames);
-				for(sizet i = 0; i < filenames.length; ++i) {
-					array_push(&FieldNames, filenames[i]);
-				}
-			}
-		}
-		break;
-	case KEY_Down:
-		if (SelectedFieldId >= FieldNames.length - 1) 
-			break;
-	    SelectedFieldId += 1;
-		break;
-	case KEY_Up:
-		if (SelectedFieldId == 0) 
-			break;
-	    SelectedFieldId -= 1;
 		break;
 	}
 }
 
 
 static void
+findfile_handle_key(i32 key, i32 mods) {
+	
+	switch(key) {
+	case KEY_Enter:
+		break;
+	case KEY_Tab: 
+		break;
+	case KEY_Backspace:
+		break;
+	}
+}
+
+static void
+findfile_on_start() {
+	
+	String cwd = fileio_get_cwd();
+	buffer_clear(CurBuffer);
+
+	for (sizet i = 0; i < cwd.length; ++i) 
+		insert_char(cwd[i]);
+
+	Text = buffer_get_text_copy(CurBuffer);
+	Array<String> filenames = fileio_path_file_names(Text);
+
+	completion_reset();
+
+	if (filenames.length) {
+
+		str_array_free(FieldNames);
+		array_init(&FieldNames, 10);
+
+		for(sizet i = 0; i < filenames.length; ++i) {
+			array_push(&FieldNames, filenames[i]);
+			completion_add(filenames[i]);
+		}
+	}
+
+	insert_char('/');
+
+}
+
+
+static void
 on_init() {
 	
-	CmdState = NORMAL_STATE;
+	MinorModes[MODE_CMD].on_start = empthy;
+	MinorModes[MODE_CMD].handle_key = cmdmode_handle_key;
+
+	MinorModes[MODE_FIND_FILE].on_start = findfile_on_start;
+	MinorModes[MODE_FIND_FILE].handle_key = findfile_handle_key;
+
+	CmdCurMode = MODE_CMD;
 	array_init(&FieldNames, 10);
 	completion_init();
 
@@ -155,14 +218,15 @@ on_init() {
 static void
 on_event(Event& event) {
 
-	if (event.type == KEY_PRESSED || event.type == KEY_REPEAT) 
-		handle_key(event.key, event.mods);
+	if (event.type == KEY_PRESSED || event.type == KEY_REPEAT) {
+		MinorModes[CmdCurMode].handle_key(event.key, event.mods);
+	}
 	else if (event.type == CHAR_INPUTED) 
-		if (CmdState == NORMAL_STATE) {
+		if (CmdCurMode == MODE_CMD) {
 			
 			normal_state_insert(event.character);
 		}
-		else if (CmdState == FIND_FILE_STATE) {
+		else if (CmdCurMode == MODE_FIND_FILE) {
 			
 			find_file_state_insert(event.character);
 		}
@@ -182,7 +246,8 @@ on_start() {
 
 		completion_add(cmdNames[i]);
 	}
-	update_fields();
+	Text = buffer_get_text_copy(CurBuffer);
+	update_fields(Text);
 }
 
 static void
@@ -223,3 +288,4 @@ const EditorModeOps CommandModeOps = {
 	on_start,
 	on_end
 };
+

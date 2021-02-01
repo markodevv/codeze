@@ -1,6 +1,7 @@
 #include "my_string.h"
 #include "debug.h"
 #include "memory.h"
+#include "container.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -353,5 +354,21 @@ get_filestr_from_path(String& filepath) {
 	}
 
 	return out;
+}
+
+void
+str_array_free(Array<String>& arr) {
+
+	for (sizet i = 0; i < arr.length; ++i) {
+
+		free(arr[i].data);
+		free(arr[i].refCount);
+		arr[i].length = 0;
+		arr[i].capacity = 0;
+		arr[i].refCount = NULL;
+		arr[i].data = NULL;
+	}
+
+	array_free(&arr);
 }
 
