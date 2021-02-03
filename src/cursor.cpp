@@ -26,10 +26,13 @@ cursor_render_pos() {
 	return pos;
 }
 
-inline static char
+char
 char_under_cursor() {
 
-	return CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen];
+	if (CurBuffer->postLen > 0)
+		return CurBuffer->text[CurBuffer->preLen + CurBuffer->gapLen];
+	else 
+		return CurBuffer->text[CurBuffer->preLen - 1];
 }
 
 Vec2
@@ -159,3 +162,4 @@ cursor_up() {
 	}
 
 }
+

@@ -5,6 +5,7 @@
 #include "command.h"
 #include "renderer.h"
 #include "complete.h"
+#include "cursor.h"
 #include "container.h"
 #include "fileio.h"
 
@@ -37,10 +38,11 @@ empthy() {
 }
 
 static inline void
-update_fields(String& word) {
+sort_completion(String& word) {
 
 	str_array_free(FieldNames);
 	FieldNames = completion_get_matching(word);
+	SelectedFieldId = 0;
 }
 
 static void
@@ -48,7 +50,7 @@ backspace_delete() {
 
 	buffer_backspace_delete();
 	Text = buffer_get_text_copy(CurBuffer);
-	update_fields(Text);
+	sort_completion(Text);
 }
 
 static void
@@ -61,41 +63,89 @@ insert_char(char c) {
 }
 
 static void
-normal_state_insert(char c) {
+cmdmode_insert(char c) {
 	
 	insert_char(c);
 	Text = buffer_get_text_copy(CurBuffer);
-	update_fields(Text);
+	sort_completion(Text);
 }
 
 static String
 last_word_from_path() {
 
-	String Text = buffer_get_text_copy(CurBuffer);
+	Text = buffer_get_text_copy(CurBuffer);
 	String out = str_create("");
 
-	i32 index = Text.length - 1;
+	sizet index = Text.length - 1;
 
-	while (index >= 0 && Text[index - 1] != '/') {
+	while (Text[index] != '/' && index > 0) {
+		str_push(&out, Text[index]);
 		index--;
 	}
+	str_reverse(&out);
 
-	for (sizet i = index; i < Text.length; ++i) {
-		
-		str_push(&out, Text[i]);
+
+	printf("last word = %s \n", out.as_cstr());
+	return out;
+}
+
+static void
+update_file_completion() {
+	
+	Array<String> filenames = fileio_cwd_file_names();
+
+	completion_reset();
+
+	if (filenames.length) {
+
+		str_array_free(FieldNames);
+		array_init(&FieldNames, 10);
+
+		for(sizet i = 0; i < filenames.length; ++i) {
+			array_push(&FieldNames, filenames[i]);
+			completion_add(filenames[i]);
+		}
 	}
 
-	return out;
 }
 
 
 static void
-find_file_state_insert(char c) {
+findfile_insert(char c) {
+	String word;
 	
-	insert_char(c);
+	if (c == '/') {
+		word = last_word_from_path();
+		if (fileio_change_dir(word)) {
+
+			update_file_completion();
+			word = str_create("");
+			insert_char(c);
+		}
+	}
+	else {
+		insert_char(c);
+		word = last_word_from_path();
+	}
+
+	sort_completion(word);
+}
+
+
+static void
+findfile_backspace() {
+	
+	char c = char_under_cursor();
+	buffer_backspace_delete();
+
+	if (c == '/') {
+		String cd = str_create("..");
+		fileio_change_dir(cd);
+		update_file_completion();
+	}
 	String word = last_word_from_path();
-	printf("word id :%s \n", word.as_cstr());
-	update_fields(word);
+	sort_completion(word);
+
 }
 
 static void
@@ -121,7 +171,6 @@ handle_command() {
 		if (Text == "find-file") {
 
 			change_minor_mode_to(MODE_FIND_FILE);
-
 		}
 		else{
 			
@@ -134,6 +183,34 @@ handle_command() {
 	}
 }
 
+
+static void
+cmdmode_complete() {
+
+	if (FieldNames.length) {
+
+		Text = buffer_get_text_copy(CurBuffer);
+
+		for (sizet i = Text.length; i < FieldNames[SelectedFieldId].length; ++i) {
+
+			cmdmode_insert(FieldNames[SelectedFieldId][i]);
+		}
+	}
+}
+
+static void
+findfile_complete() {
+	
+	if (FieldNames.length) {
+
+		String word = last_word_from_path();
+
+		for (sizet i = word.length; i < FieldNames[SelectedFieldId].length; ++i) {
+
+			findfile_insert(FieldNames[SelectedFieldId][i]);
+		}
+	}
+}
 
 static void 
 cmdmode_handle_key(i32 key, i32 mods) {
@@ -149,6 +226,15 @@ cmdmode_handle_key(i32 key, i32 mods) {
 		handle_command();
 		break;
 	case KEY_Tab:
+		cmdmode_complete();
+		break;
+	case KEY_Down:
+		if (SelectedFieldId < FieldNames.length)
+			SelectedFieldId++;
+		break;
+	case KEY_Up:
+		if (SelectedFieldId > 0) 
+			SelectedFieldId--;
 		break;
 	}
 }
@@ -161,11 +247,22 @@ findfile_handle_key(i32 key, i32 mods) {
 	case KEY_Enter:
 		break;
 	case KEY_Tab: 
+		findfile_complete();
 		break;
 	case KEY_Backspace:
+		findfile_backspace();
+		break;
+	case KEY_Down:
+		if (SelectedFieldId < FieldNames.length)
+			SelectedFieldId++;
+		break;
+	case KEY_Up:
+		if (SelectedFieldId > 0) 
+			SelectedFieldId--;
 		break;
 	}
 }
+
 
 static void
 findfile_on_start() {
@@ -176,24 +273,8 @@ findfile_on_start() {
 	for (sizet i = 0; i < cwd.length; ++i) 
 		insert_char(cwd[i]);
 
-	Text = buffer_get_text_copy(CurBuffer);
-	Array<String> filenames = fileio_path_file_names(Text);
-
-	completion_reset();
-
-	if (filenames.length) {
-
-		str_array_free(FieldNames);
-		array_init(&FieldNames, 10);
-
-		for(sizet i = 0; i < filenames.length; ++i) {
-			array_push(&FieldNames, filenames[i]);
-			completion_add(filenames[i]);
-		}
-	}
-
+	update_file_completion();
 	insert_char('/');
-
 }
 
 
@@ -221,15 +302,17 @@ on_event(Event& event) {
 	if (event.type == KEY_PRESSED || event.type == KEY_REPEAT) {
 		MinorModes[CmdCurMode].handle_key(event.key, event.mods);
 	}
-	else if (event.type == CHAR_INPUTED) 
+	else if (event.type == CHAR_INPUTED)  {
+
 		if (CmdCurMode == MODE_CMD) {
 			
-			normal_state_insert(event.character);
+			cmdmode_insert(event.character);
 		}
 		else if (CmdCurMode == MODE_FIND_FILE) {
 			
-			find_file_state_insert(event.character);
+			findfile_insert(event.character);
 		}
+	}
 }
 
 static void
@@ -247,7 +330,7 @@ on_start() {
 		completion_add(cmdNames[i]);
 	}
 	Text = buffer_get_text_copy(CurBuffer);
-	update_fields(Text);
+	sort_completion(Text);
 }
 
 static void
@@ -266,6 +349,7 @@ static void
 update() {
 	
 	render_quad({0.0f, 0.0f}, {(f32)TheWidth, (f32)TheHeight}, {0.1f, 0.1f, 0.1f, 0.8f});
+	Text = buffer_get_text_copy(CurBuffer);
 	render_text(Text, {0.0f, 0.0f}, {0.9f, 0.9f, 0.9f, 1.0f});
 
 

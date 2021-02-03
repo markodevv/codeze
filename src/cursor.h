@@ -7,4 +7,5 @@ void cursor_right();
 void cursor_left();
 void cursor_up();
 void cursor_down();
+char char_under_cursor();
 
