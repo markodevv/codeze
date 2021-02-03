@@ -99,6 +99,12 @@ cmd_find_file(List<char>* args) {
 	
 }
 
+static void
+cmd_save_file(List<char>* args) {
+	
+	file_save();
+}
+
 
 static Array<String> CommandNames;
 
@@ -134,6 +140,8 @@ commands_init() {
 	array_push(&CommandNames, temp);
 	temp = "find-file";
 	array_push(&CommandNames, temp);
+	temp = "file-save";
+	array_push(&CommandNames, temp);
 
 	hash_table_init(&Commands);
 	hash_table_put(&Commands, "cursor-left", {cmd_cursor_left, 0, 0});
@@ -151,6 +159,7 @@ commands_init() {
 	hash_table_put(&Commands, "exit-edit-mode", {cmd_exit_edit_mode, 0, 0});
 	hash_table_put(&Commands, "enter-command-mode", {cmd_enter_cmd_mode, 0, 0});
 	hash_table_put(&Commands, "find-file", {cmd_find_file, 0, 0});
+	hash_table_put(&Commands, "file-save", {cmd_save_file, 0, 0});
 }
 
 Command* 

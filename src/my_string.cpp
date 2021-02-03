@@ -291,7 +291,19 @@ str_clear(String* str) {
 void
 str_free(String* str) {
 	
-	free(str->data);
+	if (str->data) {
+		
+		ASSERT_MSG(*(str->refCount) > 1, "Deleting a string with refcount higher than 1");
+		free(str->data);
+		free(str->refCount);
+		str->length = 0;
+		str->capacity = 0;
+		str->refCount = NULL;
+		str->data = NULL;
+	}
+	else {
+		printf("Trying to delete already deleted string \n");
+	}
 }
 
 void

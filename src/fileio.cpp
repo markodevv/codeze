@@ -1,6 +1,7 @@
 #include "fileio.h"
 #include "types.h"
 #include "debug.h"
+#include "globals.h"
 
 
 #ifdef LINUX_PLATFORM
@@ -108,10 +109,9 @@ fileio_path_file_names(String& path) {
 
 
 File
-file_open(const char* path, const char* flags) {
+file_open(const char* path) {
 
-	FILE* fp = fopen(path, flags);
-	ASSERT_MSG(fp, "Failed to load file ");
+	FILE* fp = fopen(path, "r");
 
 	fseek(fp, 0, SEEK_END);
 	sizet size = ftell(fp);
@@ -119,18 +119,22 @@ file_open(const char* path, const char* flags) {
 
 	File file;
 
-	file.buffer = str_create(size);
+	file.size = size;
+	file.buffer = (char*)malloc(sizeof(char) * size);
 	file.lineCount = 0;
+	file.path = str_create(path);
 
 	char line[4096];
+	sizet cursor = 0;
 
 	while (fgets(line, sizeof(line), fp) != NULL) {
 
 		sizet i = 0;
 		while (line[i] != '\0') {
 
-			str_push(&file.buffer, line[i]);
+			file.buffer[cursor] = line[i];
 			i++;
+			cursor++;
 		}
 		file.lineCount++;
 	}
@@ -139,6 +143,22 @@ file_open(const char* path, const char* flags) {
 
 	return file;
   
+}
+
+void
+file_save() {
+	
+	String data = buffer_get_text_copy(CurBuffer);
+	String path = CurBuffer->path;
+	FILE* fp = fopen(path.as_cstr(), "r+");
+
+	if (fp) {
+		fprintf(fp, "%s", data.as_cstr());
+		printf("File saved: %s \n", path.as_cstr());
+	}
+	else {
+		printf("Invalid filepath to save %s \n", path.as_cstr());
+	}
 }
 
 String&

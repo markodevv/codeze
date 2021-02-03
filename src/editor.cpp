@@ -63,11 +63,11 @@ main(int argc, char* argv[]) {
 
 		str_push(&filepath, testFileName[i]);
 	}
-	str_push(&filepath, '\0');
 
 	buffers_init();
-	buffer_add(filepath.data);
+	buffer_add(filepath.as_cstr());
 	buffer_add_empthy("command_buffer");
+
 
 	CurBuffer = buffer_get("test.c");
 

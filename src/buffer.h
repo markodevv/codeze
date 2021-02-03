@@ -24,6 +24,8 @@ typedef struct Buffer {
 	i32 curX;
 	i32 cursorXtabed;
 
+	String path;
+
 } Buffer;
 
 

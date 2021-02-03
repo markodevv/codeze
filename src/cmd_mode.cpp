@@ -46,7 +46,7 @@ sort_completion(String& word) {
 }
 
 static void
-backspace_delete() {
+cmdmode_backspace() {
 
 	buffer_backspace_delete();
 	Text = buffer_get_text_copy(CurBuffer);
@@ -90,7 +90,7 @@ last_word_from_path() {
 }
 
 static void
-update_file_completion() {
+findfile_update_completion() {
 	
 	Array<String> filenames = fileio_cwd_file_names();
 
@@ -118,7 +118,7 @@ findfile_insert(char c) {
 		word = last_word_from_path();
 		if (fileio_change_dir(word)) {
 
-			update_file_completion();
+			findfile_update_completion();
 			word = str_create("");
 			insert_char(c);
 		}
@@ -141,7 +141,7 @@ findfile_backspace() {
 	if (c == '/') {
 		String cd = str_create("..");
 		fileio_change_dir(cd);
-		update_file_completion();
+		findfile_update_completion();
 	}
 	String word = last_word_from_path();
 	sort_completion(word);
@@ -217,7 +217,7 @@ cmdmode_handle_key(i32 key, i32 mods) {
 	
 	switch(key) {
 	case KEY_Backspace:
-		backspace_delete();
+		cmdmode_backspace();
 		break;
 	case KEY_Escape:
 		exit();
@@ -239,6 +239,11 @@ cmdmode_handle_key(i32 key, i32 mods) {
 	}
 }
 
+static void
+findfile_open_file() {
+
+	
+}
 
 static void
 findfile_handle_key(i32 key, i32 mods) {
@@ -273,7 +278,7 @@ findfile_on_start() {
 	for (sizet i = 0; i < cwd.length; ++i) 
 		insert_char(cwd[i]);
 
-	update_file_completion();
+	findfile_update_completion();
 	insert_char('/');
 }
 

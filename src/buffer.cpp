@@ -22,7 +22,7 @@ buffers_init() {
 void
 buffer_add(const char* path) {
 
-	File file = file_open(path, "r");
+	File file = file_open(path);
 	String key = get_filestr_from_path(path);
 	str_push(&key, '\0');
 
@@ -87,17 +87,15 @@ buffer_create(File& file) {
 	buf.cursorXtabed = 0;
 	buf.curX = 0;
 	buf.currentLine = 0;
-	buf.postLen = file.buffer.length;
+	buf.postLen = file.size;
+	buf.path = file.path;
 	array_init(&buf.lineLengths, file.lineCount);
 	array_init(&buf.cursorLines, file.lineCount);
 
-	buf.capacity = file.buffer.length;
+	buf.capacity = file.size;
 	buf.text = (char*)malloc(sizeof(char) * buf.capacity);
 
-	for (sizet i = 0; i < file.buffer.length; ++i) {
-
-		buf.text[i] = file.buffer[i];
-	}
+	buf.text = file.buffer;
 
 	sizet i = 0;
 	// foreach line
@@ -343,6 +341,7 @@ buffer_index_based_on_line(Buffer* buf, i32 line) {
 	return result;
 }
 
+
 void
 buffer_clear(Buffer* buf) {
 
@@ -350,6 +349,7 @@ buffer_clear(Buffer* buf) {
 	array_reset(&buf->cursorLines);
 	array_push(&buf->lineLengths, 0);
 	array_push(&buf->cursorLines, 0);
+	str_free(&buf->path);
 
 	buf->gapLen = buf->capacity;
 	buf->preLen = 0;

@@ -128,12 +128,10 @@ renderer_initialize(f32 width, f32 height) {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	File vertexFile = file_open("src/vertex_shader.txt", "r");
-	File fragmentFile = file_open("src/fragment_shader.txt", "r");
-	str_push(&vertexFile.buffer, '\0');
-	str_push(&fragmentFile.buffer, '\0');
+	File vertexFile = file_open("src/vertex_shader.txt");
+	File fragmentFile = file_open("src/fragment_shader.txt");
 
-	g_Renderer.program = shader_create(vertexFile.buffer.data, fragmentFile.buffer.data);
+	g_Renderer.program = shader_create(vertexFile.buffer, fragmentFile.buffer);
 	
 	glUseProgram(g_Renderer.program);
 
