@@ -41,10 +41,10 @@ Window
 window_create_empthy() {
 	Window window = {
 		new_window_id(),
-		0,
 		{0, 0},
 		{0, 0},
 		{0, 0},
+		NULL,
 		NODE_WINDOW,
 		NULL
 	};
@@ -105,7 +105,7 @@ window_switch_right() {
 
 
 void
-windows_init(i32 focusedBuffId, i32 commandBuffId) {
+windows_init(Buffer* buf) {
   
 	WinTree = (Node*)malloc(sizeof(Node));
 	array_init(&WinTree->children, 1);
@@ -114,7 +114,7 @@ windows_init(i32 focusedBuffId, i32 commandBuffId) {
 	window.size.w = TheWidth;
 	window.size.h = TheHeight;
 	window.parent = WinTree;
-	window.buffId = focusedBuffId;
+	window.key = buf->path.as_cstr();
 
 	array_push(&WinTree->children, window);
 	WinTree->isVertical = 0;
@@ -124,15 +124,7 @@ windows_init(i32 focusedBuffId, i32 commandBuffId) {
 	WinTree->parent = NULL;
 
 	FocusedWindow = &WinTree->children[0];
-	//FocusedWindow->parent = WinTree;
 
-	CommandWindow = (Window*)malloc(sizeof(Window));
-	CommandWindow->position.x = 0;
-	CommandWindow->position.y = FocusedWindow->size.h - 200.0f;
-	CommandWindow->size.w = FocusedWindow->size.w;
-	CommandWindow->size.h = 200.0f;
-	CommandWindow->nodeType = NODE_WINDOW;
-	CommandWindow->buffId = commandBuffId;
 
 }
 
@@ -546,7 +538,7 @@ window_split_horizontal() {
 		newWindow.position.x = FocusedWindow->position.x;
 		newWindow.position.y = FocusedWindow->position.y + FocusedWindow->size.h;
 		newWindow.size = FocusedWindow->size;
-		newWindow.buffId = FocusedWindow->buffId;
+		newWindow.key = FocusedWindow->key;
 		newWindow.parent = container;
 
 		array_push(&container->children, newWindow);
@@ -569,7 +561,7 @@ window_split_horizontal() {
 	win.position.x = childWindow->position.x;
 	win.size.h = 0;
 	win.parent = parent;
-	win.buffId = FocusedWindow->buffId;
+	win.key = FocusedWindow->key;
 
 	i32 winCount = 0;
 	i32 focusedwinId = FocusedWindow->id;
@@ -638,7 +630,7 @@ window_split_vertical() {
 		newWindow.position.x = FocusedWindow->size.w + FocusedWindow->position.x;
 		newWindow.position.y = FocusedWindow->position.y;
 		newWindow.size = FocusedWindow->size;
-		newWindow.buffId = FocusedWindow->buffId;
+		newWindow.key = FocusedWindow->key;
 		newWindow.parent = container;
 
 		array_push(&container->children, newWindow);
@@ -661,7 +653,7 @@ window_split_vertical() {
 	win.size.h = childWindow->size.h;
 	win.position.y = childWindow->position.y;
 	win.parent = parent;
-	win.buffId = FocusedWindow->buffId;
+	win.key = FocusedWindow->key;
 
 	i32 winCount = 0;
 	i32 focusedwinId = FocusedWindow->id;
@@ -742,8 +734,8 @@ render_windows(Node* parent) {
 		if (parent->children[i].nodeType == NODE_WINDOW) {
 
 			Window* window = &parent->children[i];
-			render_buffer(buffer_get(window->buffId), window, NULL);
-			render_status_line(buffer_get(window->buffId)->name, window);
+			render_buffer(buffer_get(window->key), window, NULL);
+			render_status_line(buffer_get(window->key)->name, window);
 		}
 		else 
 			render_windows(&parent->children[i]);
@@ -778,7 +770,7 @@ print_tree(Node* node) {
 			ALERT_MSG("---- Window ----\n", NULL);
 			NORMAL_MSG("Adress : %p \n", &node->children[i]);
 			NORMAL_MSG("Parent : %p \n", node->children[i].parent);
-			NORMAL_MSG("Buffer id : %i \n", node->children[i].buffId);
+			NORMAL_MSG("Buffer key : %s \n", node->children[i].key);
 			NORMAL_MSG("id : %i \n", node->children[i].id);
 			NORMAL_MSG("Position :", NULL);
 			vec2i_print(node->children[i].position);

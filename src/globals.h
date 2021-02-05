@@ -6,9 +6,7 @@
 extern Buffer* CurBuffer;
 
 extern Window* FocusedWindow;
-extern Window* CommandWindow;
 
-extern Window* PrevWindow;
 extern Buffer* PrevBuffer;
 
 extern i32 TheWidth;
@@ -22,9 +20,7 @@ extern InputMode InputMod;
 Buffer* CurBuffer;
 
 Window* FocusedWindow;
-Window* CommandWindow;
 
-Window* PrevWindow;
 Buffer* PrevBuffer;
 
 i32 TheWidth;

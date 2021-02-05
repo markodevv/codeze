@@ -2,6 +2,7 @@
 #include "debug.h"
 #include "memory.h"
 #include "container.h"
+#include "debug.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -120,7 +121,7 @@ char*
 String::as_cstr() {
 
 	if (length >= capacity) {
-		capacity *= 2;
+		capacity += 1;
 		data = (char*)realloc(data, sizeof(char) * capacity);
 	}
 	data[length] = '\0';
@@ -302,7 +303,7 @@ str_free(String* str) {
 		str->data = NULL;
 	}
 	else {
-		printf("Trying to delete already deleted string \n");
+		WARN_MSG("Trying to delete already deleted string \n", NULL);
 	}
 }
 

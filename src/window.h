@@ -25,10 +25,10 @@ typedef struct Node {
 	union {
 		struct {
 			i32 id;
-			i32 buffId;
 			Vec2i renderView;
 			Vec2i position;
 			Vec2i size;
+			char* key;
 		};
 		struct {
 			b8 isVertical;
@@ -47,6 +47,7 @@ typedef Node Window;
 typedef Node* WindowArray;
 
 
+struct Buffer;
 void window_split_vertical();
 void window_split_horizontal();
 void window_switch_up();
@@ -55,7 +56,7 @@ void window_switch_left();
 void window_switch_right();
 void window_close();
 Window window_create_empthy();
-void windows_init(i32 focusedBuffId, i32 commandBuffId);
+void windows_init(Buffer* buf);
 void windows_get_all(Array<Window>* windows);
 void print_tree(Node* node);
 i32 new_window_id();

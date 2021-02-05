@@ -25,7 +25,7 @@ struct MinorModeOps {
 static Array<String> FieldNames;
 static String Text;
 static i32 SelectedFieldId;
-static Buffer* CmdBuffer;
+static Buffer CmdBuffer;
 static CmdMode CmdCurMode;
 
 
@@ -179,6 +179,9 @@ handle_command() {
 			}
 		}
 	}
+	else {
+		ALERT_MSG("Invalid command name %s \n", Text.as_cstr());
+	}
 }
 
 
@@ -237,10 +240,31 @@ cmdmode_handle_key(i32 key, i32 mods) {
 	}
 }
 
+
 static void
 findfile_open_file() {
-
 	
+	String filepath = buffer_get_text_copy(CurBuffer);
+
+	if (FieldNames.length) {
+
+		String filename = FieldNames[SelectedFieldId];
+		if (file_exists(filepath.as_cstr())) {
+
+			File file = file_open(filepath.as_cstr());
+			Buffer* buffer = buffer_add(file);
+			PrevBuffer = buffer;
+			FocusedWindow->key = buffer->path.as_cstr();
+			exit();
+		}
+		else {
+			
+		}
+	}
+	else {
+		WARN_MSG("No file on path %s \n", filepath.as_cstr());
+	}
+
 }
 
 static void
@@ -248,6 +272,7 @@ findfile_handle_key(i32 key, i32 mods) {
 	
 	switch(key) {
 	case KEY_Enter:
+		findfile_open_file();
 		break;
 	case KEY_Tab: 
 		findfile_complete();
@@ -296,7 +321,7 @@ on_init() {
 
 	Text = str_create("");
 	SelectedFieldId = 0;
-	CmdBuffer = buffer_get("command_buffer");
+	CmdBuffer = buffer_create_empthy();
 }
 
 static void
@@ -321,7 +346,7 @@ on_event(Event& event) {
 static void
 on_start() {
 
-	CurBuffer = CmdBuffer;
+	CurBuffer = &CmdBuffer;
 	buffer_clear(CurBuffer);
 	SelectedFieldId = 0;
 

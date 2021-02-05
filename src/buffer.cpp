@@ -10,70 +10,40 @@
 #define BUFFER_EMPTHY_SIZE 20
 
 static List<Buffer> Buffers;
-static HashTable<Buffer*> BufferTable;
 
 void
 buffers_init() {
 	
 	list_init(&Buffers);
-	hash_table_init(&BufferTable);
 }
 
+
 static String
-get_filestr_from_path(const char* filepath) {
+get_filestr_from_path(String& filepath) {
 
-	String out = str_create(10);
-	sizet len = strlen(filepath);
+	String out = str_create("");
 
-	if (filepath[len - 1] == '/')
-		len -= 1;
+	sizet index = filepath.length - 1;
 
-
-	for (sizet i = len - 1; i >= 0; --i) {
-
-		if (filepath[i] == '/')
-			break;
-
-		str_push(&out, filepath[i]);
+	while (filepath[index] != '/' && index > 0) {
+		str_push(&out, filepath[index]);
+		index--;
 	}
-
 	str_reverse(&out);
 
 	return out;
 }
 
-static String
-get_filestr_from_path(String& filepath) {
+Buffer*
+buffer_add(File& file) {
 
-	String out = str_create(10);
+	String key = get_filestr_from_path(file.path);
 
-	sizet len = filepath.length;
-
-	if (filepath[filepath.length - 1] == '/')
-		len -= 1;
-
-	for (sizet i = len; i >= 0; --i) {
-
-		if (filepath[i] == '/')
-			break;
-
-		str_push(&out, filepath[i]);
-	}
-
-	return out;
-}
-
-void
-buffer_add(const char* path) {
-
-	File file = file_open(path);
-	String key = get_filestr_from_path(path);
-	str_push(&key, '\0');
-
+	NORMAL_MSG("Added file: %s \n", file.path.as_cstr());
 	list_add(&Buffers, buffer_create(file));
-	Buffers.tail->data.name = str_create(key.data);
+	Buffers.tail->data.name = str_create(key.as_cstr());
 
-	hash_table_put(&BufferTable, key.data, &Buffers.tail->data);
+	return &Buffers.tail->data;
 }
 
 void
@@ -87,7 +57,6 @@ buffer_add_empthy() {
 
 	list_add(&Buffers, buffer_create_empthy());
 	Buffers.tail->data.name = str_create(bufferName);
-	hash_table_put(&BufferTable, bufferName, &Buffers.tail->data);
 
 	index++;
 }
@@ -97,27 +66,23 @@ buffer_add_empthy(const char* bufferName) {
 
 	list_add(&Buffers, buffer_create_empthy());
 	Buffers.tail->data.name = str_create(bufferName);
-	hash_table_put(&BufferTable, bufferName, &Buffers.tail->data);
 }
 
-i32
-buffer_hash_index_from_key(const char* key) {
-
-	return hash_table_index_from_key(&BufferTable, key);
-}
 
 Buffer*
 buffer_get(const char* key) {
 
-	return hash_table_get(&BufferTable, key);
-}
+	String keystr = str_create(key);
 
-Buffer*
-buffer_get(i32 index) {
+	Member<Buffer>* Node = Buffers.head;
+	while (Node) {
+		if (Node->data.path == key) 
+			return &Node->data;
 
-	Buffer* out = BufferTable[index];
-	ASSERT_MSG(out, "invalid index for hash table");
-	return out;
+		Node = Node->next;
+	}
+
+	return NULL;
 }
 
 
@@ -143,7 +108,8 @@ buffer_create(File& file) {
 		array_push(&buf.lineLengths, 0);
 		array_push(&buf.cursorLines, 0);
 		// foreach char in line
-		while (file.buffer[i] != '\n' && i < file.size) {
+		while (file.buffer[i] != '\n' &&
+			   i < file.size) {
 			// add to line length
 			if (file.buffer[i] == '\t') 
 				buf.cursorLines[line] += TAB_SIZE;
@@ -170,6 +136,8 @@ buffer_create(File& file) {
 
 		for (sizet i = buf.preLen; i < buf.capacity; i++) 
 			buf.text[i + buf.gapLen] = file.buffer[i];
+
+		buf.text[buf.capacity - 1] = '\n';
 
 		free(file.buffer);
 	}

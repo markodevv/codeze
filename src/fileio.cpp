@@ -2,12 +2,12 @@
 #include "types.h"
 #include "debug.h"
 #include "globals.h"
+#include <unistd.h>
 
 
 #ifdef LINUX_PLATFORM
 
 #include <dirent.h>
-#include <unistd.h>
 
 #elif WINDOWS_PLATFORM
 
@@ -62,6 +62,8 @@ fileio_change_dir(String& cd) {
 
 	return true;
 }
+
+
 
 Array<String>
 fileio_cwd_file_names() {
@@ -151,15 +153,24 @@ file_open(const char* path) {
   
 }
 
+b8
+file_exists(const char* filepath) {
+	
+	if (access(filepath, R_OK) == -1)
+		return false;
+
+	return true;
+}
+
 void
 file_save() {
 	
 	String data = buffer_get_text_copy(CurBuffer);
 	String path = CurBuffer->path;
-	FILE* fp = fopen(path.as_cstr(), "w");
+	FILE* fp = fopen(path.as_cstr(), "r+");
 
 	if (fp) {
-		NORMAL_MSG("File contents: \n%s \n", data.as_cstr());
+		WARN_MSG("File contents: \n%s \n", data.as_cstr());
 		fprintf(fp, "%s", data.as_cstr());
 		NORMAL_MSG("File saved: %s \n", path.as_cstr());
 	}

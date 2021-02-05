@@ -11,6 +11,9 @@ on_event(Event& event) {
 	if (event.type == KEY_PRESSED ||
 		event.type == KEY_REPEAT) {
 		handle_key((KeyCode)event.key, event.mods);
+
+		if (event.key == KEY_Enter) 
+			buffer_insert_newline();
 	}
 	else if (event.type == CHAR_INPUTED) {
 		

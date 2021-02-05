@@ -14,9 +14,7 @@
 #undef DO_INIT
 
 /* TODO:
-   - config file parser
    - red black trees
-   - file opening/closing
    - undo redo
    - switching buffers
  */
@@ -64,15 +62,12 @@ main(int argc, char* argv[]) {
 		str_push(&filepath, testFileName[i]);
 	}
 
+	File testFile = file_open(filepath.as_cstr());
 	buffers_init();
-	buffer_add(filepath.as_cstr());
-	buffer_add_empthy("command_buffer");
+	buffer_add(testFile);
+	CurBuffer = buffer_get(filepath.as_cstr());
 
-
-	CurBuffer = buffer_get("test.c");
-
-	windows_init(buffer_hash_index_from_key("test.c"),
-				 buffer_hash_index_from_key("command_buffer"));
+	windows_init(CurBuffer);
 
 	for (sizet i = 0; i < MODES_TOTAL; ++i) {
 		Modes[i]->on_init();
