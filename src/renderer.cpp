@@ -18,7 +18,7 @@ static Renderer g_Renderer;
 static void
 error_callback(int code, const char* description) {
 
-	printf("Error %i : %s \n", code, description);
+	ALERT_MSG("Error %i : %s \n", code, description);
 
 }
 
@@ -54,7 +54,7 @@ renderer_create_window() {
 	glfwSetErrorCallback(error_callback);
 	
 	if (!glfwInit()) {
-		printf("Failed to initialize glfw\n");
+		ALERT_MSG("Failed to initialize glfw\n", NULL);
 		ASSERT(0);
 	}
 
@@ -65,7 +65,7 @@ renderer_create_window() {
 	window = glfwCreateWindow(1280, 768, "codeze", NULL, NULL);
 	if (!window) {
 		glfwTerminate();
-		printf("Failed to create window");
+		ALERT_MSG("Failed to create window", NULL);
 		ASSERT(0);
 	}
 
@@ -73,10 +73,10 @@ renderer_create_window() {
 
 	// Glad initialization
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		printf("Failed to initialize glad");
+		ALERT_MSG("Failed to initialize glad", NULL);
 		ASSERT(0);
 	}
-	printf("Initialized glad\n");
+	NORMAL_MSG("Initialized glad\n", NULL);
 
 	// Enable Vsync
 	glfwSwapInterval(1);

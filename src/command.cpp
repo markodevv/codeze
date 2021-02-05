@@ -105,6 +105,12 @@ cmd_save_file(List<char>* args) {
 	file_save();
 }
 
+static void
+cmd_backspace_delete(List<char>* args) {
+	
+	buffer_backspace_delete();
+}
+
 
 static Array<String> CommandNames;
 
@@ -142,6 +148,8 @@ commands_init() {
 	array_push(&CommandNames, temp);
 	temp = "file-save";
 	array_push(&CommandNames, temp);
+	temp = "backspace-delete";
+	array_push(&CommandNames, temp);
 
 	hash_table_init(&Commands);
 	hash_table_put(&Commands, "cursor-left", {cmd_cursor_left, 0, 0});
@@ -160,6 +168,7 @@ commands_init() {
 	hash_table_put(&Commands, "enter-command-mode", {cmd_enter_cmd_mode, 0, 0});
 	hash_table_put(&Commands, "find-file", {cmd_find_file, 0, 0});
 	hash_table_put(&Commands, "file-save", {cmd_save_file, 0, 0});
+	hash_table_put(&Commands, "backspace-delete", {cmd_backspace_delete, 0, 0});
 }
 
 Command* 

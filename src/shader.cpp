@@ -28,8 +28,8 @@ compile_shader(unsigned int type, const char* source) {
 
 		char* log = (char*)malloc(sizeof(char) * length);
 		glGetShaderInfoLog(id, length, &length, log);
-		printf("Failed to compile shader error: %s \n", log);
-		printf("Shader: %s \n", source);
+		ALERT_MSG("Failed to compile shader error: %s \n", log);
+		NORMAL_MSG("SHADER SOURCE CODE: \n %s \n", source);
 
 
 		glDeleteShader(id);
@@ -63,7 +63,7 @@ u32 shader_create(const char* vertex, const char* fragment) {
 		char* log = (char*)malloc(sizeof(char) * length);
 		glGetProgramInfoLog(shader, length, &length, log);
 
-		printf("Shader linking failed: %s \n", log);
+		ALERT_MSG("Shader linking failed: %s \n", log);
 
 		glDeleteShader(shader);
 

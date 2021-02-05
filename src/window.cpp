@@ -478,7 +478,7 @@ window_close() {
 			FocusedWindow = find_first_window_recursively(root);
 
 		}
-		printf("--------- \nTREE _______ \n");
+		NORMAL_MSG("--------- \nTREE _______ \n", NULL);
 		print_tree(WinTree);
 
 	} else if (FocusedWindow->parent->children.length > 2) {
@@ -551,7 +551,7 @@ window_split_horizontal() {
 
 		array_push(&container->children, newWindow);
 
-		printf("\n\n TREE \n\n");
+		NORMAL_MSG("\n\n TREE \n\n", NULL);
 		print_tree(WinTree);
 
 		return;
@@ -605,7 +605,7 @@ window_split_horizontal() {
 
 	resize_windows_evenly_height(parent, ypos, height, winCount);
 
-	printf("\n\n TREE \n\n");
+	NORMAL_MSG("\n\n TREE \n\n", NULL);
 	print_tree(WinTree);
 }
 
@@ -643,7 +643,7 @@ window_split_vertical() {
 
 		array_push(&container->children, newWindow);
 
-		printf("\n\n TREE \n\n");
+		NORMAL_MSG("\n\n TREE \n\n", NULL);
 		print_tree(WinTree);
 
 		return;
@@ -698,7 +698,7 @@ window_split_vertical() {
 
 	resize_windows_evenly_width(parent, xpos, width, winCount);
 
-	printf("\n\n TREE \n\n");
+	NORMAL_MSG("\n\n TREE \n\n", NULL);
 	print_tree(WinTree);
 
 }
@@ -760,29 +760,29 @@ window_render_all() {
 void
 print_tree(Node* node) {
 
-	printf("\n \n");
+	NORMAL_MSG("\n \n", NULL);
 
-	printf("---- Container ---- \n");
-	printf("Adress : %p \n", node);
-	printf("Parent : %p \n", node->parent);
-	printf("Children : %p \n", node->children);
-	printf("Is Vertical : %i \n", node->isVertical);
-	printf("Children count : %zu \n", node->children.length);
-	printf("Size : ");
+	ALERT_MSG("---- Container ---- \n", NULL);
+	NORMAL_MSG("Adress : %p \n", node, NULL);
+	NORMAL_MSG("Parent : %p \n", node->parent);
+	NORMAL_MSG("Children : %p \n", node->children);
+	NORMAL_MSG("Is Vertical : %i \n", node->isVertical);
+	NORMAL_MSG("Children count : %zu \n", node->children.length);
+	NORMAL_MSG("Size : ", NULL);
 	vec2i_print(node->containerSize);
 
 	for (sizet i = 0; i < node->children.length; ++i)  {
 
 		if (node->children[i].nodeType == NODE_WINDOW) {
-			printf("\n");
-			printf("---- Window ----\n");
-			printf("Adress : %p \n", &node->children[i]);
-			printf("Parent : %p \n", node->children[i].parent);
-			printf("Buffer id : %i \n", node->children[i].buffId);
-			printf("id : %i \n", node->children[i].id);
-			printf("Position :");
+			NORMAL_MSG("\n", NULL);
+			ALERT_MSG("---- Window ----\n", NULL);
+			NORMAL_MSG("Adress : %p \n", &node->children[i]);
+			NORMAL_MSG("Parent : %p \n", node->children[i].parent);
+			NORMAL_MSG("Buffer id : %i \n", node->children[i].buffId);
+			NORMAL_MSG("id : %i \n", node->children[i].id);
+			NORMAL_MSG("Position :", NULL);
 			vec2i_print(node->children[i].position);
-			printf("Size :");
+			NORMAL_MSG("Size :", NULL);
 			vec2i_print(node->children[i].size);
 		}
 		else {

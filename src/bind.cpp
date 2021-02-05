@@ -78,8 +78,7 @@ binding_add(String cmdname, String keys, InputMode mode) {
 			key = keycode_from_string(keystr);
 			if (cursor + 1 < keys.length || key == KEY_Unknown) {
 
-				str_push(&keys, '\0');
-				printf("invalid key sequence: %s \n", keys.data);
+				WARN_MSG("Invalid key sequence: %s \n", keys.as_cstr());
 				break;
 			}
 

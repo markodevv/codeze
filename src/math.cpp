@@ -57,76 +57,76 @@ int random_int() {
 void
 vec4_print(Vec4 vec) {
 
-	printf("( ");
-	printf("%f", vec.x);
-	printf(", ");
-	printf("%f", vec.y);
-	printf(", ");
-	printf("%f", vec.z);
-	printf(", ");
-	printf("%f", vec.w);
-	printf(" )\n");
+	NORMAL_MSG("( ", NULL);
+	NORMAL_MSG("%f", vec.x);
+	NORMAL_MSG(", ", NULL);
+	NORMAL_MSG("%f", vec.y);
+	NORMAL_MSG(", ", NULL);
+	NORMAL_MSG("%f", vec.z);
+	NORMAL_MSG(", ", NULL);
+	NORMAL_MSG("%f", vec.w);
+	NORMAL_MSG(" )\n", NULL);
   
 }
 
 void
 vec3_print(Vec3 vec) {
   
-	printf("( ");
-	printf("%f", vec.x);
-	printf(", ");
-	printf("%f", vec.y);
-	printf(", ");
-	printf("%f", vec.z);
-	printf(" )\n");
+	NORMAL_MSG("( ", NULL);
+	NORMAL_MSG("%f", vec.x);
+	NORMAL_MSG(", ", NULL);
+	NORMAL_MSG("%f", vec.y);
+	NORMAL_MSG(", ", NULL);
+	NORMAL_MSG("%f", vec.z);
+	NORMAL_MSG(" )\n", NULL);
 }
   
 void
 vec2_print(Vec2 vec) {
   
-	printf("( ");
-	printf("%f", vec.x);
-	printf(", ");
-	printf("%f", vec.y);
-	printf(" )\n");
+	NORMAL_MSG("( ", NULL);
+	NORMAL_MSG("%f", vec.x);
+	NORMAL_MSG(", ", NULL);
+	NORMAL_MSG("%f", vec.y);
+	NORMAL_MSG(" )\n", NULL);
 }
 
 
 void
 vec4i_print(Vec4i vec) {
 
-	printf("( ");
-	printf("%i", vec.x);
-	printf(", ");
-	printf("%i", vec.y);
-	printf(", ");
-	printf("%i", vec.z);
-	printf(", ");
-	printf("%i", vec.w);
-	printf(" )\n");
+	NORMAL_MSG("( ", NULL);
+	NORMAL_MSG("%i", vec.x);
+	NORMAL_MSG(", ", NULL);
+	NORMAL_MSG("%i", vec.y);
+	NORMAL_MSG(", ", NULL);
+	NORMAL_MSG("%i", vec.z);
+	NORMAL_MSG(", ", NULL);
+	NORMAL_MSG("%i", vec.w);
+	NORMAL_MSG(" )\n", NULL);
   
 }
 
 void
 vec3i_print(Vec3i vec) {
   
-	printf("( ");
-	printf("%i", vec.x);
-	printf(", ");
-	printf("%i", vec.y);
-	printf(", ");
-	printf("%i", vec.z);
-	printf(" )\n");
+	NORMAL_MSG("( ", NULL);
+	NORMAL_MSG("%i", vec.x);
+	NORMAL_MSG(", ", NULL);
+	NORMAL_MSG("%i", vec.y);
+	NORMAL_MSG(", ", NULL);
+	NORMAL_MSG("%i", vec.z);
+	NORMAL_MSG(" )\n", NULL);
 }
   
 void
 vec2i_print(Vec2i vec) {
   
-	printf("( ");
-	printf("%i", vec.x);
-	printf(", ");
-	printf("%i", vec.y);
-	printf(" )\n");
+	NORMAL_MSG("( ", NULL);
+	NORMAL_MSG("%i", vec.x);
+	NORMAL_MSG(", ", NULL);
+	NORMAL_MSG("%i", vec.y);
+	NORMAL_MSG(" )\n", NULL);
 }
 
 

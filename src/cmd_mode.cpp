@@ -84,8 +84,6 @@ last_word_from_path() {
 	}
 	str_reverse(&out);
 
-
-	printf("last word = %s \n", out.as_cstr());
 	return out;
 }
 

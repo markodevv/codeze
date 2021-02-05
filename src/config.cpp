@@ -102,7 +102,7 @@ config_handle_bind(String line, i32 &cursor, InputMode mode) {
 	else {
 
 		str_push(&cmdName, '\0');
-		printf("invalid command: %s \n", cmdName.data);
+		WARN_MSG("invalid command: %s \n", cmdName.data);
 	}
 	
 }

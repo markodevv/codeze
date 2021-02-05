@@ -19,6 +19,50 @@ buffers_init() {
 	hash_table_init(&BufferTable);
 }
 
+static String
+get_filestr_from_path(const char* filepath) {
+
+	String out = str_create(10);
+	sizet len = strlen(filepath);
+
+	if (filepath[len - 1] == '/')
+		len -= 1;
+
+
+	for (sizet i = len - 1; i >= 0; --i) {
+
+		if (filepath[i] == '/')
+			break;
+
+		str_push(&out, filepath[i]);
+	}
+
+	str_reverse(&out);
+
+	return out;
+}
+
+static String
+get_filestr_from_path(String& filepath) {
+
+	String out = str_create(10);
+
+	sizet len = filepath.length;
+
+	if (filepath[filepath.length - 1] == '/')
+		len -= 1;
+
+	for (sizet i = len; i >= 0; --i) {
+
+		if (filepath[i] == '/')
+			break;
+
+		str_push(&out, filepath[i]);
+	}
+
+	return out;
+}
+
 void
 buffer_add(const char* path) {
 
@@ -92,11 +136,6 @@ buffer_create(File& file) {
 	array_init(&buf.lineLengths, file.lineCount);
 	array_init(&buf.cursorLines, file.lineCount);
 
-	buf.capacity = file.size;
-	buf.text = (char*)malloc(sizeof(char) * buf.capacity);
-
-	buf.text = file.buffer;
-
 	sizet i = 0;
 	// foreach line
 	for (sizet line = 0; line < file.lineCount; ++line) {
@@ -104,20 +143,43 @@ buffer_create(File& file) {
 		array_push(&buf.lineLengths, 0);
 		array_push(&buf.cursorLines, 0);
 		// foreach char in line
-		for (; buf.text[i] != '\n'; ++i) {
+		while (file.buffer[i] != '\n' && i < file.size) {
 			// add to line length
-			if (buf.text[i] == '\t') 
+			if (file.buffer[i] == '\t') 
 				buf.cursorLines[line] += TAB_SIZE;
 			else
 				buf.cursorLines[line] += 1;
 
 			buf.lineLengths[line] += 1;
+			i++;
 		}
 		i++;
 		buf.cursorLines[line] += 1;
 		buf.lineLengths[line] += 1;
 
 	}
+
+	if (file.size < BUFFER_EMPTHY_SIZE) {
+
+		buf.capacity = BUFFER_EMPTHY_SIZE;
+		buf.gapLen = BUFFER_EMPTHY_SIZE - file.size;
+		buf.postLen = file.size;
+
+		buf.text = file.buffer;
+		buf.text = (char*)malloc(sizeof(char) * buf.capacity);
+
+		for (sizet i = buf.preLen; i < buf.capacity; i++) 
+			buf.text[i + buf.gapLen] = file.buffer[i];
+
+		free(file.buffer);
+	}
+	else {
+		
+		buf.capacity = file.size;
+		buf.text = file.buffer;
+	}
+
+
 
 	return buf;
 }
@@ -192,8 +254,10 @@ buffer_insert_char(char c) {
 	
 	if (CurBuffer->gapLen == 0) {
 		
-		sizet gap = CurBuffer->preLen + CurBuffer->postLen;
-		CurBuffer->capacity += gap;
+		//sizet gap = CurBuffer->preLen + CurBuffer->postLen;
+		//CurBuffer->capacity += gap;
+		sizet gap = CurBuffer->capacity;
+		CurBuffer->capacity *= 2;
 		char* newbuf = (char*)malloc(sizeof(char) * CurBuffer->capacity);
 
 		// copy first part of string

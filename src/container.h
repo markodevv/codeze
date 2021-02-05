@@ -8,6 +8,7 @@
 #include "my_string.h"
 
 #define ARRAY_RESIZE_FACTOR 2
+#define ARRAY_MIN_SIZE 5
 
 //Array
 
@@ -32,6 +33,9 @@ Array<T>::operator[](sizet index) {
 
 template <typename T> void
 array_init(Array<T>* arr, sizet capacity) {
+
+	if (capacity < ARRAY_MIN_SIZE)
+		capacity = ARRAY_MIN_SIZE;
 
 	arr->data = (T*)calloc(capacity, sizeof(T));
 	arr->capacity = capacity;

@@ -6,12 +6,14 @@ mode navigation
 	bind cursor-down 		j
 
 	bind window-split-vertical		C-v
-	bind window-split-horizontal	C-s
+	bind window-split-horizontal	C-g
 	bind window-switch-up 			C-k
 	bind window-switch-down 		C-j
 	bind window-switch-left 		C-h
 	bind window-switch-right 		C-l
 	bind window-close	 			C-q
+
+	bind file-save	                C-s
 
 	bind enter-edit-mode 	i
 	bind enter-command-mode	S-enter
@@ -23,5 +25,6 @@ mode edit
 	bind cursor-up 			up
 	bind cursor-down 		down
 
+	bind backspace-delete 	backspace
 	bind exit-edit-mode 	escape
 

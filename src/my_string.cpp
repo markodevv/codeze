@@ -324,49 +324,6 @@ str_print(String& str) {
 	printf("\n");
 }
 
-String
-get_filestr_from_path(const char* filepath) {
-
-	String out = str_create(10);
-	sizet len = strlen(filepath);
-
-	if (filepath[len - 1] == '/')
-		len -= 1;
-
-
-	for (sizet i = len - 1; i >= 0; --i) {
-
-		if (filepath[i] == '/')
-			break;
-
-		str_push(&out, filepath[i]);
-	}
-
-	str_reverse(&out);
-
-	return out;
-}
-
-String
-get_filestr_from_path(String& filepath) {
-
-	String out = str_create(10);
-
-	sizet len = filepath.length;
-
-	if (filepath[filepath.length - 1] == '/')
-		len -= 1;
-
-	for (sizet i = len; i >= 0; --i) {
-
-		if (filepath[i] == '/')
-			break;
-
-		str_push(&out, filepath[i]);
-	}
-
-	return out;
-}
 
 void
 str_array_free(Array<String>& arr) {

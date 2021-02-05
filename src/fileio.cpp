@@ -51,12 +51,12 @@ fileio_change_dir(String& cd) {
 
 	if (err == -1) {
 
-		printf("Can't change dir with: %s \n", cd.data);
+		ALERT_MSG("Can't change dir with: %s \n", cd.data);
 		return false;
 	}
 	char* cwd = (char*)malloc(sizeof(char) * LONGEST_PATH_LENGTH);
 	cwd = getcwd(cwd, LONGEST_PATH_LENGTH);
-	printf("new cwd: %s \n", cwd);
+	NORMAL_MSG("Changed cwd to : %s \n", cwd);
 	fileio_update_cwd();
 	free(cwd);
 
@@ -117,10 +117,14 @@ file_open(const char* path) {
 	sizet size = ftell(fp);
 	rewind(fp);
 
-	File file;
+	if (!fp) {
+		
+		WARN_MSG("Invalid file path %s \n", path);
+	}
 
+	File file;
 	file.size = size;
-	file.buffer = (char*)malloc(sizeof(char) * size);
+	file.buffer = (char*)malloc(sizeof(char) * (size + 1));
 	file.lineCount = 0;
 	file.path = str_create(path);
 
@@ -139,6 +143,8 @@ file_open(const char* path) {
 		file.lineCount++;
 	}
 
+	file.buffer[size] = '\0';
+
 	fclose(fp);
 
 	return file;
@@ -150,15 +156,19 @@ file_save() {
 	
 	String data = buffer_get_text_copy(CurBuffer);
 	String path = CurBuffer->path;
-	FILE* fp = fopen(path.as_cstr(), "r+");
+	FILE* fp = fopen(path.as_cstr(), "w");
 
 	if (fp) {
+		NORMAL_MSG("File contents: \n%s \n", data.as_cstr());
 		fprintf(fp, "%s", data.as_cstr());
-		printf("File saved: %s \n", path.as_cstr());
+		NORMAL_MSG("File saved: %s \n", path.as_cstr());
 	}
 	else {
-		printf("Invalid filepath to save %s \n", path.as_cstr());
+		
+		ALERT_MSG("Failed to save: %s \n", path.as_cstr());
 	}
+
+	fclose(fp);
 }
 
 String&

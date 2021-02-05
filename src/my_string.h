@@ -43,5 +43,3 @@ template <typename T> class Array;
 
 void str_array_free(Array<String>& arr);
 
-String get_filestr_from_path(const char* filepath);
-String get_filestr_from_path(String& filepath);
