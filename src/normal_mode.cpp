@@ -3,6 +3,8 @@
 #include "window.h"
 #include "cursor.h"
 #include "bind.h"
+#include "globals.h"
+#include "renderer.h"
 
 
 static void
@@ -34,6 +36,7 @@ on_end() {
 static void
 update() {
 	
+	render_cursor(CurBuffer, FocusedWindow, CURSOR_LINE);
 }
 
 static void

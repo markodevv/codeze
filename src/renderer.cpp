@@ -485,13 +485,11 @@ render_buffer(Buffer* buf, Window *window, Array<Token>* tokens) {
 
 	#ifdef DEBUG
 
-	Vec2 quadSize = {200.0f, 140.0f};
-	Vec2 pos = {window->position.x + window->size.w - 200.0f, (f32)window->position.y};
+	Vec2 quadSize = {400.0f, 160.0f};
+	Vec2 pos = {window->position.x + window->size.w - 400.0f, (f32)window->position.y};
 	Vec4 quadColor = {0.2f, 0.2f, 0.2f, 0.8f};
 	render_quad(pos, quadSize, quadColor);
 
-	pos.x = (f32)window->position.x + window->size.w - 200.0f;
-	pos.y = (f32)window->position.y;
 	DEBUG_TEXT(pos, "position: [%i, %i]", window->position.x, window->position.y); pos.y += 20.0f;
 	DEBUG_TEXT(pos, "size: [%i, %i]", window->size.w, window->size.h) pos.y += 20.0f;
 	DEBUG_TEXT(pos, "start line: %i", window->renderView.start) pos.y += 20.0f;
@@ -499,6 +497,7 @@ render_buffer(Buffer* buf, Window *window, Array<Token>* tokens) {
 	DEBUG_TEXT(pos, "window ID: %i", window->id) pos.y += 20.0f;
 	DEBUG_TEXT(pos, "parent: %p", window->parent) pos.y += 20.0f;
 	DEBUG_TEXT(pos, "adress: %p", window) pos.y += 20.0f;
+	DEBUG_TEXT(pos, "key %s", window->key) pos.y += 20.0f;
 
 	#endif
 
@@ -520,17 +519,16 @@ render_status_line(String& bufferName, Window* window) {
 }
 
 void
-render_cursor(Buffer* buf, Window* win) {
+render_cursor(Buffer* buf, Window* win, CursorStyle style) {
 
 	static Vec2 cursorPos, cursorSize;
 
-	cursorPos = cursor_render_pos();
-	cursorSize = cursor_render_size();
+	cursorPos = cursor_render_pos(buf, win);
+	cursorSize = cursor_render_size(style);
 	// TODO: fix wierd offset
 	cursorPos.y += renderer_font_size() / 5;
 	render_quad(cursorPos, cursorSize, global_Colors[2]);
 }
-
 
 
 void

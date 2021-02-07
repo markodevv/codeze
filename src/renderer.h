@@ -5,10 +5,12 @@
 #include "tokenizer.h"
 #include "buffer.h"
 #include "window.h"
+#include "cursor.h"
 
 #include <GLFW/glfw3.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
+
 
 typedef enum TextureIndex {
 
@@ -81,7 +83,7 @@ void render_textured_quad(Vec2 position, Vec2 size, Vec4 color, u32 texID);
 void render_text(String& text, Vec2 position, Vec4 color);
 void render_buffer(Buffer* buf, Window* window, Array<Token>* tokens);
 void render_status_line(String& bufferName, Window* window);
-void render_cursor(Buffer* buf, Window* window);
+void render_cursor(Buffer* buf, Window* window, CursorStyle style);
 void renderer_on_window_resize(f32 width, f32 height);
 GlyphData* renderer_get_glyphs();
 i32 renderer_font_size();

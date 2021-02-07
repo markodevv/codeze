@@ -15,7 +15,7 @@ typedef struct Buffer {
 	sizet preLen;
 	sizet postLen;
 	sizet gapLen;
-	sizet capacity;
+	sizet size;
 
 	i32 currentLine;
 	Array<i32> cursorLines;
@@ -34,6 +34,7 @@ void buffer_add_empthy();
 Buffer* buffer_add(File& file);
 Buffer* buffer_get(const char* key);
 Buffer buffer_create_empthy();
+void buffer_switch(const char* key);
 
 void buffer_forward();
 void buffer_backward();
@@ -44,7 +45,6 @@ String buffer_get_text_copy(Buffer* buf);
 void buffer_insert_tab();
 void buffer_insert_newline();
 void buffer_backspace_delete();
-String buffer_string_before_cursor();
 sizet buffer_index_based_on_line(Buffer* buf, i32 line);
 void buffer_clear(Buffer* buf);
 sizet buffer_length(Buffer* buf);

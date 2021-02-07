@@ -61,6 +61,7 @@ window_switch_up() {
 	Window* out = find_window_at_point(WinTree, point);
 	if (out != NULL)  {
 		FocusedWindow = out;
+		buffer_switch(FocusedWindow->key);
 	}
 }
 
@@ -74,6 +75,7 @@ window_switch_down() {
 	Window* out = find_window_at_point(WinTree, point);
 	if (out != NULL)  {
 		FocusedWindow = out;
+		buffer_switch(FocusedWindow->key);
 	}
 }
 
@@ -87,6 +89,7 @@ window_switch_left() {
 	Window* out = find_window_at_point(WinTree, point);
 	if (out != NULL)  {
 		FocusedWindow = out;
+		buffer_switch(FocusedWindow->key);
 	}
 }
 
@@ -100,6 +103,7 @@ window_switch_right() {
 	Window* out = find_window_at_point(WinTree, point);
 	if (out != NULL)  {
 		FocusedWindow = out;
+		buffer_switch(FocusedWindow->key);
 	}
 }
 

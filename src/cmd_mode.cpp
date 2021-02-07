@@ -40,9 +40,13 @@ empthy() {
 static inline void
 sort_completion(String& word) {
 
-	str_array_free(FieldNames);
+
+	if (FieldNames.length) 
+		str_array_free(FieldNames);
+
 	FieldNames = completion_get_matching(word);
 	SelectedFieldId = 0;
+
 }
 
 static void
@@ -146,19 +150,21 @@ findfile_backspace() {
 
 }
 
-static void
-exit() {
-
-	editor_change_mode(MODE_NAVIGATION);
-	CurBuffer = PrevBuffer;
-}
-
 static inline void
 change_minor_mode_to(CmdMode mode) {
 
 	MinorModes[mode].on_start();
 	CmdCurMode = mode;
 }
+
+static void
+exit() {
+
+	change_minor_mode_to(MODE_CMD);
+	editor_change_mode(MODE_NAVIGATION);
+	CurBuffer = PrevBuffer;
+}
+
 
 static void
 handle_command() {
@@ -271,6 +277,8 @@ static void
 findfile_handle_key(i32 key, i32 mods) {
 	
 	switch(key) {
+	case KEY_Escape:
+		exit();
 	case KEY_Enter:
 		findfile_open_file();
 		break;
@@ -379,6 +387,7 @@ update() {
 	render_quad({0.0f, 0.0f}, {(f32)TheWidth, (f32)TheHeight}, {0.1f, 0.1f, 0.1f, 0.8f});
 	Text = buffer_get_text_copy(CurBuffer);
 	render_text(Text, {0.0f, 0.0f}, {0.9f, 0.9f, 0.9f, 1.0f});
+	render_cursor(CurBuffer, FocusedWindow, CURSOR_LINE);
 
 
 	f32 posY = 0;

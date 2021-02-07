@@ -167,10 +167,9 @@ file_save() {
 	
 	String data = buffer_get_text_copy(CurBuffer);
 	String path = CurBuffer->path;
-	FILE* fp = fopen(path.as_cstr(), "r+");
+	FILE* fp = fopen(path.as_cstr(), "w");
 
 	if (fp) {
-		WARN_MSG("File contents: \n%s \n", data.as_cstr());
 		fprintf(fp, "%s", data.as_cstr());
 		NORMAL_MSG("File saved: %s \n", path.as_cstr());
 	}

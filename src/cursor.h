@@ -1,8 +1,17 @@
 #pragma once
 #include "math.h"
 
-Vec2 cursor_render_pos();
-Vec2 cursor_render_size();
+
+enum CursorStyle {
+				  
+				  CURSOR_LINE,
+				  CURSOR_BLOCK,
+};
+
+struct Buffer;
+struct Node;
+Vec2 cursor_render_pos(Buffer* buf, Node* win);
+Vec2 cursor_render_size(CursorStyle style);
 void cursor_right();
 void cursor_left();
 void cursor_up();

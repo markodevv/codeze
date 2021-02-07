@@ -45,6 +45,8 @@ array_init(Array<T>* arr, sizet capacity) {
 template <typename T> void
 array_free(Array<T>* arr) {
 
+	arr->length = 0;
+	arr->capacity = 0;
 	free(arr->data);
 }
 

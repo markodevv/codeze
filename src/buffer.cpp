@@ -39,6 +39,18 @@ buffer_add(File& file) {
 
 	String key = get_filestr_from_path(file.path);
 
+
+	Member<Buffer>* Node = Buffers.head;
+
+	while (Node) {
+		if (Node->data.path == file.path)  {
+			NORMAL_MSG("File already loaded : %s \n", file.path.as_cstr());
+			return &Node->data;
+		}
+
+		Node = Node->next;
+	}
+
 	NORMAL_MSG("Added file: %s \n", file.path.as_cstr());
 	list_add(&Buffers, buffer_create(file));
 	Buffers.tail->data.name = str_create(key.as_cstr());
@@ -127,23 +139,23 @@ buffer_create(File& file) {
 
 	if (file.size < BUFFER_EMPTHY_SIZE) {
 
-		buf.capacity = BUFFER_EMPTHY_SIZE;
+		buf.size = BUFFER_EMPTHY_SIZE;
 		buf.gapLen = BUFFER_EMPTHY_SIZE - file.size;
 		buf.postLen = file.size;
 
 		buf.text = file.buffer;
-		buf.text = (char*)malloc(sizeof(char) * buf.capacity);
+		buf.text = (char*)malloc(sizeof(char) * buf.size);
 
-		for (sizet i = buf.preLen; i < buf.capacity; i++) 
+		for (sizet i = buf.preLen; i < buf.size; i++) 
 			buf.text[i + buf.gapLen] = file.buffer[i];
 
-		buf.text[buf.capacity - 1] = '\n';
+		buf.text[buf.size - 1] = '\n';
 
 		free(file.buffer);
 	}
 	else {
 		
-		buf.capacity = file.size;
+		buf.size = file.size;
 		buf.text = file.buffer;
 	}
 
@@ -171,7 +183,7 @@ buffer_create_empthy() {
 	array_push(&buf.cursorLines, 0);
 
 	//buf.text = str_create(BUFFER_EMPTHY_SIZE);
-	buf.capacity = BUFFER_EMPTHY_SIZE;
+	buf.size = BUFFER_EMPTHY_SIZE;
 	buf.text = (char*)malloc(sizeof(char) * BUFFER_EMPTHY_SIZE);
 
 	//str_skip(buf.text, BUFFER_EMPTHY_SIZE);
@@ -208,7 +220,7 @@ buffer_get_text_copy(Buffer* buf) {
 		str_push(&out, buf->text[i]);
 	}
 
-	for (sizet i = buf->preLen; i + buf->gapLen < buf->capacity; ++i) {
+	for (sizet i = buf->preLen; i + buf->gapLen < buf->size; ++i) {
 		str_push(&out, buf->text[i + buf->gapLen]);
 	}
 
@@ -223,10 +235,10 @@ buffer_insert_char(char c) {
 	if (CurBuffer->gapLen == 0) {
 		
 		//sizet gap = CurBuffer->preLen + CurBuffer->postLen;
-		//CurBuffer->capacity += gap;
-		sizet gap = CurBuffer->capacity;
-		CurBuffer->capacity *= 2;
-		char* newbuf = (char*)malloc(sizeof(char) * CurBuffer->capacity);
+		//CurBuffer->size += gap;
+		sizet gap = CurBuffer->size;
+		CurBuffer->size *= 2;
+		char* newbuf = (char*)malloc(sizeof(char) * CurBuffer->size);
 
 		// copy first part of string
 		for (sizet i = 0; i < CurBuffer->preLen; ++i) {
@@ -338,27 +350,6 @@ buffer_backspace_delete() {
 
 }
 
-String
-buffer_string_before_cursor() {
-	
-	String line = str_create(CurBuffer->lineLengths[CurBuffer->currentLine]);
-
-	i32 i = CurBuffer->preLen - 1;
-	if (CurBuffer->currentLine == 0) {
-		while (i >= 0) {
-			str_push(&line, CurBuffer->text[i]);
-			i--;
-		}
-	}
-	else {
-		while (CurBuffer->text[i] != '\n')  {
-			str_push(&line, CurBuffer->text[i]);
-			i--;
-		}
-	}
-
-	return line;
-}
 
 
 sizet
@@ -373,6 +364,19 @@ buffer_index_based_on_line(Buffer* buf, i32 line) {
 	return result;
 }
 
+void
+buffer_switch(const char* key) {
+	
+	Member<Buffer>* Node = Buffers.head;
+	while (Node) {
+		if (Node->data.path == key) {
+
+			CurBuffer = &Node->data;
+		}
+		Node = Node->next;
+	}
+}
+
 
 void
 buffer_clear(Buffer* buf) {
@@ -381,9 +385,15 @@ buffer_clear(Buffer* buf) {
 	array_reset(&buf->cursorLines);
 	array_push(&buf->lineLengths, 0);
 	array_push(&buf->cursorLines, 0);
-	str_free(&buf->path);
 
-	buf->gapLen = buf->capacity;
+	if (buf->path.data) {
+		str_free(&buf->path);
+	}
+	if (buf->name.data) {
+		str_free(&buf->path);
+	}
+
+	buf->gapLen = buf->size;
 	buf->preLen = 0;
 	buf->postLen = 0;
 	buf->currentLine = 0;

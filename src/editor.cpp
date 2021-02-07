@@ -92,7 +92,6 @@ main(int argc, char* argv[]) {
 
 		window_render_all();
 		Modes[InputMod]->update();
-		render_cursor(CurBuffer, FocusedWindow);
 
 #ifdef DEBUG
 		Vec2 pos;

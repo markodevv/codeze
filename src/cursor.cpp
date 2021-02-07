@@ -5,25 +5,65 @@
 #include "buffer.h"
 #include "globals.h"
 
+static String
+string_before_cursor(Buffer* buf) {
+	
+	String out = str_create(buf->lineLengths[CurBuffer->currentLine]);
+
+	i32 i = buf->preLen - 1;
+	if (buf->currentLine == 0) {
+		while (i >= 0) {
+			str_push(&out, buf->text[i]);
+			i--;
+		}
+	}
+	else {
+		while (buf->text[i] != '\n')  {
+			str_push(&out, buf->text[i]);
+			i--;
+		}
+	}
+
+	return out;
+}
 
 Vec2
-cursor_render_pos() {
+cursor_render_pos(Buffer* buf, Window* win) {
   
-	String cursorString = buffer_string_before_cursor();
+	String cursorString = string_before_cursor(buf);
 	Vec2 pos;
-	pos.x = FocusedWindow->position.x;
-	pos.y = FocusedWindow->position.y +
+	pos.x = win->position.x;
+	pos.y = win->position.y +
 		renderer_font_size() *
-		(CurBuffer->currentLine - FocusedWindow->renderView.start);
+		(buf->currentLine - win->renderView.start);
 
 	GlyphData* glyphs = renderer_get_glyphs();
 
 	for (sizet i = 0; i < cursorString.length; ++i) {
 
-		pos.x += glyphs[cursorString.data[i]].advanceX;
+		pos.x += glyphs[cursorString[i]].advanceX;
 	}
 
 	return pos;
+}
+
+Vec2
+cursor_render_size(CursorStyle style) {
+	Vec2 size;
+	GlyphData* glyphs = renderer_get_glyphs();
+
+	switch (style) {
+	case CURSOR_BLOCK: {
+		size.x = glyphs[char_under_cursor()].advanceX;
+		size.y = (f32)renderer_font_size();
+	}break;
+	case CURSOR_LINE: {
+		size.x = glyphs[char_under_cursor()].advanceX / 5.0f;
+		size.y = (f32)renderer_font_size();
+	}break;
+	}
+
+	return size;
 }
 
 char
@@ -35,17 +75,6 @@ char_under_cursor() {
 		return CurBuffer->text[CurBuffer->preLen - 1];
 }
 
-Vec2
-cursor_render_size() {
-
-	GlyphData* glyphs = renderer_get_glyphs();
-	Vec2 size = {
-		glyphs[char_under_cursor()].advanceX,
-		(f32)renderer_font_size()
-	};
-
-	return size;
-}
 
 void
 cursor_right() {
