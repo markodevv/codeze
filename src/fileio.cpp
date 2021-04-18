@@ -2,17 +2,18 @@
 #include "types.h"
 #include "debug.h"
 #include "globals.h"
-#include <unistd.h>
+
 
 
 #ifdef LINUX_PLATFORM
-
+#include <unistd.h>
 #include <dirent.h>
 
 #elif WINDOWS_PLATFORM
+#include <direct.h>
 
 #include <io.h>
-#include <../third_party/dirent/dirent.h>
+#include "../third_party/dirent/dirent.h"
 
 #endif
 
@@ -113,41 +114,45 @@ fileio_path_file_names(String& path) {
 File
 file_open(const char* path) {
 
-	FILE* fp = fopen(path, "r");
-
-	fseek(fp, 0, SEEK_END);
-	sizet size = ftell(fp);
-	rewind(fp);
-
-	if (!fp) {
-		
-		WARN_MSG("Invalid file path %s \n", path);
-	}
-
+	FILE* fp = fopen(path, "r");		
 	File file;
-	file.size = size;
-	file.buffer = (char*)malloc(sizeof(char) * (size + 1));
-	file.lineCount = 0;
-	file.path = str_create(path);
 
-	char line[4096];
-	sizet cursor = 0;
+	if (1)
+	{
+		fseek(fp, 0, SEEK_END);
+		sizet size = ftell(fp);
+		rewind(fp);
 
-	while (fgets(line, sizeof(line), fp) != NULL) {
+		if (!fp) {
 
-		sizet i = 0;
-		while (line[i] != '\0') {
-
-			file.buffer[cursor] = line[i];
-			i++;
-			cursor++;
+			WARN_MSG("Invalid file path %s \n", path);
 		}
-		file.lineCount++;
+
+
+		file.size = size;
+		file.buffer = (char*)malloc(sizeof(char) * (size + 1));
+		file.lineCount = 0;
+		file.path = str_create(path);
+
+		char line[4096];
+		sizet cursor = 0;
+
+		while (fgets(line, sizeof(line), fp) != NULL) {
+
+			sizet i = 0;
+			while (line[i] != '\0') {
+
+				file.buffer[cursor] = line[i];
+				i++;
+				cursor++;
+			}
+			file.lineCount++;
+		}
+
+		file.buffer[size] = '\0';
+
+		fclose(fp);
 	}
-
-	file.buffer[size] = '\0';
-
-	fclose(fp);
 
 	return file;
   
@@ -155,9 +160,13 @@ file_open(const char* path) {
 
 b8
 file_exists(const char* filepath) {
-	
+#ifdef LINUX_PLATFORM
 	if (access(filepath, R_OK) == -1)
 		return false;
+#elif WINDOWS_PLATFORM
+	if (_access(filepath, 4) == -1)
+		return false;
+#endif
 
 	return true;
 }

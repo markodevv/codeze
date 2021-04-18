@@ -2,7 +2,6 @@ workspace "codeze"
 
 configurations {"Debug", "Release"}
 architecture "x86_64"
-toolset "clang"
 
 include "third_party/glfw/"
 include "third_party/glad/"
@@ -15,7 +14,6 @@ IncludeDir["freetype"] = "third_party/freetype/include"
 
 project "codeze"
 
-toolset "clang"
     kind "ConsoleApp"
 	language "C++"
 	staticruntime "on"

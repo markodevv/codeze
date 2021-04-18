@@ -42,7 +42,11 @@ main(int argc, char* argv[]) {
 
 	events_initialize(GLFWwin);
 	renderer_initialize(TheWidth, TheHeight);
-	renderer_load_font("assets/CONSOLA.TTF", 18);
+#ifdef WINDOWS_PLATFORM
+	renderer_load_font("assets/consolai.ttf", 18);
+#elif LINUX_PLATFORM
+	renderer_load_font("assets/CONSOLA.ttf", 18);
+#endif
 
 	fileio_update_cwd();
 	commands_init();

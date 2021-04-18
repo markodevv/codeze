@@ -385,6 +385,7 @@ static void
 update() {
 	
 	render_quad({0.0f, 0.0f}, {(f32)TheWidth, (f32)TheHeight}, {0.1f, 0.1f, 0.1f, 0.8f});
+	Text = {};
 	Text = buffer_get_text_copy(CurBuffer);
 	render_text(Text, {0.0f, 0.0f}, {0.9f, 0.9f, 0.9f, 1.0f});
 	render_cursor(CurBuffer, FocusedWindow, CURSOR_LINE);
