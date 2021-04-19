@@ -1,6 +1,6 @@
 # codeze
 
-This is an attempt to write a modal text editor in c++.
+This is an attempt to write a modal text editor in c++ and OpenGL for hardware acceleration.
 
 
 ## Features
