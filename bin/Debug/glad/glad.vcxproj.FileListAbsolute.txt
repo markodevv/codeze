@@ -1,0 +1,2 @@
+C:\work\temp\codeze\bin\Debug\glad\glad.pdb
+C:\work\temp\codeze\bin\glad.pdb

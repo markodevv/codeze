@@ -1,0 +1,2 @@
+C:\work\temp\codeze\bin\Debug\GLFW\GLFW.pdb
+C:\work\temp\codeze\bin\GLFW.pdb

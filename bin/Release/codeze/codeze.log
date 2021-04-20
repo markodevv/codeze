@@ -1,0 +1,25 @@
+﻿  editor.cpp
+C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
+C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
+C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
+C:\work\temp\codeze\src\editor.cpp(44,32): warning C4244: 'argument': conversion from 'i32' to 'f32', possible loss of data
+C:\work\temp\codeze\src\editor.cpp(44,22): warning C4244: 'argument': conversion from 'i32' to 'f32', possible loss of data
+C:\work\temp\codeze\src\editor.cpp(90,49): warning C4244: 'argument': conversion from 'int' to 'f32', possible loss of data
+C:\work\temp\codeze\src\editor.cpp(90,36): warning C4244: 'argument': conversion from 'int' to 'f32', possible loss of data
+  fileio.cpp
+C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
+C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
+C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+C:\work\temp\codeze\third_party\glfw\include\GLFW\glfw3.h(123): message : see previous definition of 'APIENTRY'
+C:\work\temp\codeze\src\fileio.cpp(51,12): warning C4996: 'chdir': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _chdir. See online help for details.
+C:\work\temp\codeze\src\fileio.cpp(59,8): warning C4996: 'getcwd': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _getcwd. See online help for details.
+C:\work\temp\codeze\src\fileio.cpp(117,13): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\fileio.cpp(179,13): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  Generating Code...
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+LINK : warning LNK4217: symbol '__stdio_common_vsscanf' defined in 'libucrt.lib(input.obj)' is imported by 'glad.lib(glad.obj)' in function 'sscanf_s'
+LINK : warning LNK4217: symbol 'free' defined in 'libucrt.lib(free.obj)' is imported by 'glad.lib(glad.obj)' in function 'gladLoadGLLoader'
+LINK : warning LNK4217: symbol 'malloc' defined in 'libucrt.lib(malloc.obj)' is imported by 'glad.lib(glad.obj)' in function 'gladLoadGLLoader'
+LINK : warning LNK4217: symbol 'strncmp' defined in 'libucrt.lib(strncmp.obj)' is imported by 'glad.lib(glad.obj)' in function 'find_coreGL'
+  codeze.vcxproj -> C:\work\temp\codeze\bin\codeze.exe
