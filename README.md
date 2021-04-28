@@ -11,6 +11,8 @@ Customizable keybinds in config.txt file.
 It is a hobby project, not even close to finished. Lacks some basic functionality
 like scrolling etc..
 
+You can download the current build on [Release](https://github.com/bisevac-marko/codeze/releases/tag/v0.0.1) page
+
 Read config.txt file for all the keybinds.
 
 ![window spliting](https://i.ibb.co/LSYq3tq/codeze-token.png)
