@@ -379,17 +379,16 @@ render_text(String& text, Vec2 position, Vec4 color) {
 
 
 void
-render_buffer(Buffer* buf, Window *window, Array<Token>* tokens) {
+render_buffer(Buffer* buf, Window *window, Array<Token> tokens) {
 
 	static float xpos, ypos, w, h, offsetX,
 		texX, texY, advanceX, advanceY, tokLen;
 
-	//String text = buffer_get_text(buf);
 
 	advanceY = window->position.y;
 	advanceX = window->position.x;
 
-	//u32 tokIndex = 0;
+	u32 tokIndex = 0;
 	Vec4 color = global_Colors[0];
 
 	sizet visibleLines = (window->size.h -
@@ -413,10 +412,12 @@ render_buffer(Buffer* buf, Window *window, Array<Token>* tokens) {
 		//skip gap
 		if (i == buf->preLen - 1)
 			i += buf->gapLen;
-		// if (tokLen <= 0) 
-		// 	color = global_Colors[TOK_IDENTIFIER];
 
-		// tokLen--;
+		if (tokLen <= 0) 
+		    color = global_Colors[TOK_IDENTIFIER];
+
+		tokLen--;
+
 		if (c == '\n') {
 			advanceY += g_Renderer.fontSize;
 			advanceX = window->position.x;
@@ -462,12 +463,12 @@ render_buffer(Buffer* buf, Window *window, Array<Token>* tokens) {
 		}
 
 
-		// if (i == tokens[tokIndex].pos) {
+		if (i == tokens[tokIndex].pos) {
 
-		// 	color = global_Colors[tokens[tokIndex].type];
-		// 	tokLen = tokens[tokIndex].length;
-		// 	tokIndex++;
-		// }
+			color = global_Colors[tokens[tokIndex].type];
+			tokLen = tokens[tokIndex].length;
+			tokIndex++;
+		}
 
 
 		for (i32 j = 0; j < VERTICES_PER_QUAD; ++j) {
@@ -616,6 +617,28 @@ render_text_debug(char* text, Vec2 position, Vec4 color) {
 		g_Renderer.vertexCount += VERTICES_PER_QUAD;
 		advanceX += g_Renderer.glyphs[text[i]].advanceX;
 	}
+}
+
+static void
+render_windows(Node* parent) {
+	
+	for (sizet i = 0; i < parent->children.length; ++i) {
+		
+		if (parent->children[i].nodeType == NODE_WINDOW) {
+
+			Window* window = &parent->children[i];
+			render_buffer(buffer_get(window->key), window, Tokens);
+			render_status_line(buffer_get(window->key)->name, window);
+		}
+		else 
+			render_windows(&parent->children[i]);
+	}
+}
+
+void
+window_render_all() {
+
+	render_windows(WinTree);
 }
 
 #endif

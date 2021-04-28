@@ -18,6 +18,8 @@ i32 TheWidth;
 i32 TheHeight;
 InputMode InputMod;
 bool just_entered_edit_mode;
+Node* WinTree;
+Array<Token> Tokens;
 
 /* TODO:
    - red black trees
@@ -99,8 +101,11 @@ main(int argc, char* argv[]) {
 			}
 		} 
 
+        Tokens = tokens_make(buffer_get_text_copy(CurBuffer));
+
 
 		renderer_begin();
+
 
 		window_render_all();
 		Modes[InputMod]->update();
@@ -133,6 +138,8 @@ main(int argc, char* argv[]) {
 #endif
 
 		renderer_end();
+
+        array_free(&Tokens);
 
 		glfwSwapBuffers(GLFWwin);
 

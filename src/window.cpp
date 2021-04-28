@@ -10,7 +10,6 @@
 #define MIN_WINDOW_HEIGHT 256
 #define BIG_NUMBER 69696969
 
-static Node* WinTree;
 
 static Window*
 find_window_at_point(Node* node, Vec2i point) {
@@ -730,27 +729,6 @@ new_window_id() {
 
 }
 
-static void
-render_windows(Node* parent) {
-	
-	for (sizet i = 0; i < parent->children.length; ++i) {
-		
-		if (parent->children[i].nodeType == NODE_WINDOW) {
-
-			Window* window = &parent->children[i];
-			render_buffer(buffer_get(window->key), window, NULL);
-			render_status_line(buffer_get(window->key)->name, window);
-		}
-		else 
-			render_windows(&parent->children[i]);
-	}
-}
-
-void
-window_render_all() {
-
-	render_windows(WinTree);
-}
 
 
 void

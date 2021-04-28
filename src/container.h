@@ -26,7 +26,7 @@ struct Array {
 template <typename T> T&
 Array<T>::operator[](sizet index) {
 	
-	ASSERT(index >= 0);
+	ASSERT(index >= 0 && index < length);
 	return data[index];
 }
 
