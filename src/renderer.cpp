@@ -113,7 +113,7 @@ renderer_create_window() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = glfwCreateWindow(1280, 768, "codeze", NULL, NULL);
+	window = glfwCreateWindow(1024, 768, "codeze", NULL, NULL);
 	if (!window) {
 		glfwTerminate();
 		ALERT_MSG("Failed to create window", NULL);
@@ -215,9 +215,8 @@ renderer_initialize(f32 width, f32 height) {
 		glUniform1i(location, i);
 
 	}
-
-
 }
+
 
 void
 renderer_load_font(const char* fontFile, i32 fontSize) {
@@ -507,7 +506,7 @@ render_buffer(Buffer* buf, Window *window, Array<Token> tokens) {
 		}
 
 
-		if (i == tokens[tokIndex].pos) {
+		if (tokIndex < tokens.length && i == tokens[tokIndex].pos) {
 
 			color = global_Colors[tokens[tokIndex].type];
 			tokLen = tokens[tokIndex].length;

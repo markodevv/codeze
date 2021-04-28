@@ -63,7 +63,12 @@ main(int argc, char* argv[]) {
 
 	config_read("config.txt");
 
-	const char* testFileName = "/test.c";
+	const char* testFileName = 
+#ifdef WINDOWS_PLATFORM 
+    "\\test_file.txt";
+#else LINUX_PLATFORM 
+    "/test_file.txt";
+#endif
 	String filepath = str_create(10);
 
 	String cwd = fileio_get_cwd();
