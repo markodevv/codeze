@@ -2,27 +2,27 @@
 C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
 C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
 C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-C:\work\temp\codeze\src\editor.cpp(44,32): warning C4244: 'argument': conversion from 'i32' to 'f32', possible loss of data
-C:\work\temp\codeze\src\editor.cpp(44,22): warning C4244: 'argument': conversion from 'i32' to 'f32', possible loss of data
-C:\work\temp\codeze\src\editor.cpp(90,49): warning C4244: 'argument': conversion from 'int' to 'f32', possible loss of data
-C:\work\temp\codeze\src\editor.cpp(90,36): warning C4244: 'argument': conversion from 'int' to 'f32', possible loss of data
-C:\work\temp\codeze\src\editor.cpp(104,3): warning C4474: 'sprintf' : too many arguments passed for format string
-C:\work\temp\codeze\src\editor.cpp(104,3): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-C:\work\temp\codeze\src\editor.cpp(104,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(106,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(107,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(108,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(109,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(110,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(111,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\editor.cpp(51,32): warning C4244: 'argument': conversion from 'i32' to 'f32', possible loss of data
+C:\work\temp\codeze\src\editor.cpp(51,22): warning C4244: 'argument': conversion from 'i32' to 'f32', possible loss of data
+C:\work\temp\codeze\src\editor.cpp(98,49): warning C4244: 'argument': conversion from 'int' to 'f32', possible loss of data
+C:\work\temp\codeze\src\editor.cpp(98,36): warning C4244: 'argument': conversion from 'int' to 'f32', possible loss of data
+C:\work\temp\codeze\src\editor.cpp(112,3): warning C4474: 'sprintf' : too many arguments passed for format string
+C:\work\temp\codeze\src\editor.cpp(112,3): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
 C:\work\temp\codeze\src\editor.cpp(112,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(113,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
 C:\work\temp\codeze\src\editor.cpp(114,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(116,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\editor.cpp(115,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\editor.cpp(116,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
 C:\work\temp\codeze\src\editor.cpp(117,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
 C:\work\temp\codeze\src\editor.cpp(118,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
 C:\work\temp\codeze\src\editor.cpp(119,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
 C:\work\temp\codeze\src\editor.cpp(120,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
 C:\work\temp\codeze\src\editor.cpp(121,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(124,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\editor.cpp(122,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\editor.cpp(124,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\editor.cpp(125,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\editor.cpp(126,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\editor.cpp(127,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\editor.cpp(128,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\editor.cpp(129,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\editor.cpp(132,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   codeze.vcxproj -> C:\work\temp\codeze\bin\codeze.exe

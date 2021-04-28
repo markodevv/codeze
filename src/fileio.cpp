@@ -115,19 +115,13 @@ File
 file_open(const char* path) {
 
 	FILE* fp = fopen(path, "r");		
-	File file;
+	File file = {};
 
-	if (1)
+	if (fp)
 	{
 		fseek(fp, 0, SEEK_END);
 		sizet size = ftell(fp);
 		rewind(fp);
-
-		if (!fp) {
-
-			WARN_MSG("Invalid file path %s \n", path);
-		}
-
 
 		file.size = size;
 		file.buffer = (char*)malloc(sizeof(char) * (size + 1));
@@ -153,6 +147,10 @@ file_open(const char* path) {
 
 		fclose(fp);
 	}
+    else
+    {
+        WARN_MSG("Failed to open file %s \n", path);
+    }
 
 	return file;
   
@@ -183,7 +181,6 @@ file_save() {
 		NORMAL_MSG("File saved: %s \n", path.as_cstr());
 	}
 	else {
-		
 		ALERT_MSG("Failed to save: %s \n", path.as_cstr());
 	}
 

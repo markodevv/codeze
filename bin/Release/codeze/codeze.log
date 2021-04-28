@@ -1,11 +1,35 @@
-﻿  editor.cpp
+﻿  bind.cpp
 C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
 C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
 C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-C:\work\temp\codeze\src\editor.cpp(44,32): warning C4244: 'argument': conversion from 'i32' to 'f32', possible loss of data
-C:\work\temp\codeze\src\editor.cpp(44,22): warning C4244: 'argument': conversion from 'i32' to 'f32', possible loss of data
-C:\work\temp\codeze\src\editor.cpp(90,49): warning C4244: 'argument': conversion from 'int' to 'f32', possible loss of data
-C:\work\temp\codeze\src\editor.cpp(90,36): warning C4244: 'argument': conversion from 'int' to 'f32', possible loss of data
+  buffer.cpp
+C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
+C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
+C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
+  cmd_mode.cpp
+C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
+C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
+C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
+  command.cpp
+C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
+C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
+C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
+  cursor.cpp
+C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
+C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
+C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
+C:\work\temp\codeze\src\cursor.cpp(13,25): warning C4267: 'initializing': conversion from 'size_t' to 'i32', possible loss of data
+C:\work\temp\codeze\src\cursor.cpp(35,23): warning C4244: '=': conversion from 'i32' to 'f32', possible loss of data
+C:\work\temp\codeze\src\cursor.cpp(36,26): warning C4244: '=': conversion from 'i32' to 'f32', possible loss of data
+C:\work\temp\codeze\src\cursor.cpp(127,18): warning C4018: '>=': signed/unsigned mismatch
+  editor.cpp
+C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
+C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
+C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
+C:\work\temp\codeze\src\editor.cpp(49,32): warning C4244: 'argument': conversion from 'i32' to 'f32', possible loss of data
+C:\work\temp\codeze\src\editor.cpp(49,22): warning C4244: 'argument': conversion from 'i32' to 'f32', possible loss of data
+C:\work\temp\codeze\src\editor.cpp(95,49): warning C4244: 'argument': conversion from 'int' to 'f32', possible loss of data
+C:\work\temp\codeze\src\editor.cpp(95,36): warning C4244: 'argument': conversion from 'int' to 'f32', possible loss of data
   fileio.cpp
 C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
 C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
@@ -15,8 +39,54 @@ C:\work\temp\codeze\third_party\glfw\include\GLFW\glfw3.h(123): message : see pr
 C:\work\temp\codeze\src\fileio.cpp(51,12): warning C4996: 'chdir': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _chdir. See online help for details.
 C:\work\temp\codeze\src\fileio.cpp(59,8): warning C4996: 'getcwd': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _getcwd. See online help for details.
 C:\work\temp\codeze\src\fileio.cpp(117,13): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\fileio.cpp(179,13): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\fileio.cpp(177,13): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  nav_mode.cpp
+C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
+C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
+C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
+  normal_mode.cpp
+C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
+C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
+C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
+  renderer.cpp
+C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
+C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
+C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
+C:\work\temp\codeze\src\renderer.cpp(201,22): warning C4018: '>': signed/unsigned mismatch
+C:\work\temp\codeze\src\renderer.cpp(204,23): warning C4244: '=': conversion from 'i32' to 'f32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(205,23): warning C4244: '=': conversion from 'i32' to 'f32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(232,52): warning C4244: '=': conversion from 'FT_Pos' to 'f32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(233,52): warning C4244: '=': conversion from 'FT_Pos' to 'f32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(235,45): warning C4244: '=': conversion from 'unsigned int' to 'f32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(236,46): warning C4244: '=': conversion from 'unsigned int' to 'f32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(238,40): warning C4244: '=': conversion from 'FT_Int' to 'f32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(239,40): warning C4244: '=': conversion from 'FT_Int' to 'f32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(259,37): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+C:\work\temp\codeze\src\renderer.cpp(392,29): warning C4244: '=': conversion from 'i32' to 'float', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(393,29): warning C4244: '=': conversion from 'i32' to 'float', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(401,70): warning C4267: '=': conversion from 'size_t' to 'i32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(403,51): warning C4267: '=': conversion from 'size_t' to 'i32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(425,31): warning C4244: '=': conversion from 'i32' to 'float', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(542,39): warning C4244: '=': conversion from '__int64' to 'i32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(543,84): warning C4267: '=': conversion from 'size_t' to 'i32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(559,30): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(560,30): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(561,26): warning C4244: '=': conversion from 'f32' to 'i32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(562,26): warning C4244: '=': conversion from 'f32' to 'i32', possible loss of data
+  window.cpp
+C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
+C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
+C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
+C:\work\temp\codeze\src\window.cpp(58,38): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
+C:\work\temp\codeze\src\window.cpp(59,38): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
+C:\work\temp\codeze\src\window.cpp(72,38): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
+C:\work\temp\codeze\src\window.cpp(73,62): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
+C:\work\temp\codeze\src\window.cpp(86,38): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
+C:\work\temp\codeze\src\window.cpp(87,38): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
+C:\work\temp\codeze\src\window.cpp(100,62): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
+C:\work\temp\codeze\src\window.cpp(101,38): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
   Generating Code...
+C:\work\temp\codeze\src\bind.cpp(33): warning C4715: 'get_mod_from_string': not all control paths return a value
 LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
 LINK : warning LNK4217: symbol '__stdio_common_vsscanf' defined in 'libucrt.lib(input.obj)' is imported by 'glad.lib(glad.obj)' in function 'sscanf_s'
 LINK : warning LNK4217: symbol 'free' defined in 'libucrt.lib(free.obj)' is imported by 'glad.lib(glad.obj)' in function 'gladLoadGLLoader'

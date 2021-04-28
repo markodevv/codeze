@@ -9,9 +9,15 @@
 #include "bind.h"
 #include "config.h"
 
-#define DO_INIT
 #include "globals.h"
-#undef DO_INIT
+
+Buffer* CurBuffer;
+Window* FocusedWindow;
+Buffer* PrevBuffer;
+i32 TheWidth;
+i32 TheHeight;
+InputMode InputMod;
+bool just_entered_edit_mode;
 
 /* TODO:
    - red black trees
@@ -35,15 +41,16 @@ i32
 main(int argc, char* argv[]) {
 
 
-	InputMod = MODE_NORMAL;
-	TheWidth = 1916;
-	TheHeight = 1041;
+	InputMod = MODE_NAVIGATION;
+	TheWidth = 1024;
+	TheHeight = 768;
+
 	GLFWwin = renderer_create_window();
 
 	events_initialize(GLFWwin);
 	renderer_initialize(TheWidth, TheHeight);
 #ifdef WINDOWS_PLATFORM
-	renderer_load_font("assets/consolai.ttf", 18);
+	renderer_load_font("C:\\Windows\\Fonts\\arial.ttf", 18);
 #elif LINUX_PLATFORM
 	renderer_load_font("assets/CONSOLA.ttf", 18);
 #endif
@@ -76,6 +83,7 @@ main(int argc, char* argv[]) {
 	for (sizet i = 0; i < MODES_TOTAL; ++i) {
 		Modes[i]->on_init();
 	}
+
 
 	while (!glfwWindowShouldClose(GLFWwin)) {
 		

@@ -78,6 +78,7 @@ cmd_window_close(List<char>* args) {
 static void
 cmd_enter_edit_mode(List<char>* args) {
 
+    just_entered_edit_mode = true;
 	editor_change_mode(MODE_NORMAL);
 }
 

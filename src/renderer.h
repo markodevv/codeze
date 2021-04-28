@@ -15,11 +15,9 @@
 typedef enum TextureIndex {
 
 	NO_TEXTURE  = -1,
-	GREEN_TEXTURE_INDEX  = 0,
 	WHITE_TEXTURE_INDEX  = 1,
 	FONT_TEXTURE_INDEX  = 2,
-	RYUK_TEXTURE_INDEX  = 3,
-	TEXTURE_SLOTS = 4
+	TEXTURE_SLOTS = 3
 	
 } TextureIndex;
 

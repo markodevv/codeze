@@ -88,7 +88,6 @@ renderer_create_window() {
 static void
 texture_load(const char* path, u32* texID, u8 slot) {
 
-	
 	glActiveTexture(GL_TEXTURE0 + slot);
 
 	i32 w, h, channels, internalFormat, dataFormat;
@@ -131,6 +130,10 @@ renderer_initialize(f32 width, f32 height) {
 	File vertexFile = file_open("src/vertex_shader.txt");
 	File fragmentFile = file_open("src/fragment_shader.txt");
 
+    if (!(vertexFile.buffer && fragmentFile.buffer))
+    {
+        ASSERT(false);
+    }
 	g_Renderer.program = shader_create(vertexFile.buffer, fragmentFile.buffer);
 	
 	glUseProgram(g_Renderer.program);
@@ -151,9 +154,7 @@ renderer_initialize(f32 width, f32 height) {
 
 	mat_ortho(g_Renderer.projection, 0.0f, width, height, 0.0f);
 
-	texture_load("assets/green.png", &g_Renderer.texIDs[GREEN_TEXTURE_INDEX], GREEN_TEXTURE_INDEX);
 	texture_load("assets/white.png", &g_Renderer.texIDs[WHITE_TEXTURE_INDEX], WHITE_TEXTURE_INDEX);
-	texture_load("assets/ryuk.png", &g_Renderer.texIDs[RYUK_TEXTURE_INDEX], RYUK_TEXTURE_INDEX);
 
 	const i8 subscriptIndex = 10;
 	char str[] = "uTextures[ ]";
@@ -551,7 +552,7 @@ void
 renderer_on_window_resize(f32 width, f32 height) {
   
 	mat_ortho(g_Renderer.projection, 0.0f, width, height, 0.0f);
-	// TODO:
+	// TODO: make resizing actually work
 	FocusedWindow->position.x = 0.0f;
 	FocusedWindow->position.y = 0.0f;
 	FocusedWindow->size.w = width;

@@ -18,8 +18,15 @@ on_event(Event& event) {
 			buffer_insert_newline();
 	}
 	else if (event.type == CHAR_INPUTED) {
+        if (just_entered_edit_mode)
+        {
+            just_entered_edit_mode = false;
+        }
+        else
+        {
+            buffer_insert_char(event.character);
+        }
 		
-		buffer_insert_char(event.character);
 	}
 }
 
