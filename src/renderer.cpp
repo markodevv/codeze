@@ -22,6 +22,57 @@ error_callback(int code, const char* description) {
 
 }
 
+static const char* vertex_shader =
+R"(
+#version 330 core
+
+layout (location = 0) in vec4 aPosData;
+layout (location = 1) in vec4 aColor;
+layout (location = 2) in int aTexIndex;
+
+out vec2 vTexCoords;
+flat out int vTexIndex;
+out vec4 vColor;
+
+uniform mat4 uProjection;
+
+void main() {
+	gl_Position = uProjection * vec4(aPosData.xy, 0.0, 1.0);
+	vTexCoords = aPosData.zw;
+	vTexIndex = aTexIndex;
+	vColor = aColor;
+}
+)";
+
+static const char* fragment_shader =
+R"(
+#version 330 core
+
+out vec4 color;
+
+in vec2 vTexCoords;
+flat in int vTexIndex;
+in vec4 vColor;
+
+uniform sampler2D uTextures[16];
+
+void main() {
+	color = vColor;
+	if (vTexIndex == 0) {
+		color *= texture(uTextures[0], vTexCoords);
+	}
+	else if (vTexIndex == 1) {
+		color *= texture(uTextures[1], vTexCoords);
+	}
+	else if (vTexIndex == 2) {
+		color *= vec4(1.0, 1.0, 1.0, texture(uTextures[2], vTexCoords).r);
+	}
+	else if (vTexIndex == 3) {
+		color *= texture(uTextures[3], vTexCoords);
+	}
+}
+)";
+
 
 GLFWwindow*
 renderer_create_window() {
@@ -127,14 +178,7 @@ renderer_initialize(f32 width, f32 height) {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	File vertexFile = file_open("src/vertex_shader.txt");
-	File fragmentFile = file_open("src/fragment_shader.txt");
-
-    if (!(vertexFile.buffer && fragmentFile.buffer))
-    {
-        ASSERT(false);
-    }
-	g_Renderer.program = shader_create(vertexFile.buffer, fragmentFile.buffer);
+	g_Renderer.program = shader_create(vertex_shader, fragment_shader);
 	
 	glUseProgram(g_Renderer.program);
 

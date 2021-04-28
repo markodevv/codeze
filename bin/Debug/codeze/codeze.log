@@ -1,177 +1,43 @@
-﻿  bind.cpp
+﻿  renderer.cpp
 C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
 C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
 C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-  buffer.cpp
-C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
-C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
-C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-  cmd_mode.cpp
-C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
-C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
-C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-  command.cpp
-C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
-C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
-C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-  complete.cpp
-C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
-C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
-C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-  config.cpp
-C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
-C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
-C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-C:\work\temp\codeze\src\config.cpp(124,13): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  cursor.cpp
-C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
-C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
-C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-C:\work\temp\codeze\src\cursor.cpp(13,25): warning C4267: 'initializing': conversion from 'size_t' to 'i32', possible loss of data
-C:\work\temp\codeze\src\cursor.cpp(35,23): warning C4244: '=': conversion from 'i32' to 'f32', possible loss of data
-C:\work\temp\codeze\src\cursor.cpp(36,26): warning C4244: '=': conversion from 'i32' to 'f32', possible loss of data
-C:\work\temp\codeze\src\cursor.cpp(127,18): warning C4018: '>=': signed/unsigned mismatch
-  editor.cpp
-C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
-C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
-C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-C:\work\temp\codeze\src\editor.cpp(53,32): warning C4244: 'argument': conversion from 'i32' to 'f32', possible loss of data
-C:\work\temp\codeze\src\editor.cpp(53,22): warning C4244: 'argument': conversion from 'i32' to 'f32', possible loss of data
-C:\work\temp\codeze\src\editor.cpp(100,49): warning C4244: 'argument': conversion from 'int' to 'f32', possible loss of data
-C:\work\temp\codeze\src\editor.cpp(100,36): warning C4244: 'argument': conversion from 'int' to 'f32', possible loss of data
-C:\work\temp\codeze\src\editor.cpp(117,3): warning C4474: 'sprintf' : too many arguments passed for format string
-C:\work\temp\codeze\src\editor.cpp(117,3): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-C:\work\temp\codeze\src\editor.cpp(117,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(119,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(120,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(121,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(122,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(123,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(124,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(125,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(126,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(127,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(129,4): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(130,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(131,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(132,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(133,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(134,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\editor.cpp(137,3): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  fileio.cpp
-C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
-C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
-C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
-C:\work\temp\codeze\third_party\glfw\include\GLFW\glfw3.h(123): message : see previous definition of 'APIENTRY'
-C:\work\temp\codeze\src\fileio.cpp(51,12): warning C4996: 'chdir': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _chdir. See online help for details.
-C:\work\temp\codeze\src\fileio.cpp(59,8): warning C4996: 'getcwd': The POSIX name for this item is deprecated. Instead, use the ISO C and C++ conformant name: _getcwd. See online help for details.
-C:\work\temp\codeze\src\fileio.cpp(117,13): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\fileio.cpp(177,13): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  keymap.cpp
-C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
-C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
-C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-  my_string.cpp
-C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
-C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
-C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-C:\work\temp\codeze\src\my_string.cpp(245,22): warning C4267: 'initializing': conversion from 'size_t' to 'i32', possible loss of data
-C:\work\temp\codeze\src\my_string.cpp(306,3): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\my_string.cpp(306,3): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-  nav_mode.cpp
-C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
-C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
-C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-  normal_mode.cpp
-C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
-C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
-C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-  renderer.cpp
-C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
-C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
-C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-C:\work\temp\codeze\src\renderer.cpp(57,3): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\renderer.cpp(57,3): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-C:\work\temp\codeze\src\renderer.cpp(68,3): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\renderer.cpp(68,3): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-C:\work\temp\codeze\src\renderer.cpp(76,3): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\renderer.cpp(76,3): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-C:\work\temp\codeze\src\renderer.cpp(79,2): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\renderer.cpp(79,2): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-C:\work\temp\codeze\src\renderer.cpp(198,22): warning C4018: '>': signed/unsigned mismatch
-C:\work\temp\codeze\src\renderer.cpp(201,23): warning C4244: '=': conversion from 'i32' to 'f32', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(202,23): warning C4244: '=': conversion from 'i32' to 'f32', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(229,52): warning C4244: '=': conversion from 'FT_Pos' to 'f32', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(230,52): warning C4244: '=': conversion from 'FT_Pos' to 'f32', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(232,45): warning C4244: '=': conversion from 'unsigned int' to 'f32', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(233,46): warning C4244: '=': conversion from 'unsigned int' to 'f32', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(235,40): warning C4244: '=': conversion from 'FT_Int' to 'f32', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(236,40): warning C4244: '=': conversion from 'FT_Int' to 'f32', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(256,37): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
-C:\work\temp\codeze\src\renderer.cpp(388,29): warning C4244: '=': conversion from 'i32' to 'float', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(389,29): warning C4244: '=': conversion from 'i32' to 'float', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(397,70): warning C4267: '=': conversion from 'size_t' to 'i32', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(399,51): warning C4267: '=': conversion from 'size_t' to 'i32', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(423,31): warning C4244: '=': conversion from 'i32' to 'float', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(469,29): warning C4244: '=': conversion from 'sizet' to 'float', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(495,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\renderer.cpp(496,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\renderer.cpp(497,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\renderer.cpp(498,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\renderer.cpp(499,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\renderer.cpp(500,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\renderer.cpp(501,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\renderer.cpp(502,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\work\temp\codeze\src\renderer.cpp(540,39): warning C4244: '=': conversion from '__int64' to 'i32', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(541,84): warning C4267: '=': conversion from 'size_t' to 'i32', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(557,30): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(558,30): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(559,26): warning C4244: '=': conversion from 'f32' to 'i32', possible loss of data
-C:\work\temp\codeze\src\renderer.cpp(560,26): warning C4244: '=': conversion from 'f32' to 'i32', possible loss of data
-  tokenizer.cpp
-C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
-C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
-C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-  window.cpp
-C:\work\temp\codeze\src\container.h(24,2): warning C4099: 'Array': type name first seen using 'class' now seen using 'struct'
-C:\work\temp\codeze\src\my_string.h(42): message : see declaration of 'Array'
-C:\work\temp\codeze\src\container.h(219,9): warning C4101: 'c': unreferenced local variable
-C:\work\temp\codeze\src\window.cpp(57,38): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
-C:\work\temp\codeze\src\window.cpp(58,38): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
-C:\work\temp\codeze\src\window.cpp(71,38): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
-C:\work\temp\codeze\src\window.cpp(72,62): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
-C:\work\temp\codeze\src\window.cpp(85,38): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
-C:\work\temp\codeze\src\window.cpp(86,38): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
-C:\work\temp\codeze\src\window.cpp(99,62): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
-C:\work\temp\codeze\src\window.cpp(100,38): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
-C:\work\temp\codeze\src\window.cpp(476,3): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\window.cpp(476,3): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-C:\work\temp\codeze\src\window.cpp(549,3): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\window.cpp(549,3): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-C:\work\temp\codeze\src\window.cpp(603,2): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\window.cpp(603,2): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-C:\work\temp\codeze\src\window.cpp(641,3): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\window.cpp(641,3): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-C:\work\temp\codeze\src\window.cpp(696,2): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\window.cpp(696,2): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-C:\work\temp\codeze\src\window.cpp(737,2): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\window.cpp(737,2): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-C:\work\temp\codeze\src\window.cpp(739,2): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\window.cpp(739,2): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-C:\work\temp\codeze\src\window.cpp(740,2): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\window.cpp(740,2): message : placeholders and their parameters expect 1 variadic arguments, but 2 were provided
-C:\work\temp\codeze\src\window.cpp(742,2): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'Array<Node>'
-C:\work\temp\codeze\src\window.cpp(745,2): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\window.cpp(745,2): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-C:\work\temp\codeze\src\window.cpp(751,4): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\window.cpp(751,4): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-C:\work\temp\codeze\src\window.cpp(752,4): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\window.cpp(752,4): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-C:\work\temp\codeze\src\window.cpp(757,4): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\window.cpp(757,4): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-C:\work\temp\codeze\src\window.cpp(759,4): warning C4474: 'printf' : too many arguments passed for format string
-C:\work\temp\codeze\src\window.cpp(759,4): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
-  Generating Code...
-C:\work\temp\codeze\src\bind.cpp(33): warning C4715: 'get_mod_from_string': not all control paths return a value
+C:\work\temp\codeze\src\renderer.cpp(108,3): warning C4474: 'printf' : too many arguments passed for format string
+C:\work\temp\codeze\src\renderer.cpp(108,3): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
+C:\work\temp\codeze\src\renderer.cpp(119,3): warning C4474: 'printf' : too many arguments passed for format string
+C:\work\temp\codeze\src\renderer.cpp(119,3): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
+C:\work\temp\codeze\src\renderer.cpp(127,3): warning C4474: 'printf' : too many arguments passed for format string
+C:\work\temp\codeze\src\renderer.cpp(127,3): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
+C:\work\temp\codeze\src\renderer.cpp(130,2): warning C4474: 'printf' : too many arguments passed for format string
+C:\work\temp\codeze\src\renderer.cpp(130,2): message : placeholders and their parameters expect 0 variadic arguments, but 1 were provided
+C:\work\temp\codeze\src\renderer.cpp(242,22): warning C4018: '>': signed/unsigned mismatch
+C:\work\temp\codeze\src\renderer.cpp(245,23): warning C4244: '=': conversion from 'i32' to 'f32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(246,23): warning C4244: '=': conversion from 'i32' to 'f32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(273,52): warning C4244: '=': conversion from 'FT_Pos' to 'f32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(274,52): warning C4244: '=': conversion from 'FT_Pos' to 'f32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(276,45): warning C4244: '=': conversion from 'unsigned int' to 'f32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(277,46): warning C4244: '=': conversion from 'unsigned int' to 'f32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(279,40): warning C4244: '=': conversion from 'FT_Int' to 'f32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(280,40): warning C4244: '=': conversion from 'FT_Int' to 'f32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(300,37): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+C:\work\temp\codeze\src\renderer.cpp(432,29): warning C4244: '=': conversion from 'i32' to 'float', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(433,29): warning C4244: '=': conversion from 'i32' to 'float', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(441,70): warning C4267: '=': conversion from 'size_t' to 'i32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(443,51): warning C4267: '=': conversion from 'size_t' to 'i32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(467,31): warning C4244: '=': conversion from 'i32' to 'float', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(513,29): warning C4244: '=': conversion from 'sizet' to 'float', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(539,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\renderer.cpp(540,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\renderer.cpp(541,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\renderer.cpp(542,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\renderer.cpp(543,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\renderer.cpp(544,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\renderer.cpp(545,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\renderer.cpp(546,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\work\temp\codeze\src\renderer.cpp(584,39): warning C4244: '=': conversion from '__int64' to 'i32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(585,84): warning C4267: '=': conversion from 'size_t' to 'i32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(601,30): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(602,30): warning C4244: '=': conversion from 'float' to 'i32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(603,26): warning C4244: '=': conversion from 'f32' to 'i32', possible loss of data
+C:\work\temp\codeze\src\renderer.cpp(604,26): warning C4244: '=': conversion from 'f32' to 'i32', possible loss of data
   codeze.vcxproj -> C:\work\temp\codeze\bin\codeze.exe
